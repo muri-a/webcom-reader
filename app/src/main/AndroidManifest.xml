@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.halftough.webcomreader">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".activities.MyComicListActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.AddWebcomActivity"
+            android:label="@string/title_activity_add_webcom"
+            android:parentActivityName=".activities.MyComicListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.halftough.webcomreader.activities.MyComicListActivity" />
+        </activity>
+        <activity
+            android:name=".activities.WebcomInfoActivity"
+            android:label="@string/title_activity_webcom_info"
+            android:parentActivityName=".activities.AddWebcomActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.halftough.webcomreader.activities.AddWebcomActivity" />
+        </activity>
+    </application>
+
+</manifest>

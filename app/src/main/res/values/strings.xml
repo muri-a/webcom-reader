@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">WebComReader</string>
+    <string name="title_activity_available_comic_list">AvailableComicListActivity</string>
+    <string name="title_activity_add_webcom">AddWebcomActivity</string>
+    <string name="title_activity_webcom_info">WebcomInfoActivity</string>
+    <string name="webcom_info_format">Format:</string>
+    <string name="webcom_info_pages_label">Pages:</string>
+    <string name="webcom_info_chapters_label">Chapters:</string>
+    <string name="webcom_info_pages">pages</string>
+    <string name="webcom_info_chapters">chapters</string>
+</resources>
