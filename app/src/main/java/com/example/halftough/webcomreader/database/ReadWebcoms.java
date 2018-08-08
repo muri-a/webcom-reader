@@ -11,6 +11,10 @@ public class ReadWebcoms {
     @NonNull
     private String wid;
 
+    public ReadWebcoms(String wid){
+        this.wid = wid;
+    }
+
     public String getWid() {
         return wid;
     }

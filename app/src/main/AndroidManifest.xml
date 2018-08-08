@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MyComicListActivity">
+        <activity android:name=".activities.MyWebcoms.MyWebcomsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,11 +19,11 @@
         <activity
             android:name=".activities.AddWebcomActivity"
             android:label="@string/title_activity_add_webcom"
-            android:parentActivityName=".activities.MyComicListActivity"
+            android:parentActivityName=".activities.MyWebcoms.MyWebcomsActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.halftough.webcomreader.activities.MyComicListActivity" />
+                android:value="com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity" />
         </activity>
         <activity
             android:name=".activities.WebcomInfoActivity"

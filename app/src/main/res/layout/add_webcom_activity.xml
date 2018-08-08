@@ -20,6 +20,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_add_webcom" />
+    <include layout="@layout/add_webcoms_content" />
 
 </android.support.design.widget.CoordinatorLayout>

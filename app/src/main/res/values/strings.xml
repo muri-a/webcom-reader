@@ -8,4 +8,5 @@
     <string name="webcom_info_chapters_label">Chapters:</string>
     <string name="webcom_info_pages">pages</string>
     <string name="webcom_info_chapters">chapters</string>
+    <string name="webcom_info_add">Add</string>
 </resources>
