@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.halftough.webcomreader">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -33,6 +35,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.halftough.webcomreader.activities.AddWebcomActivity" />
+        </activity>
+        <activity
+            android:name=".activities.ChapterList.ChapterListActivity"
+            android:label="@string/title_activity_page_list"
+            android:parentActivityName=".activities.MyWebcoms.MyWebcomsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity" />
         </activity>
     </application>
 

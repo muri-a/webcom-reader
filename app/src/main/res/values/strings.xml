@@ -9,4 +9,5 @@
     <string name="webcom_info_pages">pages</string>
     <string name="webcom_info_chapters">chapters</string>
     <string name="webcom_info_add">Add</string>
+    <string name="title_activity_page_list">PageListActivity</string>
 </resources>

@@ -86,6 +86,7 @@
                             android:id="@+id/webcomInfoPagesLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginRight="6dp"
                             android:layout_weight="0"
                             android:text="TextView"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1"

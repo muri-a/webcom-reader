@@ -1,6 +1,11 @@
 package com.example.halftough.webcomreader.webcoms;
 
+import android.arch.lifecycle.LiveData;
+
 import com.example.halftough.webcomreader.R;
+import com.example.halftough.webcomreader.database.Chapter;
+
+import java.util.List;
 
 public class DilbertWebcom extends Webcom {
     public DilbertWebcom(){
@@ -19,7 +24,22 @@ public class DilbertWebcom extends Webcom {
     }
 
     @Override
-    public int getPageNumber() {
+    public int getPageCount() {
         return 1;
+    }
+
+    @Override
+    public String[] getTags() {
+        String[] tags =  {"funny"};
+        return tags;
+    }
+
+    @Override
+    public LiveData<List<Chapter>> getChapters() {
+        return null;
+    }
+    @Override
+    public String[] getLanguages() {
+        return new String[]{"en"};
     }
 }

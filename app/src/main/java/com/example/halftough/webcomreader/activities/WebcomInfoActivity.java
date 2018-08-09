@@ -15,6 +15,7 @@ import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 //TODO hide/change add button if already on the list
+//TODO tags
 
 public class WebcomInfoActivity extends AppCompatActivity {
     public static String WEBCOM_INFO_ID;
@@ -63,12 +64,12 @@ public class WebcomInfoActivity extends AppCompatActivity {
                 pagesLabelTextView.setText(getResources().getText(R.string.webcom_info_chapters_label));
                 break;
         }
-        pagesTextView.setText(Integer.toString(webcom.getPageNumber()));
+        pagesTextView.setText(Integer.toString(webcom.getPageCount()));
     }
 
     public void addWebcom(View view){
         Intent result = new Intent();
-        result.putExtra(MyWebcomsActivity.ADD_WEBCOM_ID, webcom.getId());
+        result.putExtra(MyWebcomsActivity.WEBCOM_ID, webcom.getId());
         setResult(AddWebcomActivity.ADD_WEBCOM_RESULT, result);
         finish();
     }

@@ -22,7 +22,7 @@ import java.util.List;
 public class AddWebcomActivity extends AppCompatActivity {
     public static int ADD_WEBCOM_RESULT = 1;
 
-    RecyclerView addWebcomList;
+    RecyclerView addWebcomRecyclerView;
     List<Webcom> list;
 
     //TODO hide added
@@ -35,7 +35,7 @@ public class AddWebcomActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        addWebcomList = (RecyclerView)findViewById(R.id.add_webcom_list);
+        addWebcomRecyclerView = (RecyclerView)findViewById(R.id.add_webcom_list);
         fillAvailableComicList();
     }
 
@@ -47,10 +47,10 @@ public class AddWebcomActivity extends AppCompatActivity {
         //list.add(new Webcom(3,"Nemi"));
         //list.add(new Webcom(4,"Pepper & Carrot"));
         AddWebcomAdapter adapter = new AddWebcomAdapter(list);
-        addWebcomList.setAdapter(adapter);
-        addWebcomList.setLayoutManager(new LinearLayoutManager(this));
+        addWebcomRecyclerView.setAdapter(adapter);
+        addWebcomRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        addWebcomList.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+        addWebcomRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 showInfoActivity(list.get(position));
@@ -70,10 +70,10 @@ public class AddWebcomActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode==ADD_WEBCOM_RESULT && resultCode!=RESULT_CANCELED){
-            if(data.hasExtra(MyWebcomsActivity.ADD_WEBCOM_ID)) {
-                String wid = data.getStringExtra(MyWebcomsActivity.ADD_WEBCOM_ID);
+            if(data.hasExtra(MyWebcomsActivity.WEBCOM_ID)) {
+                String wid = data.getStringExtra(MyWebcomsActivity.WEBCOM_ID);
                 Intent result = new Intent();
-                result.putExtra(MyWebcomsActivity.ADD_WEBCOM_ID, wid);
+                result.putExtra(MyWebcomsActivity.WEBCOM_ID, wid);
                 setResult(MyWebcomsActivity.ADD_WEBCOM_RESULT, result);
                 finish();
             }

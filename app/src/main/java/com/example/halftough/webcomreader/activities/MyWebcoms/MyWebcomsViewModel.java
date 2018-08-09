@@ -3,7 +3,6 @@ package com.example.halftough.webcomreader.activities.MyWebcoms;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
 
 import com.example.halftough.webcomreader.database.ReadWebcoms;
 import com.example.halftough.webcomreader.database.ReadWebcomsRepository;
