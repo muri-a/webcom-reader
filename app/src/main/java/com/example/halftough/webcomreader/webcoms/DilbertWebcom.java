@@ -1,17 +1,29 @@
 package com.example.halftough.webcomreader.webcoms;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.database.Chapter;
 
 import java.util.List;
 
+import retrofit2.Call;
+
 public class DilbertWebcom extends Webcom {
+    private MutableLiveData<Integer> chapterCount;
     public DilbertWebcom(){
-        id = "dilbert";
-        title = "Dilbert";
+        if(chapterCount==null){
+            chapterCount = new MutableLiveData<>();
+            chapterCount.setValue(new Integer(0));
+        }
     }
+    @Override
+    public String getId(){ return "dilbert"; }
+    @Override
+    public String getTitle(){ return "Dilbert"; }
+    @Override
+    public String getDescription(){ return ""; }
 
     @Override
     public int getIcon() {
@@ -24,8 +36,8 @@ public class DilbertWebcom extends Webcom {
     }
 
     @Override
-    public int getPageCount() {
-        return 1;
+    public MutableLiveData<Integer> getChapterCount() {
+        return chapterCount;
     }
 
     @Override
@@ -35,9 +47,15 @@ public class DilbertWebcom extends Webcom {
     }
 
     @Override
-    public LiveData<List<Chapter>> getChapters() {
+    public Call<ComicPage> getPageCall(String number) {
         return null;
     }
+
+    @Override
+    public List<String> getChapterList() {
+        return null;
+    }
+
     @Override
     public String[] getLanguages() {
         return new String[]{"en"};

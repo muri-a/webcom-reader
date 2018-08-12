@@ -7,12 +7,14 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import java.util.List;
+import java.util.Set;
 
 @Dao
-public interface ReadWebcomsDAO {
-    @Query("SELECT * FROM readwebcoms")
-    LiveData<List<ReadWebcoms>> getAll();
+public interface ChaptersDAO {
+    @Query("SELECT * FROM chapters WHERE wid=:wid ORDER BY CAST(chapter AS REAL)")
+    LiveData<List<Chapter>> getChapters(String wid);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(ReadWebcoms readWebcoms);
+    void insert(Chapter chapter);
+
 }

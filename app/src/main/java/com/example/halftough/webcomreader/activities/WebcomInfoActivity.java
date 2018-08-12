@@ -1,7 +1,9 @@
 package com.example.halftough.webcomreader.activities;
 
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -64,7 +66,12 @@ public class WebcomInfoActivity extends AppCompatActivity {
                 pagesLabelTextView.setText(getResources().getText(R.string.webcom_info_chapters_label));
                 break;
         }
-        pagesTextView.setText(Integer.toString(webcom.getPageCount()));
+        webcom.getChapterCount().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(@Nullable Integer integer) {
+                pagesTextView.setText(integer.toString());
+            }
+        });
     }
 
     public void addWebcom(View view){

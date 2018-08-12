@@ -5,10 +5,11 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-@Database(entities = {ReadWebcoms.class}, version = 1)
+@Database(entities = {ReadWebcoms.class, Chapter.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract ReadWebcomsDAO readWebcomsDAO();
+    public abstract ChaptersDAO chaptersDAO();
 
     private static AppDatabase INSTANCE;
 
