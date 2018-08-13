@@ -45,6 +45,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity" />
         </activity>
+        <activity
+            android:name=".activities.ReadChapterActivity"
+            android:label="@string/title_activity_read_webcom"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

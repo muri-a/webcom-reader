@@ -1,4 +1,4 @@
-package com.example.halftough.webcomreader;
+package com.example.halftough.webcomreader.activities;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 import java.util.List;

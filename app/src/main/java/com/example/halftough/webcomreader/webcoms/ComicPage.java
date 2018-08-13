@@ -7,6 +7,8 @@ public class ComicPage {
     String num;
     @SerializedName("title")
     String title;
+    @SerializedName("img")
+    String img;
 
     public ComicPage(String num, String title){
         this.num = num;
@@ -16,7 +18,6 @@ public class ComicPage {
     public String getNum() {
         return num;
     }
-
     public void setNum(String num) {
         this.num = num;
     }
@@ -24,8 +25,10 @@ public class ComicPage {
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public String getImg() { return img; }
+    public void setImg(String img) { this.img = img; }
 }
