@@ -8,5 +8,5 @@ Lis of working webcoms:
 
 list of planned webcoms:
 
-1 .[Dilbert](http://dilbert.com/)
+1. [Dilbert](http://dilbert.com/)
 2. [Pepper & Carrot](https://www.peppercarrot.com/)
