@@ -43,8 +43,7 @@ public class AddWebcomActivity extends AppCompatActivity {
 
         list.add(new XkcdWebcom());
         list.add(new DilbertWebcom());
-        //list.add(new Webcom(3,"Nemi"));
-        //list.add(new Webcom(4,"Pepper & Carrot"));
+        //list.add(new Webcom(3,"Pepper & Carrot"));
         AddWebcomAdapter adapter = new AddWebcomAdapter(list);
         addWebcomRecyclerView.setAdapter(adapter);
         addWebcomRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -73,7 +72,7 @@ public class AddWebcomActivity extends AppCompatActivity {
                 String wid = data.getStringExtra(MyWebcomsActivity.WEBCOM_ID);
                 Intent result = new Intent();
                 result.putExtra(MyWebcomsActivity.WEBCOM_ID, wid);
-                setResult(MyWebcomsActivity.ADD_WEBCOM_RESULT, result);
+                setResult(RESULT_OK, result);
                 finish();
             }
         }

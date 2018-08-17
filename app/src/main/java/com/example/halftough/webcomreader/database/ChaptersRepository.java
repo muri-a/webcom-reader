@@ -6,6 +6,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.OneByOneDownloader;
@@ -14,6 +15,8 @@ import com.example.halftough.webcomreader.webcoms.ComicPage;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -26,7 +29,6 @@ import retrofit2.Response;
 public class ChaptersRepository {
     private ChaptersDAO chaptersDAO;
     private MutableLiveData<List<Chapter>> chapters;
-    private Semaphore chaptersSemaphore;
     private LiveData<Integer> chapterCount;
     private Webcom webcom;
 
@@ -34,7 +36,6 @@ public class ChaptersRepository {
         AppDatabase db = AppDatabase.getDatabase(application);
         chaptersDAO = db.chaptersDAO();
         chapters = new MutableLiveData<>();
-        chaptersSemaphore = new Semaphore(1);
         try {
             webcom = UserRepository.getWebcomInstance(wid);
 
@@ -71,74 +72,62 @@ public class ChaptersRepository {
     }
 
     private void dataLoaded(){
-        final List<Chapter> chapterList = chapters.getValue();
         Integer chapterInt = chapterCount.getValue();
-        if(chapterList == null || chapterInt == null )
+        if(chapters.getValue() == null || chapterInt == null )
             return;
-        // see if chapter count matches what we have in database
-        // if not, download data and put it in the database
-        if(chapterList.size() < chapterInt){
-            int size = chapterList.size();
-            Set<String> stringChapters = new TreeSet<>();
-            for(Chapter chapter : chapterList){
-                stringChapters.add(chapter.getChapter());
-            }
 
-            List<Call<ComicPage>> calls = new ArrayList<>();
-            List<String> allChapters = webcom.getChapterList();
-            for(String chap : allChapters){
-                if( !stringChapters.contains(chap)){
-                    calls.add( webcom.getPageCall(chap) );
+        List<String> allChapters = webcom.getChapterList();
+        List<Chapter> dbChapters = chapters.getValue();
+
+        final List<Chapter> chapterList = new ArrayList<>();
+        List<Call<ComicPage>> calls = new ArrayList<>();
+        List<Chapter> extra = new ArrayList<>(); // References to chapters that will be downloaded
+
+        Iterator<String> allIt = allChapters.iterator();
+        Iterator<Chapter> dbIt = dbChapters.iterator();
+
+        // TODO Zdecydować co jeśli wpis istnieje w bazie, ale nie danych ze strony. Na razie jest po prostu dodawany do listy.
+        String a = null;
+        Chapter b = null;
+        if(allIt.hasNext())
+            a = allIt.next();
+        if(dbIt.hasNext())
+            b = dbIt.next();
+        // TODO do while instead (?)
+        while(allIt.hasNext() || dbIt.hasNext()){
+            if(b==null || (a!=null && Float.parseFloat(a) < Float.parseFloat(b.getChapter())) ){
+                Chapter chapter = new Chapter(webcom.getId(), a);
+                chapterList.add(chapter);
+                calls.add(webcom.getPageCall(a));
+                extra.add(chapter);
+                a = allIt.hasNext()?allIt.next():null;
+            }
+            else if(a==null || Float.parseFloat(a) > Float.parseFloat(b.getChapter())){
+                chapterList.add(b);
+                b = dbIt.hasNext()?dbIt.next():null;
+            }
+            else{
+                chapterList.add(b);
+                a = allIt.hasNext()?allIt.next():null;
+                b = dbIt.hasNext()?dbIt.next():null;
+            }
+        }
+        chapters.postValue(chapterList);
+
+        new OneByOneDownloader<ComicPage, Chapter>(calls, extra, 5){
+            @Override
+            public void onResponse(Call<ComicPage> call, Response<ComicPage> response, Chapter extra) {
+                if(response.body() != null) {
+                    //extra is reference to chapter in the list we use, so we can update it from here.
+                    extra.setTitle(response.body().getTitle());
+                    insertChapter(extra);
+                    chapters.postValue(chapterList);
                 }
             }
-            new OneByOneDownloader<ComicPage>(calls, 5){
-                @Override
-                public void onMyResponse(Call<ComicPage> call, Response<ComicPage> response) {
-                    if(response.body() != null) {
-                        Chapter chapter = new Chapter(webcom.getId(), response.body().getNum());
-                        chapter.setTitle(response.body().getTitle());
-                        insertChapter(chapter);
-                        chaptersSemaphore.acquireUninterruptibly();
-                        chapterList.add(findIndexFor(chapter.getChapter()), chapter);
-                        chapters.postValue(chapterList);
-                        chaptersSemaphore.release();
-                    }
-                }
-            }.download();
-
-        }
+        }.download();
     }
 
-    private int findIndexFor(String chapter) {
-        List<Chapter> chapterList = chapters.getValue();
-        Float chap = Float.parseFloat(chapter);
-        int index = chapterList.size()/2;
-        int low = 0;
-        int top = chapterList.size();
-        if( top == 0 ){
-            return 0;
-        }
-        if( chap > Float.parseFloat( chapterList.get(top-1).getChapter() )){
-            return top;
-        }
-
-        while(true){
-            float onIndex = Float.parseFloat( chapterList.get(index-1).getChapter() );
-            if( low == index){
-                return index;
-            }
-            else if( chap < onIndex ){
-                top = index;
-                index = (low+top)/2;
-            }
-            else if( chap > onIndex){
-                low = index;
-                index = (low+top)/2;
-            }
-        }
-    }
-
-    public LiveData<List<Chapter>> getChapters(){
+    public MutableLiveData<List<Chapter>> getChapters(){
         return chapters;
     }
 
@@ -146,10 +135,48 @@ public class ChaptersRepository {
         new insertAsyncTask(chaptersDAO).execute(chapter);
     }
 
+    public void update() {
+        final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(webcom.getId());
+        dbChapters.observeForever(new Observer<List<Chapter>>() {
+            @Override
+            public void onChanged(@Nullable List<Chapter> chaps) {
+                dbChapters.removeObserver(this);
+                Iterator<Chapter> chIt = chaps.iterator();
+                Iterator<Chapter> dbIt = dbChapters.getValue().iterator();
+                List<Chapter> toAdd = new ArrayList<>();
+                Chapter a = chIt.hasNext()?chIt.next():null;
+                Chapter b = dbIt.hasNext()?dbIt.next():null;
+                do{
+                    if(a.equals(b)){
+                        if(a.getStatus() != b.getStatus()){
+                            a.setStatus(b.getStatus());
+                        }
+                        a = chIt.hasNext()?chIt.next():null;
+                        b = dbIt.hasNext()?dbIt.next():null;
+                    }
+                    else if( a.compareTo(b) < 0 ){
+                        a = chIt.hasNext()?chIt.next():null;
+                    }
+                    else{
+                        // Because this should be rare, we don't care for speed
+                        toAdd.add(b);
+                        b = dbIt.hasNext()?dbIt.next():null;
+                    }
+                }while(chIt.hasNext() || dbIt.hasNext());
+                if(toAdd.size() > 0){
+                    Set<Chapter> set = new TreeSet<>(chaps);
+                    for(Chapter c : toAdd){
+                        set.add(c);
+                    }
+                    chaps = new ArrayList<>(set);
+                }
+                chapters.postValue(chaps);
+            }
+        });
+    }
+
     private static class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
-
         private ChaptersDAO mAsyncTaskDao;
-
         insertAsyncTask(ChaptersDAO dao) {
             mAsyncTaskDao = dao;
         }
@@ -157,6 +184,29 @@ public class ChaptersRepository {
         @Override
         protected Void doInBackground(final Chapter... params) {
             mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+
+    public void markRead(Chapter chapter){
+        chapter.setStatus(Chapter.Status.READ);
+        new updateAsyncTask(chaptersDAO).execute(chapter);
+    }
+
+    public void markNotRead(Chapter chapter){
+        chapter.setStatus(Chapter.Status.UNREAD);
+        new updateAsyncTask(chaptersDAO).execute(chapter);
+    }
+
+    private static class updateAsyncTask extends AsyncTask<Chapter, Void, Void>{
+        private ChaptersDAO mAsyncTaskDao;
+        updateAsyncTask(ChaptersDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Chapter... chapters) {
+            mAsyncTaskDao.update(chapters[0]);
             return null;
         }
     }

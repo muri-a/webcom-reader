@@ -3,6 +3,7 @@ package com.example.halftough.webcomreader.activities.ChapterList;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class ChapterListViewModel extends AndroidViewModel {
     private ChaptersRepository chaptersRepository;
-    private LiveData<List<Chapter>> chapters;
+    private MutableLiveData<List<Chapter>> chapters;
     private Application application;
     private String wid;
 
@@ -28,5 +29,9 @@ public class ChapterListViewModel extends AndroidViewModel {
 
     public LiveData<List<Chapter>> getChapters() {
         return chapters;
+    }
+
+    public void update() {
+        chaptersRepository.update();
     }
 }

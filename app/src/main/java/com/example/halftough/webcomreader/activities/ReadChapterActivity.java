@@ -2,11 +2,8 @@ package com.example.halftough.webcomreader.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.example.halftough.webcomreader.NoWebcomClassException;
@@ -39,20 +36,18 @@ public class ReadChapterActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        readChapterRepository = new ReadChapterRepository(this, webcom);
+        readChapterRepository = new ReadChapterRepository(getApplication(), webcom, number);
         readChapterImage = (ImageView)findViewById(R.id.readChapterImage);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, webcom.getTitle()+": "+number, Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         readChapterRepository.getImageFor(number, readChapterImage);
 
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent result = new Intent();
+        result.putExtra(ChapterListActivity.UPDATE_LIST, readChapterRepository.getUpdateMarker());
+        setResult(RESULT_OK, result);
+        super.onBackPressed();
+    }
 }

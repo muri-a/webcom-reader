@@ -11,7 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.RecyclerItemClickListener;
@@ -23,7 +25,10 @@ import java.util.List;
 
 public class ChapterListActivity extends AppCompatActivity {
     public static String CHAPTER_NUMBER = "CHAPTER_NUMBER";
+    public static int READ_CHAPTER_RESULT = 3;
+    public static String UPDATE_LIST = "UPDATE_LIST";
     RecyclerView chapterListRecyclerView;
+    ChapterListAdapter adapter;
     ChapterListViewModel viewModel;
     String wid;
 
@@ -49,7 +54,7 @@ public class ChapterListActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         chapterListRecyclerView = (RecyclerView)findViewById(R.id.chapterListRecyclerView);
-        final ChapterListAdapter adapter = new ChapterListAdapter(this);
+        adapter = new ChapterListAdapter(this);
         chapterListRecyclerView.setAdapter(adapter);
         chapterListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -65,18 +70,30 @@ public class ChapterListActivity extends AppCompatActivity {
         chapterListRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                if(position==-1)
+                    return;
                 Chapter chapter = viewModel.getChapters().getValue().get(position);
                 readWebcom(chapter);
             }
         }));
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == READ_CHAPTER_RESULT && resultCode!=RESULT_CANCELED){
+            boolean update = data.getBooleanExtra(UPDATE_LIST, false);
+            if(update){
+                viewModel.update();
+            }
+        }
     }
 
     void readWebcom(Chapter chapter){
         Intent intent = new Intent(this, ReadChapterActivity.class);
         intent.putExtra(MyWebcomsActivity.WEBCOM_ID, chapter.getWid());
         intent.putExtra(CHAPTER_NUMBER, chapter.getChapter());
-        startActivity(intent);
+        startActivityForResult(intent, READ_CHAPTER_RESULT);
     }
 
 }

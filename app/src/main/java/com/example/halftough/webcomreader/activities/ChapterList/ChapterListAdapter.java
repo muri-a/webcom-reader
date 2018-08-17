@@ -2,10 +2,12 @@ package com.example.halftough.webcomreader.activities.ChapterList;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.halftough.webcomreader.R;
@@ -27,9 +29,11 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
     }
 
     private final LayoutInflater mInflater;
-    List<Chapter> chapters;
+    private List<Chapter> chapters;
+    private Context context;
 
     public ChapterListAdapter(Context context){
+        this.context = context;
         mInflater = LayoutInflater.from(context);
     }
 
@@ -44,7 +48,15 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if(chapters!=null) {
             Chapter chapter = chapters.get(position);
-            holder.chapterNumber.setText(new Integer(chapter.getChapter()).toString());
+            if(chapter.getStatus() == Chapter.Status.READ){
+                holder.chapterNumber.setTextColor(ContextCompat.getColor(context, R.color.chapterRead));
+                holder.chapterTitle.setTextColor(ContextCompat.getColor(context, R.color.chapterRead));
+            }
+            else{
+                holder.chapterNumber.setTextColor(ContextCompat.getColor(context, R.color.chapterUnread));
+                holder.chapterTitle.setTextColor(ContextCompat.getColor(context, R.color.chapterUnread));
+            }
+            holder.chapterNumber.setText(chapter.getChapter());
             holder.chapterTitle.setText(chapter.getTitle());
         }
     }
