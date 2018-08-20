@@ -34,4 +34,28 @@ public class ChapterListViewModel extends AndroidViewModel {
     public void update() {
         chaptersRepository.update();
     }
+
+    public void markRead(Chapter chapter){
+        chaptersRepository.markRead(chapter);
+    }
+
+    public void markReadTo(Chapter chapter){
+        chaptersRepository.markReadTo(chapter);
+    }
+
+    public void markReadFrom(Chapter chapter){
+        chaptersRepository.markReadFrom(chapter);
+    }
+
+    public void markUnread(Chapter chapter){
+        chaptersRepository.markUnread(chapter);
+    }
+
+    public void markUnreadTo(Chapter chapter){
+        chaptersRepository.markUnreadTo(chapter);
+    }
+
+    public void markUnreadFrom(Chapter chapter){
+        chaptersRepository.markUnreadFrom(chapter);
+    }
 }

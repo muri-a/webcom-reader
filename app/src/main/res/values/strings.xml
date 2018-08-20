@@ -3,12 +3,26 @@
     <string name="title_activity_available_comic_list">AvailableComicListActivity</string>
     <string name="title_activity_add_webcom">AddWebcomActivity</string>
     <string name="title_activity_webcom_info">WebcomInfoActivity</string>
+    <string name="title_activity_page_list">PageListActivity</string>
+    <string name="title_activity_read_webcom">ReadWebcomActivity</string>
+
     <string name="webcom_info_format">Format:</string>
     <string name="webcom_info_pages_label">Pages:</string>
     <string name="webcom_info_chapters_label">Chapters:</string>
     <string name="webcom_info_pages">pages</string>
     <string name="webcom_info_chapters">chapters</string>
     <string name="webcom_info_add">Add</string>
-    <string name="title_activity_page_list">PageListActivity</string>
-    <string name="title_activity_read_webcom">ReadWebcomActivity</string>
+
+    <string name="chapter_item_downloaded">Downloaded</string>
+    <string name="chapter_item_menu_download">Download</string>
+    <string name="chapter_item_menu_remove">Remove</string>
+    <string name="chapter_item_menu_mark_read">Mark sa read</string>
+    <string name="chapter_item_menu_mark_read_this">this</string>
+    <string name="chapter_item_menu_mark_previous_read">this and previous</string>
+    <string name="chapter_item_menu_mark_later_read">this and later</string>
+    <string name="chapter_item_menu_mark_unread">Mark as unread</string>
+    <string name="chapter_item_menu_mark_unread_this">this</string>
+    <string name="chapter_item_menu_mark_previous_unread">this and previous</string>
+    <string name="chapter_item_menu_mark_later_unread">this and later</string>
+
 </resources>

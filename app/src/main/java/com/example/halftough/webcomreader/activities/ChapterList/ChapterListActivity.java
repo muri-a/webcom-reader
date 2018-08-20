@@ -67,15 +67,6 @@ public class ChapterListActivity extends AppCompatActivity {
             }
         });
 
-        chapterListRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                if(position==-1)
-                    return;
-                Chapter chapter = viewModel.getChapters().getValue().get(position);
-                readWebcom(chapter);
-            }
-        }));
     }
 
     @Override
@@ -89,11 +80,14 @@ public class ChapterListActivity extends AppCompatActivity {
         }
     }
 
-    void readWebcom(Chapter chapter){
+    public void readWebcom(Chapter chapter){
         Intent intent = new Intent(this, ReadChapterActivity.class);
         intent.putExtra(MyWebcomsActivity.WEBCOM_ID, chapter.getWid());
         intent.putExtra(CHAPTER_NUMBER, chapter.getChapter());
         startActivityForResult(intent, READ_CHAPTER_RESULT);
     }
 
+    public ChapterListViewModel getViewModel() {
+        return viewModel;
+    }
 }

@@ -21,6 +21,9 @@ public interface ChaptersDAO {
     @Update
     void update(Chapter chapter);
 
+    @Update
+    void update(List<Chapter> chapters);
+
     @Query("SELECT * FROM chapters WHERE wid LIKE :wid AND chapter LIKE :number")
     LiveData<Chapter> getChapter(String wid, String number);
 

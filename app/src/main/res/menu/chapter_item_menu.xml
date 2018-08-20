@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/chapterItemMenuDownload"
+        android:title="@string/chapter_item_menu_download" />
+    <item
+        android:id="@+id/chapterItemMenuRemove"
+        android:title="@string/chapter_item_menu_remove" >
+    </item>
+    <item android:title="@string/chapter_item_menu_mark_read">
+        <menu >
+            <item
+                android:id="@+id/chapterItemMenuMarkRead"
+                android:title="@string/chapter_item_menu_mark_read_this" />
+            <item
+                android:id="@+id/chapterItemMenuMarkPreviousRead"
+                android:title="@string/chapter_item_menu_mark_previous_read" />
+            <item
+                android:id="@+id/chapterItemMenuMarkLaterRead"
+                android:title="@string/chapter_item_menu_mark_later_read" />
+        </menu>
+    </item>
+    <item android:title="@string/chapter_item_menu_mark_unread" >
+        <menu>
+
+            <item
+                android:id="@+id/chapterItemMenuMarkUnread"
+                android:title="@string/chapter_item_menu_mark_unread_this" />
+            <item
+                android:id="@+id/chapterItemMenuMarkPreviousUnread"
+                android:title="@string/chapter_item_menu_mark_previous_unread" />
+            <item
+                android:id="@+id/chapterItemMenuMarkLaterUndear"
+                android:title="@string/chapter_item_menu_mark_later_unread" />
+        </menu>
+    </item>
+</menu>

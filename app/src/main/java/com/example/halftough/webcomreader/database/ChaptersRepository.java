@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
@@ -87,6 +88,7 @@ public class ChaptersRepository {
         Iterator<Chapter> dbIt = dbChapters.iterator();
 
         // TODO Zdecydować co jeśli wpis istnieje w bazie, ale nie danych ze strony. Na razie jest po prostu dodawany do listy.
+        // Jeśli komiks nie jest pobrany, powinna być usuwana z bazy
         String a = null;
         Chapter b = null;
         if(allIt.hasNext())
@@ -193,9 +195,65 @@ public class ChaptersRepository {
         new updateAsyncTask(chaptersDAO).execute(chapter);
     }
 
-    public void markNotRead(Chapter chapter){
+    public void markReadTo(Chapter chapter){
+        Iterator<Chapter> it = chapters.getValue().iterator();
+        List<Chapter> toUpdate = new ArrayList<>();
+        while(it.hasNext()){
+            Chapter c = it.next();
+            if(c.compareTo(chapter) <= 0 && c.getStatus()!= Chapter.Status.READ){
+                c.setStatus(Chapter.Status.READ);
+                toUpdate.add(c);
+            }
+        }
+        if(toUpdate.size()>0)
+            new updateListAsyncTask(chaptersDAO).execute(toUpdate);
+    }
+
+    public void markReadFrom(Chapter chapter){
+        ListIterator<Chapter> it = chapters.getValue().listIterator(chapters.getValue().size());
+        List<Chapter> toUpdate = new ArrayList<>();
+        while(it.hasPrevious()){
+            Chapter c = it.previous();
+            if(c.compareTo(chapter) >= 0 && c.getStatus()!= Chapter.Status.READ){
+                c.setStatus(Chapter.Status.READ);
+                toUpdate.add(c);
+            }
+        }
+        if(toUpdate.size()>0)
+            new updateListAsyncTask(chaptersDAO).execute(toUpdate);
+    }
+
+    public void markUnread(Chapter chapter){
         chapter.setStatus(Chapter.Status.UNREAD);
         new updateAsyncTask(chaptersDAO).execute(chapter);
+    }
+
+    public void markUnreadTo(Chapter chapter){
+        Iterator<Chapter> it = chapters.getValue().iterator();
+        List<Chapter> toUpdate = new ArrayList<>();
+        while(it.hasNext()){
+            Chapter c = it.next();
+            if(c.compareTo(chapter) <= 0 && c.getStatus()!= Chapter.Status.UNREAD){
+                c.setStatus(Chapter.Status.UNREAD);
+                toUpdate.add(c);
+            }
+        }
+        if(toUpdate.size()>0)
+            new updateListAsyncTask(chaptersDAO).execute(toUpdate);
+    }
+
+    public void markUnreadFrom(Chapter chapter){
+        ListIterator<Chapter> it = chapters.getValue().listIterator(chapters.getValue().size());
+        List<Chapter> toUpdate = new ArrayList<>();
+        while(it.hasPrevious()){
+            Chapter c = it.previous();
+            if(c.compareTo(chapter) >= 0 && c.getStatus()!= Chapter.Status.UNREAD){
+                c.setStatus(Chapter.Status.UNREAD);
+                toUpdate.add(c);
+            }
+        }
+        if(toUpdate.size()>0)
+            new updateListAsyncTask(chaptersDAO).execute(toUpdate);
     }
 
     private static class updateAsyncTask extends AsyncTask<Chapter, Void, Void>{
@@ -203,10 +261,19 @@ public class ChaptersRepository {
         updateAsyncTask(ChaptersDAO dao) {
             mAsyncTaskDao = dao;
         }
-
         @Override
         protected Void doInBackground(Chapter... chapters) {
             mAsyncTaskDao.update(chapters[0]);
+            return null;
+        }
+    }
+
+    private static  class updateListAsyncTask extends AsyncTask<List<Chapter>, Void, Void>{
+        private ChaptersDAO mAsyncTaskDao;
+        updateListAsyncTask(ChaptersDAO dao){ mAsyncTaskDao = dao; }
+        @Override
+        protected Void doInBackground(List<Chapter>... lists) {
+            mAsyncTaskDao.update(lists[0]);
             return null;
         }
     }

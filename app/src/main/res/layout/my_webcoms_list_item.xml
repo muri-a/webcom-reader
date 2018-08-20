@@ -12,7 +12,7 @@
         android:layout_weight="1"
         android:gravity="start|center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="@dimen/item_padding">
 
         <ImageView
             android:id="@+id/myWebcomIcon"

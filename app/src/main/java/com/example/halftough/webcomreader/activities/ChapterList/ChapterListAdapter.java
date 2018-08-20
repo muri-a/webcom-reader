@@ -1,13 +1,15 @@
 package com.example.halftough.webcomreader.activities.ChapterList;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.halftough.webcomreader.R;
@@ -18,21 +20,25 @@ import java.util.List;
 public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.ViewHolder>{
 
     public class ViewHolder extends RecyclerView.ViewHolder{
+        public View item;
         public TextView chapterNumber;
         public TextView chapterTitle;
+        public ImageButton menuButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
             chapterNumber = (TextView)itemView.findViewById(R.id.chapterListItemNumber);
             chapterTitle = (TextView)itemView.findViewById(R.id.chapterListItemTitle);
+            menuButton = (ImageButton)itemView.findViewById(R.id.chapterListItemMenuButton);
+            item = itemView;
         }
     }
 
     private final LayoutInflater mInflater;
     private List<Chapter> chapters;
-    private Context context;
+    private ChapterListActivity context;
 
-    public ChapterListAdapter(Context context){
+    public ChapterListAdapter(ChapterListActivity context){
         this.context = context;
         mInflater = LayoutInflater.from(context);
     }
@@ -47,7 +53,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if(chapters!=null) {
-            Chapter chapter = chapters.get(position);
+            final Chapter chapter = chapters.get(position);
             if(chapter.getStatus() == Chapter.Status.READ){
                 holder.chapterNumber.setTextColor(ContextCompat.getColor(context, R.color.chapterRead));
                 holder.chapterTitle.setTextColor(ContextCompat.getColor(context, R.color.chapterRead));
@@ -58,6 +64,52 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
             }
             holder.chapterNumber.setText(chapter.getChapter());
             holder.chapterTitle.setText(chapter.getTitle());
+            holder.menuButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu menu = new PopupMenu(context, v);
+                    MenuInflater menuInflater = menu.getMenuInflater();
+                    menuInflater.inflate(R.menu.chapter_item_menu, menu.getMenu());
+                    menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        Chapter chap = chapter;
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()){
+                                case R.id.chapterItemMenuDownload:
+                                case R.id.chapterItemMenuRemove:
+                                    return false;
+                                case R.id.chapterItemMenuMarkRead:
+                                    context.getViewModel().markRead(chap);
+                                    return true;
+                                case R.id.chapterItemMenuMarkPreviousRead:
+                                    context.getViewModel().markReadTo(chap);
+                                    return true;
+                                case R.id.chapterItemMenuMarkLaterRead:
+                                    context.getViewModel().markReadFrom(chap);
+                                    return true;
+                                case R.id.chapterItemMenuMarkUnread:
+                                    context.getViewModel().markUnread(chap);
+                                    return true;
+                                case R.id.chapterItemMenuMarkPreviousUnread:
+                                    context.getViewModel().markUnreadTo(chap);
+                                    return true;
+                                case R.id.chapterItemMenuMarkLaterUndear:
+                                    context.getViewModel().markUnreadFrom(chap);
+                                    return true;
+                            }
+                            return false;
+                        }
+                    });
+                    menu.show();
+                }
+            });
+            holder.item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    context.readWebcom(chapter);
+                }
+            });
+
         }
     }
 
