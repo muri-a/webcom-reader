@@ -11,14 +11,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.halftough.webcomreader.R;
-import com.example.halftough.webcomreader.RecyclerItemClickListener;
 import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
-import com.example.halftough.webcomreader.activities.ReadChapterActivity;
+import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
 import com.example.halftough.webcomreader.database.Chapter;
 
 import java.util.List;

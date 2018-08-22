@@ -5,12 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activities.ReadChapterActivity"
+    tools:context=".activities.ReadChapter.ReadChapterActivity"
     tools:showIn="@layout/read_chapter_activity">
 
-    <ImageView
+    <!--<ImageView-->
+        <!--android:id="@+id/readChapterImage"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--app:srcCompat="@android:color/background_light" />-->
+
+    <com.example.halftough.webcomreader.activities.ReadChapter.ComicPageView
         android:id="@+id/readChapterImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srcCompat="@android:color/background_light" />
+        app:srcCompat="@color/comicVievBackground" />
 </android.support.constraint.ConstraintLayout>
