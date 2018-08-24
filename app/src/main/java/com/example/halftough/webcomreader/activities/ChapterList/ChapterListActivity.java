@@ -13,7 +13,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
+import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
 import com.example.halftough.webcomreader.database.Chapter;
@@ -38,6 +40,13 @@ public class ChapterListActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         wid = intent.getStringExtra(MyWebcomsActivity.WEBCOM_ID);
+
+        try {
+            String title = UserRepository.getWebcomInstance(wid).getTitle();
+            setTitle(title);
+        } catch (NoWebcomClassException e) {
+            e.printStackTrace();
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

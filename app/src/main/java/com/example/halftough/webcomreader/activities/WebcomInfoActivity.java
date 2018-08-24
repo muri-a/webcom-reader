@@ -54,6 +54,7 @@ public class WebcomInfoActivity extends AppCompatActivity {
         pagesTextView = (TextView)findViewById(R.id.webcomInfoPageNumber);
 
         title.setText(webcom.getTitle());
+        setTitle(webcom.getTitle());
         description.setText(webcom.getDescription());
         icon.setImageDrawable(getResources().getDrawable(webcom.getIcon()));
         switch (webcom.getFormat()){

@@ -1,20 +1,16 @@
 package com.example.halftough.webcomreader.activities.ReadChapter;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
 
 import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
 import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
-import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ReadChapterRepository;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
@@ -43,7 +39,7 @@ public class ReadChapterActivity extends AppCompatActivity {
 
         number = intent.getStringExtra(ChapterListActivity.CHAPTER_NUMBER);
 
-        readChapterRepository = new ReadChapterRepository(getApplication(), webcom, readChapterImage);
+        readChapterRepository = new ReadChapterRepository(this, webcom, readChapterImage);
         setChapter(number);
 
     }

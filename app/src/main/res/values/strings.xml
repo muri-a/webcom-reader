@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">WebComReader</string>
     <string name="title_activity_available_comic_list">AvailableComicListActivity</string>
-    <string name="title_activity_add_webcom">AddWebcomActivity</string>
+    <string name="title_activity_add_webcom">Add webcom</string>
     <string name="title_activity_webcom_info">WebcomInfoActivity</string>
     <string name="title_activity_page_list">PageListActivity</string>
     <string name="title_activity_read_webcom">ReadWebcomActivity</string>

@@ -1,11 +1,14 @@
 package com.example.halftough.webcomreader.database;
 
+import android.app.Activity;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -22,24 +25,27 @@ import retrofit2.Response;
 public class ReadChapterRepository {
     private ChaptersDAO chaptersDAO;
     Webcom webcom;
-    //String number;
     LiveData<Chapter> chapter;
     ComicPageView imageView;
     boolean wasUpdate = false;
-    public ReadChapterRepository(Application application, Webcom webcom, ComicPageView imageView) {
-        AppDatabase db = AppDatabase.getDatabase(application);
+    Activity context;
+
+    public ReadChapterRepository(Activity context, Webcom webcom, ComicPageView imageView) {
+        AppDatabase db = AppDatabase.getDatabase(context.getApplicationContext());
         chaptersDAO = db.chaptersDAO();
         this.webcom = webcom;
         this.imageView = imageView;
+        this.context = context;
     }
 
     public void setChapter(String c){
-        //number = c;
         chapter = chaptersDAO.getChapter(webcom.getId(), c);
         chapter.observeForever(new Observer<Chapter>() {
             @Override
             public void onChanged(@Nullable Chapter c) {
+                // TODO Duplicated code
                 chapter.removeObserver(this);
+                context.setTitle(c.getTitle());
                 getImage();
             }
         });
@@ -98,7 +104,9 @@ public class ReadChapterRepository {
         chapter.observeForever(new Observer<Chapter>() {
             @Override
             public void onChanged(@Nullable Chapter c) {
+                // TODO Duplicated code
                 chapter.removeObserver(this);
+                context.setTitle(c.getTitle());
                 getImage();
             }
         });
@@ -109,7 +117,9 @@ public class ReadChapterRepository {
         chapter.observeForever(new Observer<Chapter>() {
             @Override
             public void onChanged(@Nullable Chapter c) {
+                // TODO Duplicated code
                 chapter.removeObserver(this);
+                context.setTitle(c.getTitle());
                 getImage();
             }
         });

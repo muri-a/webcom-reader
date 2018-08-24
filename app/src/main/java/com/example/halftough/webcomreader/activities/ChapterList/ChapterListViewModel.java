@@ -14,7 +14,7 @@ public class ChapterListViewModel extends AndroidViewModel {
     private ChaptersRepository chaptersRepository;
     private MutableLiveData<List<Chapter>> chapters;
     private Application application;
-    private String wid;
+    //private String wid;
 
     public ChapterListViewModel(Application application) {
         super(application);
@@ -22,7 +22,7 @@ public class ChapterListViewModel extends AndroidViewModel {
     }
 
     public void setWid(String wid){
-        this.wid = wid;
+        //this.wid = wid;
         chaptersRepository = new ChaptersRepository(application, wid);
         chapters = chaptersRepository.getChapters();
     }
