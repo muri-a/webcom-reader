@@ -45,7 +45,20 @@ public class ReadChapterActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        readChapterImage.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        readChapterImage.stop();
+    }
+
+    @Override
     public void onBackPressed() {
+        readChapterImage.stop();
         Intent result = new Intent();
         result.putExtra(ChapterListActivity.UPDATE_LIST, readChapterRepository.getUpdateMarker());
         setResult(RESULT_OK, result);

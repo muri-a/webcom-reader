@@ -40,46 +40,15 @@ public class ReadChapterRepository {
 
     public void setChapter(String c){
         chapter = chaptersDAO.getChapter(webcom.getId(), c);
-        chapter.observeForever(new Observer<Chapter>() {
-            @Override
-            public void onChanged(@Nullable Chapter c) {
-                // TODO Duplicated code
-                chapter.removeObserver(this);
-                context.setTitle(c.getTitle());
-                getImage();
-            }
-        });
+        chapter.observeForever(new ChapterChangedObserver(chapter, context));
     }
 
-    // TODO Only mark chapter as read if it wasn't marked before (and image was downloaded before user changed page (?))
     public void getImage() {
         Call<ComicPage> call = webcom.getPageCall(chapter.getValue().getChapter());
         call.enqueue(new Callback<ComicPage>() {
             @Override
             public void onResponse(Call<ComicPage> call, Response<ComicPage> response) {
-                Picasso.get().load(response.body().getImg()).fit().centerInside().into(imageView, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        imageView.setX(0);
-                        //If chapter haven't been loaded yet, we put method in the observer
-                        if(chapter.getValue() != null){
-                            markRead();
-                        }
-                        else{
-                            chapter.observeForever(new Observer<Chapter>() {
-                                @Override
-                                public void onChanged(@Nullable Chapter chap) {
-                                    markRead();
-                                    chapter.removeObserver(this);
-                                }
-                            });
-                        }
-                    }
-                    @Override
-                    public void onError(Exception e) {
-                        Log.e("DOWNLOADING_ERROR", e.toString());
-                    }
-                });
+                Picasso.get().load(response.body().getImg()).into(imageView);
             }
             @Override
             public void onFailure(Call<ComicPage> call, Throwable t) {
@@ -101,28 +70,12 @@ public class ReadChapterRepository {
 
     public void nextChapter() {
         chapter = chaptersDAO.getNext(webcom.getId(), chapter.getValue().getChapter());
-        chapter.observeForever(new Observer<Chapter>() {
-            @Override
-            public void onChanged(@Nullable Chapter c) {
-                // TODO Duplicated code
-                chapter.removeObserver(this);
-                context.setTitle(c.getTitle());
-                getImage();
-            }
-        });
+        chapter.observeForever(new ChapterChangedObserver(chapter, context));
     }
 
     public void previousChapter() {
         chapter = chaptersDAO.getPrevious(webcom.getId(), chapter.getValue().getChapter());
-        chapter.observeForever(new Observer<Chapter>() {
-            @Override
-            public void onChanged(@Nullable Chapter c) {
-                // TODO Duplicated code
-                chapter.removeObserver(this);
-                context.setTitle(c.getTitle());
-                getImage();
-            }
-        });
+        chapter.observeForever(new ChapterChangedObserver(chapter, context));
     }
 
     private static class updateAsyncTask extends AsyncTask<Chapter, Void, Void> {
@@ -135,6 +88,22 @@ public class ReadChapterRepository {
         protected Void doInBackground(Chapter...chapters) {
             mAsyncTaskDao.update(chapters[0]);
             return null;
+        }
+    }
+
+    private class ChapterChangedObserver implements Observer<Chapter>{
+        private final LiveData<Chapter> chapter;
+        private final Activity context;
+        public ChapterChangedObserver(LiveData<Chapter> chapter, Activity context){
+            this.chapter = chapter;
+            this.context = context;
+        }
+        @Override
+        public void onChanged(@Nullable Chapter chapter) {
+            this.chapter.removeObserver(this);
+            context.setTitle(chapter.getTitle());
+            getImage();
+            markRead();
         }
     }
 }
