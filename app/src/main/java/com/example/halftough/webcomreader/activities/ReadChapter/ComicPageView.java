@@ -180,7 +180,7 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
         float zx = w/pageImg.getWidth();
         float zy = h/pageImg.getHeight();
         currentZoom = (zx+zy)/2;
-        currentZoom = Math.min(currentZoom,maxZoom); // don't let zoom be bigger than maxZoom
+        currentZoom = Math.min(currentZoom, maxZoom); // don't let zoom be bigger than maxZoom
         currentZoom = Math.max(currentZoom, minZoom); // or smaller than minEditZoom
 
         imgWidth = Math.round(pageImg.getWidth()*currentZoom);
@@ -189,6 +189,30 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
         //x,y are calculated for initial transformation, so we need to fix them as well
         padX = Math.round(x+(w-imgWidth)/2);
         padY = Math.round(y+(h-imgHeight)/2);
+        adjustPadding();
+    }
+
+    private void adjustPadding() {
+        if(currentZoom<noZoom){
+            padX = (getWidth()-imgWidth)/2;
+            padY = (getHeight()-imgHeight)/2;
+        }
+        else {
+            if(imgWidth < getWidth()){
+                padX = padX = (getWidth()-imgWidth)/2;
+            }
+            else {
+                padX = Math.max(padX, getWidth() - imgWidth);
+                padX = Math.min(padX, 0);
+            }
+            if(imgHeight < getHeight()){
+                padY = (getHeight()-imgHeight)/2;
+            }
+            else {
+                padY = Math.max(padY, getHeight() - imgHeight);
+                padY = Math.min(padY, 0);
+            }
+        }
     }
 
     private void swipeEnd(float x) {
