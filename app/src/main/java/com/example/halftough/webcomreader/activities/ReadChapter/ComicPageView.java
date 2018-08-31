@@ -91,7 +91,7 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
         switch(event.getAction()& MotionEvent.ACTION_MASK){
             case ACTION_DOWN:
                 saveStartPoint1(event.getX(), event.getY());
-                if(currentZoom > noZoom)
+                if(currentZoom > noZoom && !isOnRightEdge() && !isOnLeftEdge())
                     touchState = TouchState.MOVE;
                 else
                     touchState = TouchState.DOWN;
@@ -121,12 +121,29 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
                             move(event.getX(), event.getY());
                         break;
                     case DOWN:
-                        if( Math.abs(event.getX()- startX1) > slideOffset ){
+                        //Swipe to next when zoom is on
+                        if( currentZoom>noZoom && ((isOnRightEdge() && startX1>event.getX() && (startX1-event.getX()) > slideOffset)
+                                || (isOnLeftEdge() && startX1<event.getX() && (event.getX()-startX1) > slideOffset ))){
+                            touchState = TouchState.SWIPE;
+                        }
+                        //Move when on enge
+                        else if(currentZoom>noZoom && ((isOnRightEdge() && startX1<event.getX() )
+                                || (isOnLeftEdge() && startX1>event.getX()))){
+                            touchState = TouchState.MOVE;
+                        }
+                        else if( currentZoom<=noZoom && Math.abs(event.getX()- startX1) > slideOffset ){
                             touchState = TouchState.SWIPE;
                         }
                         break;
                     case SWIPE:
-                        slide = Math.round(event.getX()- startX1);
+                        if(currentZoom>noZoom && ((isOnRightEdge() && startX1<event.getX())
+                                || (isOnLeftEdge() && startX1>event.getX()))){
+                            slide = 0;
+                            touchState = TouchState.DOWN;
+                        }
+                        else {
+                            slide = Math.round(event.getX() - startX1);
+                        }
                         break;
                     case ZOOM:
                         changeZoom(event.getX(), event.getY(), event.getX(1), event.getY(1));
@@ -136,6 +153,15 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
         }
         return true;
     }
+
+    private boolean isOnRightEdge() {
+        return padX+imgWidth == getWidth();
+    }
+
+    private boolean isOnLeftEdge(){
+        return padX==0;
+    }
+
     private void endZoom() {
         if(currentZoom < noZoom){
             int newW = Math.round(pageImg.getWidth()*noZoom);
@@ -167,6 +193,8 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
     }
 
     private void changeZoom(float x1, float y1, float x2, float y2) {
+        if(pageImg == null)
+            return;
         // We find position/size such that fxs,fys move to new position
         float w = (x1-x2)/(x1f-x2f);
         float h = (y1-y2)/(y1f-y2f);
@@ -359,6 +387,7 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
                 padX = (getWidth()-imgWidth)/2;
                 padY = 0;
             }
+            currentZoom = noZoom;
             initPadX = padX;
             initPadY = padY;
             maxZoom = MAX_ZOOM_MOD*noZoom;
