@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 
@@ -66,7 +67,6 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
         readChapterActivity = (ReadChapterActivity)context;
         paint = new Paint();
         slideOffset = (int) (getResources().getDisplayMetrics().density*10);
-        slideAnimator = ValueAnimator.ofInt(0, 0);
     }
 
     @Override
@@ -111,6 +111,8 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
             case ACTION_POINTER_UP:
                 if(touchState == TouchState.ZOOM) {
                     endZoom();
+                    saveStartPoint1(event.getX(), event.getY());
+                    touchState = TouchState.MOVE;
                 }
                 break;
             case ACTION_MOVE:
@@ -144,7 +146,6 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
             animateZoom(newX, newY, newW, newH, (long)((noZoom-currentZoom)/(noZoom-minZoom)*FIX_ZOOM_SPEED));
             currentZoom = noZoom;
         }
-        touchState = TouchState.MOVE;
     }
 
     private void saveStartPoint1(float x, float y) {

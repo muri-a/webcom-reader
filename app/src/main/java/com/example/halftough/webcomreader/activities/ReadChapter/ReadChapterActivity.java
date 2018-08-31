@@ -3,8 +3,10 @@ package com.example.halftough.webcomreader.activities.ReadChapter;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
@@ -16,7 +18,6 @@ import com.example.halftough.webcomreader.webcoms.Webcom;
 
 public class ReadChapterActivity extends AppCompatActivity {
     private Webcom webcom;
-    private String number;
     ComicPageView readChapterImage;
     ReadChapterRepository readChapterRepository;
 
@@ -37,11 +38,22 @@ public class ReadChapterActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        number = intent.getStringExtra(ChapterListActivity.CHAPTER_NUMBER);
-
         readChapterRepository = new ReadChapterRepository(this, webcom, readChapterImage);
-        setChapter(number);
+        setChapter( intent.getStringExtra(ChapterListActivity.CHAPTER_NUMBER) );
+    }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstance) {
+        String number = readChapterRepository.getChapterNumber();
+        savedInstance.putString(ChapterListActivity.CHAPTER_NUMBER, number);
+        super.onSaveInstanceState(savedInstance);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        String number = savedInstanceState.getString(ChapterListActivity.CHAPTER_NUMBER);
+        setChapter(number);
     }
 
     @Override
@@ -67,7 +79,6 @@ public class ReadChapterActivity extends AppCompatActivity {
 
     public void setChapter(String c){
         readChapterRepository.setChapter(c);
-        //readChapterRepository.getImageFor(readChapterImage);
     }
 
     public void nextPage() {

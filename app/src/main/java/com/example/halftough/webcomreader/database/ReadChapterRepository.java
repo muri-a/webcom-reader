@@ -24,11 +24,11 @@ import retrofit2.Response;
 
 public class ReadChapterRepository {
     private ChaptersDAO chaptersDAO;
-    Webcom webcom;
-    LiveData<Chapter> chapter;
-    ComicPageView imageView;
-    boolean wasUpdate = false;
-    Activity context;
+    private Webcom webcom;
+    private LiveData<Chapter> chapter;
+    private ComicPageView imageView;
+    private boolean wasUpdate = false;
+    private Activity context;
 
     public ReadChapterRepository(Activity context, Webcom webcom, ComicPageView imageView) {
         AppDatabase db = AppDatabase.getDatabase(context.getApplicationContext());
@@ -43,7 +43,9 @@ public class ReadChapterRepository {
         chapter.observeForever(new ChapterChangedObserver(chapter, context));
     }
 
-    public void getImage() {
+    private void getImage() {
+        if(chapter.getValue()==null)
+            return;
         Call<ComicPage> call = webcom.getPageCall(chapter.getValue().getChapter());
         call.enqueue(new Callback<ComicPage>() {
             @Override
@@ -59,6 +61,8 @@ public class ReadChapterRepository {
     }
 
     public void markRead(){
+        if(chapter.getValue() == null)
+            return;
         wasUpdate = true;
         chapter.getValue().setStatus(Chapter.Status.READ);
         new updateAsyncTask(chaptersDAO).execute(chapter.getValue());
@@ -76,6 +80,10 @@ public class ReadChapterRepository {
     public void previousChapter() {
         chapter = chaptersDAO.getPrevious(webcom.getId(), chapter.getValue().getChapter());
         chapter.observeForever(new ChapterChangedObserver(chapter, context));
+    }
+
+    public String getChapterNumber() {
+        return chapter.getValue()!=null?chapter.getValue().getChapter():null;
     }
 
     private static class updateAsyncTask extends AsyncTask<Chapter, Void, Void> {
