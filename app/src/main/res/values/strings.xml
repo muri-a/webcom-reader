@@ -14,6 +14,7 @@
     <string name="webcom_info_add">Add</string>
 
     <string name="chapter_item_downloaded">Downloaded</string>
+    <string name="chapter_item_downloading">Downloading</string>
     <string name="chapter_item_menu_download">Download</string>
     <string name="chapter_item_menu_remove">Remove</string>
     <string name="chapter_item_menu_mark_read">Mark sa read</string>

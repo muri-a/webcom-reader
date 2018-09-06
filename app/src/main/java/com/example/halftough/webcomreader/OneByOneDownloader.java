@@ -1,78 +1,55 @@
 package com.example.halftough.webcomreader;
 
-import java.util.List;
+import java.util.Queue;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+public abstract class OneByOneDownloader<ElementType, Extra> {
+    protected int capacity;
+    protected int free;
+    protected boolean downloading = false;
+    Queue<ElementType> queue;
+    Queue<Extra> extras;
 
-//Class preventing app from asking server for huge number of calls at once
-public abstract class OneByOneDownloader<T, K> {
-    int free;
-    List<Call<T>> calls;
-    List<K> extra;
-
-    public OneByOneDownloader(List<Call<T>> calls){
-        this(calls,1);
+    public void add(ElementType element, Extra extra){
+        queue.add(element);
+        if(extras != null){
+            extras.add(extra);
+        }
+    }
+    // Add to the list and start downloading, if it wasn't before
+    public void enqueue(ElementType element, Extra extra){
+        add(element, extra);
+        download();
     }
 
-    public OneByOneDownloader(List<Call<T>> calls, int slots){
-        this(calls, null, slots);
-    }
 
-    public OneByOneDownloader(List<Call<T>> calls, List<K> extra){
-        this(calls, extra, 1);
-    }
+    public void download(){
+        if (!downloading) {
+            while (free > 0 && !queue.isEmpty()) {
+                downloading = true;
+                free--;
+                ElementType element  = queue.remove();
+                Extra extra = extras!=null?extras.remove():null;
 
-    public OneByOneDownloader(List<Call<T>> calls, List<K> extra, int slots){
-        free = slots;
-        this.calls = calls;
-        this.extra = extra;
-    }
-
-    private void markDone(){
-        if(calls.size()>0) {
-            calls.get(0).enqueue(new Callback<T>() {
-                K ex = extra!=null?extra.get(0):null;
-                @Override
-                public void onResponse(Call<T> call, Response<T> response) {
-                    OneByOneDownloader.this.onResponse(call, response, ex);
-                    markDone();
-                }
-
-                @Override
-                public void onFailure(Call<T> call, Throwable t) {
-                    markDone();
-                }
-            });
-            calls.remove(0);
-            if(extra!=null)
-                extra.remove(0);
+                downloadElement(element, extra);
+            }
         }
     }
 
-    public abstract void onResponse(Call<T> call, Response<T> response, K extra);
+    protected abstract void downloadElement(ElementType element, final Extra extra);
 
-    public void download() {
-        for (int i = 0; i < free && i < calls.size(); i++) {
-            Call call = calls.get(0);
-            final K ex = extra!=null?extra.get(0):null;
-            calls.remove(0);
-            if(extra!=null)
-                extra.remove(0);
+    // Method that should be called on success of downloadElement.
+    // Because ways of doing that may vary, extension of this class should remember to call it.
+    protected void elementDownloaded(){
+        if(!queue.isEmpty()) {
+            ElementType element = queue.remove();
+            Extra extra = extras!=null?extras.remove():null;
 
-            call.enqueue(new Callback<T>() {
-                @Override
-                public void onResponse(Call<T> call, Response<T> response) {
-                    OneByOneDownloader.this.onResponse(call, response, ex);
-                    markDone();
-                }
-
-                @Override
-                public void onFailure(Call<T> call, Throwable t) {
-                    markDone();
-                }
-            });
+            downloadElement(element, extra);
+        }
+        else{
+            free++;
+            if(free==capacity)
+                downloading = false;
         }
     }
 

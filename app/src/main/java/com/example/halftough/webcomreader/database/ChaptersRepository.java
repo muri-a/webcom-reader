@@ -6,25 +6,24 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
+import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.NoWebcomClassException;
-import com.example.halftough.webcomreader.OneByOneDownloader;
+import com.example.halftough.webcomreader.OneByOneCallDownloader;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.webcoms.ComicPage;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.Semaphore;
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ChaptersRepository {
@@ -32,8 +31,10 @@ public class ChaptersRepository {
     private MutableLiveData<List<Chapter>> chapters;
     private LiveData<Integer> chapterCount;
     private Webcom webcom;
+    private Application application;
 
     public ChaptersRepository(Application application, final String wid){
+        this.application = application;
         AppDatabase db = AppDatabase.getDatabase(application);
         chaptersDAO = db.chaptersDAO();
         chapters = new MutableLiveData<>();
@@ -81,8 +82,8 @@ public class ChaptersRepository {
         List<Chapter> dbChapters = chapters.getValue();
 
         final List<Chapter> chapterList = new ArrayList<>();
-        List<Call<ComicPage>> calls = new ArrayList<>();
-        List<Chapter> extra = new ArrayList<>(); // References to chapters that will be downloaded
+        Queue<Call<ComicPage>> calls = new LinkedList<>();
+        Queue<Chapter> extra = new LinkedList<>(); // References to chapters that will be downloaded
 
         Iterator<String> allIt = allChapters.iterator();
         Iterator<Chapter> dbIt = dbChapters.iterator();
@@ -100,7 +101,7 @@ public class ChaptersRepository {
             if(b==null || (a!=null && Float.parseFloat(a) < Float.parseFloat(b.getChapter())) ){
                 Chapter chapter = new Chapter(webcom.getId(), a);
                 chapterList.add(chapter);
-                calls.add(webcom.getPageCall(a));
+                calls.add(webcom.getChapterMetaCall(a));
                 extra.add(chapter);
                 a = allIt.hasNext()?allIt.next():null;
             }
@@ -116,7 +117,7 @@ public class ChaptersRepository {
         }
         chapters.postValue(chapterList);
 
-        new OneByOneDownloader<ComicPage, Chapter>(calls, extra, 5){
+        new OneByOneCallDownloader<ComicPage, Chapter>(calls, extra, 5){
             @Override
             public void onResponse(Call<ComicPage> call, Response<ComicPage> response, Chapter extra) {
                 if(response.body() != null) {
@@ -135,6 +136,12 @@ public class ChaptersRepository {
 
     public void insertChapter(Chapter chapter){
         new insertAsyncTask(chaptersDAO).execute(chapter);
+    }
+
+    public void downloadChapter(Chapter chapter){
+        chapter.setDownloadStatus(Chapter.DownloadStatus.DOWNLOADING);
+        new setDownloadStatusAsyncTask(chaptersDAO).execute(chapter);
+        DownloaderService.enqueueChapter(application, chapter);
     }
 
     public void update() {
@@ -268,12 +275,24 @@ public class ChaptersRepository {
         }
     }
 
-    private static  class updateListAsyncTask extends AsyncTask<List<Chapter>, Void, Void>{
+    private static class updateListAsyncTask extends AsyncTask<List<Chapter>, Void, Void>{
         private ChaptersDAO mAsyncTaskDao;
         updateListAsyncTask(ChaptersDAO dao){ mAsyncTaskDao = dao; }
         @Override
         protected Void doInBackground(List<Chapter>... lists) {
             mAsyncTaskDao.update(lists[0]);
+            return null;
+        }
+    }
+
+    private static class setDownloadStatusAsyncTask extends AsyncTask<Chapter, Void, Void>{
+        private ChaptersDAO mAsyncTaskDao;
+        public setDownloadStatusAsyncTask(ChaptersDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+        @Override
+        protected Void doInBackground(Chapter... chapters) {
+            mAsyncTaskDao.setDownloadStatus(chapters[0].getWid(), chapters[0].getChapter(), chapters[0].getDownloadStatus());
             return null;
         }
     }

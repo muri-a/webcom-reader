@@ -1,16 +1,10 @@
 package com.example.halftough.webcomreader.database;
 
 import android.app.Activity;
-import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.widget.ImageView;
 
 
 import com.example.halftough.webcomreader.activities.ReadChapter.ComicPageView;
@@ -46,11 +40,11 @@ public class ReadChapterRepository {
     private void getImage() {
         if(chapter.getValue()==null)
             return;
-        Call<ComicPage> call = webcom.getPageCall(chapter.getValue().getChapter());
+        Call<ComicPage> call = webcom.getChapterMetaCall(chapter.getValue().getChapter());
         call.enqueue(new Callback<ComicPage>() {
             @Override
             public void onResponse(Call<ComicPage> call, Response<ComicPage> response) {
-                Picasso.get().load(response.body().getImg()).into(imageView);
+                Picasso.get().load(response.body().getUrl()).into(imageView);
             }
             @Override
             public void onFailure(Call<ComicPage> call, Throwable t) {

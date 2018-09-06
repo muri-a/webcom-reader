@@ -15,7 +15,7 @@ public class ComicPage {
         this.title = title;
     }
 
-    public String getNum() {
+    public String getChapterNumber() {
         return num;
     }
     public void setNum(String num) {
@@ -29,6 +29,6 @@ public class ComicPage {
         this.title = title;
     }
 
-    public String getImg() { return img; }
+    public String getUrl() { return img; }
     public void setImg(String img) { this.img = img; }
 }

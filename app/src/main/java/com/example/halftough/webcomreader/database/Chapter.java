@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 
 @Entity(tableName = "chapters", primaryKeys = {"wid", "chapter"})
 public class Chapter implements Comparable<Chapter> {
-    public enum Status{ UNREAD, READ, READING }
+    public enum Status { UNREAD, READ, READING }
+    public enum DownloadStatus { UNDOWNLOADED, DOWNLOADING, DOWNLOADED }
+
     @NonNull
     private String wid;
     @NonNull
@@ -15,6 +17,10 @@ public class Chapter implements Comparable<Chapter> {
     @NonNull
     @TypeConverters(StatusConverter.class)
     private Status status = Status.UNREAD;
+
+    @NonNull
+    @TypeConverters(DownloadStatusConverter.class)
+    private DownloadStatus downloadStatus = DownloadStatus.UNDOWNLOADED;
 
     public Chapter(String wid, String chapter){
         this.wid = wid;
@@ -40,13 +46,22 @@ public class Chapter implements Comparable<Chapter> {
         this.status = status;
     }
 
-    @Override
-    public int compareTo(@NonNull Chapter o) {
-        return new Float(Float.parseFloat(chapter)).compareTo(Float.parseFloat(o.getChapter()));
+    @NonNull
+    public DownloadStatus getDownloadStatus() {
+        return downloadStatus;
+    }
+
+    public void setDownloadStatus(@NonNull DownloadStatus downloadStatus) {
+        this.downloadStatus = downloadStatus;
     }
 
     @Override
-    public boolean equals(Object o){
+    public int compareTo(@NonNull Chapter o) {
+        return Float.valueOf(Float.parseFloat(chapter)).compareTo(Float.parseFloat(o.getChapter()));
+    }
+
+    @Override
+    public boolean equals(Object o) {
         if (o == null || !Chapter.class.isAssignableFrom(o.getClass())) {
             return false;
         }

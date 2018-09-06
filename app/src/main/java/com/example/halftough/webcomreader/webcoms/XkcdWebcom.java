@@ -78,7 +78,7 @@ public class XkcdWebcom extends Webcom {
         call.enqueue(new Callback<ComicPage>() {
             @Override
             public void onResponse(Call<ComicPage> call, Response<ComicPage> response) {
-                chapterCount.postValue( Integer.parseInt(response.body().getNum()) -1); // We subtract 1, because comic nr 404 doesn't exist
+                chapterCount.postValue( Integer.parseInt(response.body().getChapterNumber()) -1); // We subtract 1, because comic nr 404 doesn't exist
             }
 
             @Override
@@ -89,7 +89,7 @@ public class XkcdWebcom extends Webcom {
     }
 
     @Override
-    public Call<ComicPage> getPageCall(String number) {
+    public Call<ComicPage> getChapterMetaCall(String number) {
         initService();
         return service.getChapter(number);
     }

@@ -47,7 +47,7 @@ public class DilbertWebcom extends Webcom {
     }
 
     @Override
-    public Call<ComicPage> getPageCall(String number) {
+    public Call<ComicPage> getChapterMetaCall(String number) {
         return null;
     }
 

@@ -23,6 +23,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         public View item;
         public TextView chapterNumber;
         public TextView chapterTitle;
+        public TextView downloadedText;
         public ImageButton menuButton;
 
         public ViewHolder(View itemView) {
@@ -30,6 +31,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
             chapterNumber = (TextView)itemView.findViewById(R.id.chapterListItemNumber);
             chapterTitle = (TextView)itemView.findViewById(R.id.chapterListItemTitle);
             menuButton = (ImageButton)itemView.findViewById(R.id.chapterListItemMenuButton);
+            downloadedText = (TextView)itemView.findViewById(R.id.chapterListItemDownloaded);
             item = itemView;
         }
     }
@@ -62,6 +64,16 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                 holder.chapterNumber.setTextColor(ContextCompat.getColor(context, R.color.chapterUnread));
                 holder.chapterTitle.setTextColor(ContextCompat.getColor(context, R.color.chapterUnread));
             }
+            switch (chapter.getDownloadStatus()){
+                case DOWNLOADED:
+                    holder.downloadedText.setText(R.string.chapter_item_downloaded);
+                    break;
+                case DOWNLOADING:
+                    holder.downloadedText.setText(R.string.chapter_item_downloading);
+                    break;
+                case UNDOWNLOADED:
+                    holder.downloadedText.setText("");
+            }
             holder.chapterNumber.setText(chapter.getChapter());
             holder.chapterTitle.setText(chapter.getTitle());
             holder.menuButton.setOnClickListener(new View.OnClickListener() {
@@ -76,8 +88,10 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                         public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()){
                                 case R.id.chapterItemMenuDownload:
+                                    context.downloadChapter(chap);
+                                    return true;
                                 case R.id.chapterItemMenuRemove:
-                                    return false;
+                                    return true;
                                 case R.id.chapterItemMenuMarkRead:
                                     context.getViewModel().markRead(chap);
                                     return true;

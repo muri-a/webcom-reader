@@ -5,6 +5,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.TypeConverters;
 import android.arch.persistence.room.Update;
 
 import java.util.List;
@@ -29,6 +30,19 @@ public interface ChaptersDAO {
 
     @Update
     void update(List<Chapter> chapters);
+
+//    @Query("UPDATE chapters SET DownloadStatus=0 WHERE wid=:wid AND chapter=:chapter")
+//    void setUndownloaded(String wid, String chapter);
+//
+//    @Query("UPDATE chapters SET DownloadStatus=1 WHERE wid=:wid AND chapter=:chapter")
+//    void setDownloading(String wid, String chapter);
+//
+//    @Query("UPDATE chapters SET DownloadStatus=2 WHERE wid=:wid AND chapter=:chapter")
+//    void setDownloaded(String wid, String chapter);
+
+    @Query("UPDATE chapters SET DownloadStatus=:status WHERE wid=:wid AND chapter=:chapter")
+    @TypeConverters(DownloadStatusConverter.class)
+    void setDownloadStatus(String wid, String chapter, Chapter.DownloadStatus status);
 
     @Query("SELECT * FROM chapters WHERE wid LIKE :wid AND chapter LIKE :number")
     LiveData<Chapter> getChapter(String wid, String number);

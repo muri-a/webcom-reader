@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
@@ -23,6 +24,7 @@ import com.example.halftough.webcomreader.database.Chapter;
 import java.util.List;
 
 public class ChapterListActivity extends AppCompatActivity {
+    public static String CHAPTER_WID = "CHAPTER_WID";
     public static String CHAPTER_NUMBER = "CHAPTER_NUMBER";
     public static int READ_CHAPTER_RESULT = 3;
     public static String UPDATE_LIST = "UPDATE_LIST";
@@ -95,5 +97,9 @@ public class ChapterListActivity extends AppCompatActivity {
 
     public ChapterListViewModel getViewModel() {
         return viewModel;
+    }
+
+    public void downloadChapter(Chapter chapter) {
+        viewModel.downloadChapter(chapter);
     }
 }
