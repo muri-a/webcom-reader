@@ -41,5 +41,7 @@ public abstract class Webcom {
     }
     public abstract Call<ComicPage> getChapterMetaCall(String number);
     public abstract List<String> getChapterList();
+    public String getFirstChapterId(){ return getChapterList().get(0); }
+    public String getLastChapterId(){ return getChapterList().get(getChapterList().size()-1); }
     public abstract String[] getLanguages();
 }

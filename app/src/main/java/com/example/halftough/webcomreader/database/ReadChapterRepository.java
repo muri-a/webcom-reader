@@ -104,6 +104,7 @@ public class ReadChapterRepository {
         public void onChanged(@Nullable Chapter chapter) {
             this.chapter.removeObserver(this);
             context.setTitle(chapter.getTitle());
+            imageView.setCurrentChapter(chapter.getChapter());
             getImage();
             markRead();
         }

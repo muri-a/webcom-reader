@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 
+import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -27,6 +28,7 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
     private enum TouchState { EMPTY, DOWN, ZOOM, SWIPE, MOVE }
 
     private ReadChapterActivity readChapterActivity;
+    private String firstChapterId, lastChapterId, currentChapterId;
     private Paint paint;
     private Bitmap pageImg;
 
@@ -67,6 +69,32 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
         readChapterActivity = (ReadChapterActivity)context;
         paint = new Paint();
         slideOffset = (int) (getResources().getDisplayMetrics().density*10);
+    }
+
+    public void setCurrentChapter(String currentChapter) {
+        this.currentChapterId = currentChapter;
+    }
+
+    public void setFirstChapterId(String id){
+        firstChapterId = id;
+    }
+
+    public void setLastChapterId(String id){
+        lastChapterId = id;
+    }
+
+    private boolean isFirst(){
+        if(currentChapterId!=null){
+            return currentChapterId.equals(firstChapterId);
+        }
+        return false;
+    }
+
+    private boolean isLast(){
+        if(currentChapterId!=null){
+            return currentChapterId.equals(lastChapterId);
+        }
+        return false;
     }
 
     @Override
@@ -122,8 +150,8 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
                         break;
                     case DOWN:
                         //Swipe to next when zoom is on
-                        if( currentZoom>noZoom && ((isOnRightEdge() && startX1>event.getX() && (startX1-event.getX()) > slideOffset)
-                                || (isOnLeftEdge() && startX1<event.getX() && (event.getX()-startX1) > slideOffset ))){
+                        if( currentZoom>noZoom && ((isOnRightEdge() && startX1>event.getX() && (startX1-event.getX()) > slideOffset && !isLast())
+                                || (isOnLeftEdge() && startX1<event.getX() && (event.getX()-startX1) > slideOffset && !isFirst() ))){
                             touchState = TouchState.SWIPE;
                         }
                         //Move when on enge
@@ -131,12 +159,19 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
                                 || (isOnLeftEdge() && startX1>event.getX()))){
                             touchState = TouchState.MOVE;
                         }
-                        else if( currentZoom<=noZoom && Math.abs(event.getX()- startX1) > slideOffset ){
+                        else if( currentZoom<=noZoom && Math.abs(event.getX()- startX1) > slideOffset
+                                && !(isFirst() && startX1<event.getX()) && !(isLast() && startX1>event.getX())){
                             touchState = TouchState.SWIPE;
                         }
                         break;
                     case SWIPE:
-                        if(currentZoom>noZoom && ((isOnRightEdge() && startX1<event.getX())
+                        // Don't allow to swipe right if we read first chapter or swipe left when last
+                        if( (isFirst() && startX1 < event.getX()
+                            || isLast() && startX1 > event.getX()) ){
+                            slide = 0;
+                            touchState = TouchState.DOWN;
+                        }
+                        else if(currentZoom>noZoom && ((isOnRightEdge() && startX1<event.getX())
                                 || (isOnLeftEdge() && startX1>event.getX()))){
                             slide = 0;
                             touchState = TouchState.DOWN;
@@ -261,10 +296,10 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
                     pageImg = null;
                     slide = 0;
                     if(sign<0){
-                        readChapterActivity.nextPage();
+                        nextPage();
                     }
                     else{
-                        readChapterActivity.previousPage();
+                        previousPage();
                     }
                 }
             });
@@ -331,6 +366,16 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
         yAnimator.start();
         wAnimator.start();
         hAnimator.start();
+    }
+
+    private void previousPage(){
+        if(!isFirst())
+            readChapterActivity.previousPage();
+    }
+
+    private void nextPage(){
+        if(!isLast())
+            readChapterActivity.nextPage();
     }
 
     @Override

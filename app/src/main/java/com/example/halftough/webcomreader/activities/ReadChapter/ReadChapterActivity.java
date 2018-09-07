@@ -28,8 +28,6 @@ public class ReadChapterActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        readChapterImage = (ComicPageView)findViewById(R.id.readChapterImage);
-
         Intent intent = getIntent();
         try {
             webcom = UserRepository.getWebcomInstance( intent.getStringExtra(MyWebcomsActivity.WEBCOM_ID) );
@@ -38,6 +36,9 @@ public class ReadChapterActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        readChapterImage = (ComicPageView)findViewById(R.id.readChapterImage);
+        readChapterImage.setFirstChapterId(webcom.getFirstChapterId());
+        readChapterImage.setLastChapterId(webcom.getLastChapterId());
         readChapterRepository = new ReadChapterRepository(this, webcom, readChapterImage);
         setChapter( intent.getStringExtra(ChapterListActivity.CHAPTER_NUMBER) );
     }
@@ -88,4 +89,6 @@ public class ReadChapterActivity extends AppCompatActivity {
     public void previousPage() {
         readChapterRepository.previousChapter();
     }
+
+    public Webcom getWebcom(){ return webcom; }
 }
