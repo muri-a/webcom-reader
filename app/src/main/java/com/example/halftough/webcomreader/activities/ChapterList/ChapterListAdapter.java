@@ -82,6 +82,19 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                     PopupMenu menu = new PopupMenu(context, v);
                     MenuInflater menuInflater = menu.getMenuInflater();
                     menuInflater.inflate(R.menu.chapter_item_menu, menu.getMenu());
+                    switch (chapter.getDownloadStatus()){
+                        case UNDOWNLOADED:
+                            menu.getMenu().findItem(R.id.chapterItemMenuDownload).setVisible(true);
+                            menu.getMenu().findItem(R.id.chapterItemMenuRemove).setVisible(false);
+                            break;
+                        case DOWNLOADING:
+                            menu.getMenu().findItem(R.id.chapterItemMenuDownload).setVisible(false);
+                            menu.getMenu().findItem(R.id.chapterItemMenuRemove).setVisible(false);
+                            break;
+                        case DOWNLOADED:
+                            menu.getMenu().findItem(R.id.chapterItemMenuDownload).setVisible(false);
+                            menu.getMenu().findItem(R.id.chapterItemMenuRemove).setVisible(true);
+                    }
                     menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         Chapter chap = chapter;
                         @Override
@@ -91,6 +104,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                                     context.downloadChapter(chap);
                                     return true;
                                 case R.id.chapterItemMenuRemove:
+                                    // TODO implement manual removing
                                     return true;
                                 case R.id.chapterItemMenuMarkRead:
                                     context.getViewModel().markRead(chap);
