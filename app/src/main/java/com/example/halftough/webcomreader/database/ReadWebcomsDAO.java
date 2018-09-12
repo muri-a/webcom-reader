@@ -10,9 +10,12 @@ import java.util.List;
 
 @Dao
 public interface ReadWebcomsDAO {
-    @Query("SELECT * FROM readwebcoms")
-    LiveData<List<ReadWebcoms>> getAll();
+    @Query("SELECT * FROM read_webcoms")
+    LiveData<List<ReadWebcom>> getAll();
+
+    @Query("SELECT chapterCount from read_webcoms WHERE wid=:wid")
+    LiveData<Integer> getChapterCount(String wid);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(ReadWebcoms readWebcoms);
+    void insert(ReadWebcom readWebcoms);
 }

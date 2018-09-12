@@ -14,12 +14,11 @@ import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.RecyclerItemClickListener;
 import com.example.halftough.webcomreader.activities.AddWebcomActivity;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
-import com.example.halftough.webcomreader.database.ReadWebcoms;
+import com.example.halftough.webcomreader.database.ReadWebcom;
 
 import java.util.List;
 
 //TODO Alternative views
-
 public class MyWebcomsActivity extends AppCompatActivity {
     public static String WEBCOM_ID = "WEBCOM_ID";
     public static int ADD_WEBCOM_RESULT = 1;
@@ -38,9 +37,9 @@ public class MyWebcomsActivity extends AppCompatActivity {
         myWebcomRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
         viewModel = ViewModelProviders.of(this).get(MyWebcomsViewModel.class);
-        viewModel.getAllReadWebcoms().observe(this, new Observer<List<ReadWebcoms>>() {
+        viewModel.getAllReadWebcoms().observe(this, new Observer<List<ReadWebcom>>() {
             @Override
-            public void onChanged(@Nullable List<ReadWebcoms> readWebcoms) {
+            public void onChanged(@Nullable List<ReadWebcom> readWebcoms) {
                 adapter.setReadWebcoms(readWebcoms);
             }
         });
@@ -72,7 +71,7 @@ public class MyWebcomsActivity extends AppCompatActivity {
         if(requestCode== ADD_WEBCOM_RESULT && resultCode!=RESULT_CANCELED){
             if(data.hasExtra(WEBCOM_ID)){
                 String wid = data.getStringExtra(WEBCOM_ID);
-                viewModel.insert(new ReadWebcoms(wid));
+                viewModel.insert(new ReadWebcom(wid));
             }
         }
     }

@@ -60,4 +60,9 @@ public class DilbertWebcom extends Webcom {
     public String[] getLanguages() {
         return new String[]{"en"};
     }
+
+    @Override
+    public void updateChapters(){
+
+    }
 }

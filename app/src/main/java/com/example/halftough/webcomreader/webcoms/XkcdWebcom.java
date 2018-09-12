@@ -1,6 +1,7 @@
 package com.example.halftough.webcomreader.webcoms;
 
 import android.arch.lifecycle.MutableLiveData;
+import android.util.Log;
 
 import com.example.halftough.webcomreader.R;
 
@@ -23,8 +24,9 @@ public class XkcdWebcom extends Webcom {
         if(chapterCount==null){
             chapterCount = new MutableLiveData<>();
             chapterCount.setValue(new Integer(0));
+            Log.e("STATUS", "SET CHAPTER COUNT 0");
         }
-        updatePageCount();
+        initService();
     }
 
     @Override
@@ -35,25 +37,26 @@ public class XkcdWebcom extends Webcom {
     public String getDescription(){ return "Webcomic created by American author Randall Munroe. The comic's tagline describes it as \"A webcomic of romance, sarcasm, math, and language\". Munroe states on the comic's website that the name of the comic is not an initialism but \"just a word with no phonetic pronunciation\".\n" +
             "\n" +
             "\"The subject matter of the comic varies from statements on life and love to mathematical, programming, and scientific in-jokes. Some strips feature simple humor or pop-culture references. Although it has a cast of stick figures, the comic occasionally features landscapes, graphs and charts, and intricate mathematical patterns such as fractals. New cartoons are added three times a week, on Mondays, Wednesdays, and Fridays.";}
-
     @Override
     public int getIcon() {
         return R.mipmap.xkcd_ico;
     }
-
     @Override
     public format getFormat() {
         return format.PAGES;
+    }
+    @Override
+    public String[] getTags() {
+        return new String[]{"it", "funny", "science"};
+    }
+    @Override
+    public String[] getLanguages() {
+        return new String[]{"en"};
     }
 
     @Override
     public MutableLiveData<Integer> getChapterCount() {
         return chapterCount;
-    }
-
-    @Override
-    public String[] getTags() {
-        return new String[]{"it", "funny", "science"};
     }
 
     public interface XkcdService{
@@ -69,23 +72,6 @@ public class XkcdWebcom extends Webcom {
             Retrofit retrofit = new Retrofit.Builder().baseUrl("https://xkcd.com").addConverterFactory(GsonConverterFactory.create()).build();
             service = retrofit.create(XkcdService.class);
         }
-    }
-
-    public void updatePageCount(){
-        initService();
-
-        Call<ComicPage> call = service.getLast();
-        call.enqueue(new Callback<ComicPage>() {
-            @Override
-            public void onResponse(Call<ComicPage> call, Response<ComicPage> response) {
-                chapterCount.postValue( Integer.parseInt(response.body().getChapterNumber()) -1); // We subtract 1, because comic nr 404 doesn't exist
-            }
-
-            @Override
-            public void onFailure(Call<ComicPage> call, Throwable t) {
-                //TODO onFailure
-            }
-        });
     }
 
     @Override
@@ -111,7 +97,21 @@ public class XkcdWebcom extends Webcom {
     }
 
     @Override
-    public String[] getLanguages() {
-        return new String[]{"en"};
+    public void updateChapters(){
+        Log.e("Updating chapters", "yes");
+        Call<ComicPage> call = service.getLast();
+        call.enqueue(new Callback<ComicPage>() {
+            @Override
+            public void onResponse(Call<ComicPage> call, Response<ComicPage> response) {
+                chapterCount.postValue( Integer.parseInt(response.body().getChapterNumber()) -1); // We subtract 1, because comic nr 404 doesn't exist
+                Log.e("STATUS", "GOT CHAPTER COUNT RESPONE "+response.body().getChapterNumber());
+            }
+
+            @Override
+            public void onFailure(Call<ComicPage> call, Throwable t) {
+                chapterCount.postValue(chapterCount.getValue());
+                Log.e("STATUS", "DOWNLOADING CC FAIL");
+            }
+        });
     }
 }

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
-import com.example.halftough.webcomreader.database.ReadWebcoms;
+import com.example.halftough.webcomreader.database.ReadWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
     }
 
     private final LayoutInflater mInflater;
-    private List<ReadWebcoms> readWebcoms;
+    private List<ReadWebcom> readWebcoms;
     Context context;
 
     public MyWebcomsAdapter(Context context){
@@ -49,7 +49,7 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if(readWebcoms != null){
-            ReadWebcoms readWebcom = readWebcoms.get(position);
+            ReadWebcom readWebcom = readWebcoms.get(position);
             try {
                 Webcom webcom = UserRepository.getWebcomInstance(readWebcom.getWid());
                 holder.nameTextView.setText(webcom.getTitle());
@@ -60,7 +60,7 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
         }
     }
 
-    void setReadWebcoms(List<ReadWebcoms> readWebcoms){
+    void setReadWebcoms(List<ReadWebcom> readWebcoms){
         this.readWebcoms = readWebcoms;
         notifyDataSetChanged();
     }

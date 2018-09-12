@@ -13,7 +13,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public abstract class Webcom {
-
     public enum format { CHAPTERS, PAGES }
 
     public abstract String getId();
@@ -21,8 +20,10 @@ public abstract class Webcom {
     public abstract String getDescription();
     public abstract int getIcon();
     public abstract format getFormat();
-    public abstract MutableLiveData<Integer> getChapterCount(); //Returns number of all available pages/chapters of comic
     public abstract String[] getTags();
+    public abstract String[] getLanguages();
+
+    public abstract MutableLiveData<Integer> getChapterCount(); //Returns number of all available pages/chapters of comic
     public LiveData<String> getChapterUrl(String chapter){
         final MutableLiveData<String> chapterUrl = new MutableLiveData<>();
         Call<ComicPage> call = getChapterMetaCall(chapter);
@@ -43,5 +44,5 @@ public abstract class Webcom {
     public abstract List<String> getChapterList();
     public String getFirstChapterId(){ return getChapterList().get(0); }
     public String getLastChapterId(){ return getChapterList().get(getChapterList().size()-1); }
-    public abstract String[] getLanguages();
+    public abstract void updateChapters();
 }
