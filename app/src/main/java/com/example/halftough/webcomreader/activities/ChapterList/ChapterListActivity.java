@@ -37,6 +37,7 @@ public class ChapterListActivity extends AppCompatActivity {
     RecyclerView chapterListRecyclerView;
     ChapterListAdapter adapter;
     ChapterListViewModel viewModel;
+    ChapterListReciever reciever;
     String wid;
 
     @Override
@@ -80,11 +81,15 @@ public class ChapterListActivity extends AppCompatActivity {
                 adapter.setChapters(chapters);
             }
         });
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        reciever = new ChapterListReciever(viewModel, wid);
         IntentFilter filter = new IntentFilter(ChapterListReciever.ACTION_CHAPTER_UPDATED);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(new ChapterListReciever(viewModel, wid), filter);
-
+        registerReceiver(reciever, filter);
     }
 
     @Override
@@ -96,6 +101,12 @@ public class ChapterListActivity extends AppCompatActivity {
                 viewModel.update();
             }
         }
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        unregisterReceiver(reciever);
     }
 
     public void readWebcom(Chapter chapter){
