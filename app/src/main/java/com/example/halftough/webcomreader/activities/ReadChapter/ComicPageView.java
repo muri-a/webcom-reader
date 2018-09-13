@@ -10,11 +10,9 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 
-import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 

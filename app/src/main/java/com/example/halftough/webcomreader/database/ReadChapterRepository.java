@@ -5,6 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 
 import com.example.halftough.webcomreader.activities.ReadChapter.ComicPageView;
@@ -19,7 +20,7 @@ import retrofit2.Response;
 public class ReadChapterRepository {
     private ChaptersDAO chaptersDAO;
     private Webcom webcom;
-    private LiveData<Chapter> chapter;
+    private LiveData<Chapter> firstChapter, chapter, lastChapter;
     private ComicPageView imageView;
     private boolean wasUpdate = false;
     private Activity context;
@@ -35,6 +36,22 @@ public class ReadChapterRepository {
     public void setChapter(String c){
         chapter = chaptersDAO.getChapter(webcom.getId(), c);
         chapter.observeForever(new ChapterChangedObserver(chapter, context));
+        firstChapter = chaptersDAO.getFirstChapter();
+        firstChapter.observeForever(new Observer<Chapter>() {
+            @Override
+            public void onChanged(@Nullable Chapter chapter) {
+                firstChapter.removeObserver(this);
+                imageView.setFirstChapterId(chapter.getChapter());
+            }
+        });
+        lastChapter = chaptersDAO.getLastChapter();
+        lastChapter.observeForever(new Observer<Chapter>() {
+            @Override
+            public void onChanged(@Nullable Chapter chapter) {
+                lastChapter.removeObserver(this);
+                imageView.setLastChapterId(chapter.getChapter());
+            }
+        });
     }
 
     private void getImage() {
@@ -51,7 +68,6 @@ public class ReadChapterRepository {
 
             }
         });
-
     }
 
     public void markRead(){

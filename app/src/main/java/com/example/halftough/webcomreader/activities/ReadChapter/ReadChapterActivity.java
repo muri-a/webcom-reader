@@ -37,8 +37,6 @@ public class ReadChapterActivity extends AppCompatActivity {
         }
 
         readChapterImage = (ComicPageView)findViewById(R.id.readChapterImage);
-        readChapterImage.setFirstChapterId(webcom.getFirstChapterId());
-        readChapterImage.setLastChapterId(webcom.getLastChapterId());
         readChapterRepository = new ReadChapterRepository(this, webcom, readChapterImage);
         setChapter( intent.getStringExtra(ChapterListActivity.CHAPTER_NUMBER) );
     }

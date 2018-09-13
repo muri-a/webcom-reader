@@ -22,6 +22,12 @@ public interface ChaptersDAO {
     @Query("SELECT * FROM chapters WHERE wid=:wid AND CAST(chapter AS REAL) < CAST(:chapter AS REAL) ORDER BY CAST(chapter AS REAL) DESC LIMIT 1")
     LiveData<Chapter> getPrevious(String wid, String chapter);
 
+    @Query("SELECT * FROM chapters ORDER BY CAST(chapter AS REAL) LIMIT 1")
+    LiveData<Chapter> getFirstChapter();
+
+    @Query("SELECT * FROM chapters ORDER BY CAST(chapter AS REAL) DESC LIMIT 1")
+    LiveData<Chapter> getLastChapter();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Chapter chapter);
 
@@ -30,15 +36,6 @@ public interface ChaptersDAO {
 
     @Update
     void update(List<Chapter> chapters);
-
-//    @Query("UPDATE chapters SET DownloadStatus=0 WHERE wid=:wid AND chapter=:chapter")
-//    void setUndownloaded(String wid, String chapter);
-//
-//    @Query("UPDATE chapters SET DownloadStatus=1 WHERE wid=:wid AND chapter=:chapter")
-//    void setDownloading(String wid, String chapter);
-//
-//    @Query("UPDATE chapters SET DownloadStatus=2 WHERE wid=:wid AND chapter=:chapter")
-//    void setDownloaded(String wid, String chapter);
 
     @Query("UPDATE chapters SET DownloadStatus=:status WHERE wid=:wid AND chapter=:chapter")
     @TypeConverters(DownloadStatusConverter.class)
