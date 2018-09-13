@@ -414,8 +414,8 @@ public class ComicPageView extends SurfaceView implements Runnable, Target {
 
     private void calcImgSize(){
         if(pageImg != null){
-            float imgRatio = (float)(pageImg.getWidth()/pageImg.getHeight());
-            float screenRatio = (float)(getWidth()/getHeight());
+            float imgRatio = (float)pageImg.getWidth()/pageImg.getHeight();
+            float screenRatio = (float)getWidth()/getHeight();
             if( imgRatio > screenRatio ){
                 imgWidth = getWidth();
                 noZoom = (float)imgWidth/pageImg.getWidth();
