@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.RecyclerItemClickListener;
 import com.example.halftough.webcomreader.activities.AddWebcomActivity;
@@ -72,6 +73,7 @@ public class MyWebcomsActivity extends AppCompatActivity {
             if(data.hasExtra(WEBCOM_ID)){
                 String wid = data.getStringExtra(WEBCOM_ID);
                 viewModel.insert(new ReadWebcom(wid));
+                DownloaderService.updateNewChaptersIn(this, wid);
             }
         }
     }

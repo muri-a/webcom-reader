@@ -113,7 +113,7 @@ public class DownloaderService extends IntentService {
             new OnLiveDataReady(){
                 @Override
                 public void onReady() {
-                    updateNewChaptersInReady(webcom, dbChapters, chapterCountNet);
+                    updateNewChaptersInReady(webcom, dbChapters);
                 }
             }.observe(dbChapters, chapterCountNet, OnLiveDataReady.WaitUntil.CHANGED);
             webcom.updateChapters();
@@ -122,8 +122,8 @@ public class DownloaderService extends IntentService {
         }
     }
 
-    //TODO? LiveData<Chapters> to Chapters, remove chapterCountNet
-    private void updateNewChaptersInReady(Webcom webcom, LiveData<List<Chapter>> dbChapters, LiveData<Integer> chapterCountNet){
+    //TODO? LiveData<Chapters> to Chapters
+    private void updateNewChaptersInReady(Webcom webcom, LiveData<List<Chapter>> dbChapters){
         List<String> netChapters = webcom.getChapterList();
         Queue<Call<ComicPage>> calls = new LinkedList<>();
         Queue<Chapter> extra = new LinkedList<>(); // References to chapters that will be downloaded
@@ -146,7 +146,6 @@ public class DownloaderService extends IntentService {
             //If there is chapter in database that isn't on the list
             else if(netChapter==null || Float.parseFloat(netChapter) > Float.parseFloat(dbChapter.getChapter())){
                 //TODO remove it from database if it haven't been downloaded
-                //chapterList.add(dbChapter);
                 dbChapter = dbIt.hasNext()?dbIt.next():null;
             }
             //If chapter is both in database and on the list

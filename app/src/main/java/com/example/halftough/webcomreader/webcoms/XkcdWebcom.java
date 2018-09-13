@@ -98,19 +98,16 @@ public class XkcdWebcom extends Webcom {
 
     @Override
     public void updateChapters(){
-        Log.e("Updating chapters", "yes");
         Call<ComicPage> call = service.getLast();
         call.enqueue(new Callback<ComicPage>() {
             @Override
             public void onResponse(Call<ComicPage> call, Response<ComicPage> response) {
                 chapterCount.postValue( Integer.parseInt(response.body().getChapterNumber()) -1); // We subtract 1, because comic nr 404 doesn't exist
-                Log.e("STATUS", "GOT CHAPTER COUNT RESPONE "+response.body().getChapterNumber());
             }
 
             @Override
             public void onFailure(Call<ComicPage> call, Throwable t) {
                 chapterCount.postValue(chapterCount.getValue());
-                Log.e("STATUS", "DOWNLOADING CC FAIL");
             }
         });
     }

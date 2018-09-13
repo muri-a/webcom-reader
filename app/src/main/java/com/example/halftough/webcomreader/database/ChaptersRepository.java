@@ -29,7 +29,6 @@ import retrofit2.Response;
 public class ChaptersRepository {
     private ChaptersDAO chaptersDAO;
     private MutableLiveData<List<Chapter>> chapters;
-    //private LiveData<Integer> chapterCount;
     private Webcom webcom;
     private Application application;
 
@@ -48,95 +47,10 @@ public class ChaptersRepository {
                     chapters.postValue(chaps);
                 }
             });
-//
-//            //We don't know if it was updated yet
-//            chapterCount = webcom.getChapterCount();
-//            chapterCount.observeForever(new Observer<Integer>() {
-//                @Override
-//                public void onChanged(@Nullable Integer integer) {
-//                    dataLoaded();
-//                    chapterCount.removeObserver(this);
-//                }
-//            });
-//            chapters.observeForever(new Observer<List<Chapter>>() {
-//                @Override
-//                public void onChanged(@Nullable List<Chapter> chapters2) {
-//                    dataLoaded();
-//                    chapters.removeObserver(this);
-//                }
-//            });
-//            // Get chapters from database.
-//            // We have two variables one for chapters in general, one for the ones got from database,
-//            // as LiveData can't be casted into MutableLiveData and we need mutable if we want to add
-//            // new elements as we download them later
-//            LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(webcom.getId());
-//            dbChapters.observeForever(new Observer<List<Chapter>>() {
-//                @Override
-//                public void onChanged(@Nullable List<Chapter> dbChapters) {
-//                    chapters.postValue(dbChapters);
-//                }
-//            });
         } catch (NoWebcomClassException e) {
             e.printStackTrace();
         }
     }
-
-//    private void dataLoaded(){
-//        Integer chapterInt = chapterCount.getValue();
-//        if(chapters.getValue() == null || chapterInt == null )
-//            return;
-//
-//        List<String> allChapters = webcom.getChapterList();
-//        List<Chapter> dbChapters = chapters.getValue();
-//
-//        final List<Chapter> chapterList = new ArrayList<>();
-//        Queue<Call<ComicPage>> calls = new LinkedList<>();
-//        Queue<Chapter> extra = new LinkedList<>(); // References to chapters that will be downloaded
-//
-//        Iterator<String> allIt = allChapters.iterator();
-//        Iterator<Chapter> dbIt = dbChapters.iterator();
-//
-//        // TODO Zdecydować co jeśli wpis istnieje w bazie, ale nie danych ze strony. Na razie jest po prostu dodawany do listy.
-//        // Jeśli komiks nie jest pobrany, powinna być usuwana z bazy
-//        String a = null;
-//        Chapter b = null;
-//        if(allIt.hasNext())
-//            a = allIt.next();
-//        if(dbIt.hasNext())
-//            b = dbIt.next();
-//        // TODO do while instead (?)
-//        while(allIt.hasNext() || dbIt.hasNext()){
-//            if(b==null || (a!=null && Float.parseFloat(a) < Float.parseFloat(b.getChapter())) ){
-//                Chapter chapter = new Chapter(webcom.getId(), a);
-//                chapterList.add(chapter);
-//                calls.add(webcom.getChapterMetaCall(a));
-//                extra.add(chapter);
-//                a = allIt.hasNext()?allIt.next():null;
-//            }
-//            else if(a==null || Float.parseFloat(a) > Float.parseFloat(b.getChapter())){
-//                chapterList.add(b);
-//                b = dbIt.hasNext()?dbIt.next():null;
-//            }
-//            else{
-//                chapterList.add(b);
-//                a = allIt.hasNext()?allIt.next():null;
-//                b = dbIt.hasNext()?dbIt.next():null;
-//            }
-//        }
-//        chapters.postValue(chapterList);
-//
-//        new OneByOneCallDownloader<ComicPage, Chapter>(calls, extra, 5){
-//            @Override
-//            public void onResponse(Call<ComicPage> call, Response<ComicPage> response, Chapter extra) {
-//                if(response.body() != null) {
-//                    //extra is reference to chapter in the list we use, so we can update it from here.
-//                    extra.setTitle(response.body().getTitle());
-//                    insertChapter(extra);
-//                    chapters.postValue(chapterList);
-//                }
-//            }
-//        }.download();
-//    }
 
     public MutableLiveData<List<Chapter>> getChapters(){
         return chapters;
