@@ -2,9 +2,6 @@ package com.example.halftough.webcomreader.webcoms;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.graphics.drawable.Drawable;
-
-import com.example.halftough.webcomreader.database.Chapter;
 
 import java.util.List;
 

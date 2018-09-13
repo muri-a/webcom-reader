@@ -2,7 +2,6 @@ package com.example.halftough.webcomreader;
 
 import android.app.IntentService;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.Context;
@@ -11,10 +10,11 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
+import com.example.halftough.webcomreader.activities.ChapterList.ChapterListReciever;
+import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 import com.example.halftough.webcomreader.database.AppDatabase;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersDAO;
-import com.example.halftough.webcomreader.database.ChaptersRepository;
 import com.example.halftough.webcomreader.database.ReadWebcom;
 import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 import com.example.halftough.webcomreader.webcoms.ComicPage;
@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -172,7 +171,7 @@ public class DownloaderService extends IntentService {
         new insertAsyncTask(chaptersDAO).execute(chapter);
     }
 
-    private static class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
+    private class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
         private ChaptersDAO mAsyncTaskDao;
         insertAsyncTask(ChaptersDAO dao) {
             mAsyncTaskDao = dao;
@@ -180,6 +179,11 @@ public class DownloaderService extends IntentService {
         @Override
         protected Void doInBackground(final Chapter... params) {
             mAsyncTaskDao.insert(params[0]);
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction(ChapterListReciever.ACTION_CHAPTER_UPDATED);
+            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+            broadcastIntent.putExtra(MyWebcomsActivity.WEBCOM_ID, params[0].getWid());
+            sendBroadcast(broadcastIntent);
             return null;
         }
     }

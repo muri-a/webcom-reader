@@ -1,7 +1,6 @@
 package com.example.halftough.webcomreader.webcoms;
 
 import android.arch.lifecycle.MutableLiveData;
-import android.util.Log;
 
 import com.example.halftough.webcomreader.R;
 
@@ -24,7 +23,6 @@ public class XkcdWebcom extends Webcom {
         if(chapterCount==null){
             chapterCount = new MutableLiveData<>();
             chapterCount.setValue(new Integer(0));
-            Log.e("STATUS", "SET CHAPTER COUNT 0");
         }
         initService();
     }

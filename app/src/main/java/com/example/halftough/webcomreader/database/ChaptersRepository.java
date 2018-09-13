@@ -56,6 +56,7 @@ public class ChaptersRepository {
         return chapters;
     }
 
+    //TODO? might remove it
     public void insertChapter(Chapter chapter){
         new insertAsyncTask(chaptersDAO).execute(chapter);
     }
