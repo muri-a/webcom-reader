@@ -60,7 +60,7 @@ public class ChapterListActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, new Integer(viewModel.getChapters().getValue().size()).toString(), Snackbar.LENGTH_LONG)
+                Snackbar.make(view, Integer.toString(viewModel.getChapters().getValue().size()), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
             }

@@ -112,7 +112,7 @@ public class DownloaderService extends IntentService {
             new OnLiveDataReady(){
                 @Override
                 public void onReady() {
-                    updateNewChaptersInReady(webcom, dbChapters);
+                    updateNewChaptersInReady(webcom, dbChapters.getValue());
                 }
             }.observe(dbChapters, chapterCountNet, OnLiveDataReady.WaitUntil.CHANGED);
             webcom.updateChapters();
@@ -121,14 +121,13 @@ public class DownloaderService extends IntentService {
         }
     }
 
-    //TODO? LiveData<Chapters> to Chapters
-    private void updateNewChaptersInReady(Webcom webcom, LiveData<List<Chapter>> dbChapters){
+    private void updateNewChaptersInReady(Webcom webcom, List<Chapter> dbChapters){
         List<String> netChapters = webcom.getChapterList();
         Queue<Call<ComicPage>> calls = new LinkedList<>();
         Queue<Chapter> extra = new LinkedList<>(); // References to chapters that will be downloaded
 
         Iterator<String> netIt = netChapters.iterator();
-        Iterator<Chapter> dbIt = dbChapters.getValue().iterator();
+        Iterator<Chapter> dbIt = dbChapters.iterator();
 
         String netChapter = netIt.hasNext()?netIt.next():null;
         Chapter dbChapter = dbIt.hasNext()?dbIt.next():null;
@@ -152,7 +151,7 @@ public class DownloaderService extends IntentService {
                 netChapter = netIt.hasNext()?netIt.next():null;
                 dbChapter = dbIt.hasNext()?dbIt.next():null;
             }
-        }while(netIt.hasNext() || dbIt.hasNext());
+        }while(netChapter != null || dbChapter != null);
 
         new OneByOneCallDownloader<ComicPage, Chapter>(calls, extra, 5){
             @Override
