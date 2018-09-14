@@ -179,10 +179,7 @@ public class DownloaderService extends IntentService {
         protected Void doInBackground(final Chapter... params) {
             mAsyncTaskDao.insert(params[0]);
             Intent broadcastIntent = new Intent();
-            broadcastIntent.setAction(ChapterListReciever.ACTION_CHAPTER_UPDATED);
-            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-            broadcastIntent.putExtra(MyWebcomsActivity.WEBCOM_ID, params[0].getWid());
-            sendBroadcast(broadcastIntent);
+            broadcastChapterUpdated(params[0]);
             return null;
         }
     }
@@ -209,6 +206,10 @@ public class DownloaderService extends IntentService {
             // TODO option to save internal or external
             saveBufferToFile(bufferInStream, extra, extentsion);
         }
+        void onFail(Chapter chapter, String extentsion){
+            chaptersDAO.setDownloadStatus(chapter.getWid(), chapter.getChapter(), Chapter.DownloadStatus.UNDOWNLOADED);
+            broadcastChapterUpdated(chapter);
+        }
 
         private void saveBufferToFile(BufferedInputStream bufferedInputStream, Chapter chapter, String extension){
             File root = android.os.Environment.getExternalStorageDirectory();
@@ -231,13 +232,20 @@ public class DownloaderService extends IntentService {
                 fos.flush();
                 fos.close();
                 chaptersDAO.setDownloadStatus(chapter.getWid(), chapter.getChapter(), Chapter.DownloadStatus.DOWNLOADED);
-            } catch (FileNotFoundException e) {
-                chaptersDAO.setDownloadStatus(chapter.getWid(), chapter.getChapter(), Chapter.DownloadStatus.UNDOWNLOADED);
-                e.printStackTrace();
             } catch (IOException e) {
                 chaptersDAO.setDownloadStatus(chapter.getWid(), chapter.getChapter(), Chapter.DownloadStatus.UNDOWNLOADED);
-                e.printStackTrace();
+            }
+            finally {
+                broadcastChapterUpdated(chapter);
             }
         }
+    }
+
+    private void broadcastChapterUpdated(Chapter chapter){
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(ChapterListReciever.ACTION_CHAPTER_UPDATED);
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        broadcastIntent.putExtra(MyWebcomsActivity.WEBCOM_ID, chapter.getWid());
+        sendBroadcast(broadcastIntent);
     }
 }

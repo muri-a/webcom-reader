@@ -28,6 +28,9 @@ public interface ChaptersDAO {
     @Query("SELECT * FROM chapters ORDER BY CAST(chapter AS REAL) DESC LIMIT 1")
     LiveData<Chapter> getLastChapter();
 
+    @Query("UPDATE chapters SET DownloadStatus=0 WHERE DownloadStatus=1")
+    void clearUndownloaded();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Chapter chapter);
 

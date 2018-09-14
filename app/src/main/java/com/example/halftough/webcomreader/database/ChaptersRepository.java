@@ -73,35 +73,6 @@ public class ChaptersRepository {
             @Override
             public void onChanged(@Nullable List<Chapter> chaps) {
                 dbChapters.removeObserver(this);
-                Iterator<Chapter> chIt = chaps.iterator();
-                Iterator<Chapter> dbIt = dbChapters.getValue().iterator();
-                List<Chapter> toAdd = new ArrayList<>();
-                Chapter a = chIt.hasNext()?chIt.next():null;
-                Chapter b = dbIt.hasNext()?dbIt.next():null;
-                do{
-                    if(a.equals(b)){
-                        if(a.getStatus() != b.getStatus()){
-                            a.setStatus(b.getStatus());
-                        }
-                        a = chIt.hasNext()?chIt.next():null;
-                        b = dbIt.hasNext()?dbIt.next():null;
-                    }
-                    else if( a.compareTo(b) < 0 ){
-                        a = chIt.hasNext()?chIt.next():null;
-                    }
-                    else{
-                        // Because this should be rare, we don't care for speed
-                        toAdd.add(b);
-                        b = dbIt.hasNext()?dbIt.next():null;
-                    }
-                }while(chIt.hasNext() || dbIt.hasNext());
-                if(toAdd.size() > 0){
-                    Set<Chapter> set = new TreeSet<>(chaps);
-                    for(Chapter c : toAdd){
-                        set.add(c);
-                    }
-                    chaps = new ArrayList<>(set);
-                }
                 chapters.postValue(chaps);
             }
         });
@@ -198,7 +169,7 @@ public class ChaptersRepository {
         }
     }
 
-    private static class updateListAsyncTask extends AsyncTask<List<Chapter>, Void, Void>{
+    private class updateListAsyncTask extends AsyncTask<List<Chapter>, Void, Void>{
         private ChaptersDAO mAsyncTaskDao;
         updateListAsyncTask(ChaptersDAO dao){ mAsyncTaskDao = dao; }
         @Override
@@ -208,7 +179,7 @@ public class ChaptersRepository {
         }
     }
 
-    private static class setDownloadStatusAsyncTask extends AsyncTask<Chapter, Void, Void>{
+    private class setDownloadStatusAsyncTask extends AsyncTask<Chapter, Void, Void>{
         private ChaptersDAO mAsyncTaskDao;
         public setDownloadStatusAsyncTask(ChaptersDAO dao) {
             mAsyncTaskDao = dao;
@@ -216,6 +187,7 @@ public class ChaptersRepository {
         @Override
         protected Void doInBackground(Chapter... chapters) {
             mAsyncTaskDao.setDownloadStatus(chapters[0].getWid(), chapters[0].getChapter(), chapters[0].getDownloadStatus());
+            update();
             return null;
         }
     }

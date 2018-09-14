@@ -31,6 +31,7 @@ public abstract class OneByOneUrlDownloader<Extra> extends OneByOneDownloader<St
     }
 
     abstract void onResponse(BufferedInputStream bufferinstream, Extra extra, String extentsion);
+    abstract void onFail(Extra extra, String extentsion);
 
     protected void downloadElement(String element, final Extra extra){
         new asyncDownload(element).execute(extra);
@@ -51,10 +52,10 @@ public abstract class OneByOneUrlDownloader<Extra> extends OneByOneDownloader<St
                 InputStream is = connection.getInputStream();
                 BufferedInputStream bufferInStream = new BufferedInputStream(is);
                 onResponse(bufferInStream, extras[0], ext);
-                elementDownloaded();
             } catch (IOException e) {
-                e.printStackTrace();
+                onFail(extras[0], ext);
             }
+            elementDownloaded();
             return null;
         }
     }
