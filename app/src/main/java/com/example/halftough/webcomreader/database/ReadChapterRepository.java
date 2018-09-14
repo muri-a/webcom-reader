@@ -13,6 +13,8 @@ import com.example.halftough.webcomreader.webcoms.ComicPage;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,6 +59,24 @@ public class ReadChapterRepository {
     private void getImage() {
         if(chapter.getValue()==null)
             return;
+        switch (chapter.getValue().getDownloadStatus()){
+            case DOWNLOADED:
+                getImageFromStorage();
+                break;
+            case UNDOWNLOADED:
+                downloadImage();
+                //TODO no break
+            case DOWNLOADING:
+                //TODO wait for download to complite
+        }
+    }
+
+    private void getImageFromStorage(){
+        File f = chapter.getValue().getFile();
+        Picasso.get().load(f).into(imageView);
+    }
+
+    private void downloadImage(){
         Call<ComicPage> call = webcom.getChapterMetaCall(chapter.getValue().getChapter());
         call.enqueue(new Callback<ComicPage>() {
             @Override

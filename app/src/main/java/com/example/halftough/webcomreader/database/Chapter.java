@@ -4,6 +4,9 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
+import java.io.File;
+import java.io.FilenameFilter;
+
 @Entity(tableName = "chapters", primaryKeys = {"wid", "chapter"})
 public class Chapter implements Comparable<Chapter> {
     public enum Status { UNREAD, READ, READING }
@@ -67,5 +70,19 @@ public class Chapter implements Comparable<Chapter> {
         }
         Chapter b = (Chapter)o;
         return wid == b.getWid() && chapter == b.getChapter();
+    }
+
+    public File getFile() {
+        //TODO option to load from internal or external
+        File root = android.os.Environment.getExternalStorageDirectory();
+        File dir = new File(root.getAbsolutePath()+"/webcom/"+wid);
+        File [] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.startsWith(getChapter()+".") || name.equals(getChapter());
+            }
+        });
+        //TODO if more than one file, pick "best"
+        return files.length>0?files[0]:null;
     }
 }
