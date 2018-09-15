@@ -12,8 +12,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
+import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
@@ -79,6 +81,31 @@ public class ChapterListActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.chapter_list_toolbar_menu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.chapterListToolbarMenuFilter:
+            case R.id.chapterListToolbarMenuChangeOrder:
+            case R.id.chapterListToolbarDownload1: {
+                List<Chapter> chapters = viewModel.getChaptersToDownload(1);
+                for (Chapter chapter : chapters) {
+                    downloadChapter(chapter);
+                }
+                break;
+            }
+            case R.id.chapterListToolbarDownload10: {
+                //TODO would be even nicer if they would download in odrer
+                List<Chapter> chapters = viewModel.getChaptersToDownload(10);
+                for (Chapter chapter : chapters) {
+                    downloadChapter(chapter);
+                }
+                break;
+            }
+            case R.id.chapterListToolbarDownloadCustom:
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

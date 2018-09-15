@@ -26,8 +26,13 @@
     <string name="chapter_item_menu_mark_previous_unread">this and previous</string>
     <string name="chapter_item_menu_mark_later_unread">this and later</string>
 
-    <string name="chapter_list_toolbar_menu_download">Download</string>
-    <string name="chapter_list_toolbar_menu_sorting_order">Order</string>
     <string name="chapter_list_toolbar_menu_filter">Filter</string>
+    <string name="chapter_list_toolbar_menu_sorting_order">Change order</string>
+    <string name="chapter_list_toolbar_menu_download">Download</string>
+    <string name="chapter_list_toolbar_download_1">Download next</string>
+    <string name="chapter_list_toolbar_download_10">Download 10</string>
+    <string name="chapter_list_toolbar_download_custom">Download few</string>
+
+
 
 </resources>

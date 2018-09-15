@@ -3,17 +3,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/chapterListToolbarMenuFilter"
         android:enabled="false"
         android:icon="@drawable/ic_filter_list_white_24dp"
         android:title="@string/chapter_list_toolbar_menu_filter"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/chapterListToolbarMenuChangeOrder"
         android:enabled="false"
         android:icon="@drawable/ic_sorting_order"
         android:title="@string/chapter_list_toolbar_menu_sorting_order"
         app:showAsAction="ifRoom" />
     <item
-        android:enabled="false"
+        android:id="@+id/chapterListToolbarMenuDownload"
         android:title="@string/chapter_list_toolbar_menu_download"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" >
+        <menu>
+            <item
+                android:id="@+id/chapterListToolbarDownload1"
+                android:title="@string/chapter_list_toolbar_download_1" />
+            <item
+                android:id="@+id/chapterListToolbarDownload10"
+                android:title="@string/chapter_list_toolbar_download_10" />
+            <item
+                android:id="@+id/chapterListToolbarDownloadCustom"
+                android:checkable="false"
+                android:title="@string/chapter_list_toolbar_download_custom" />
+        </menu>
+    </item>
 </menu>

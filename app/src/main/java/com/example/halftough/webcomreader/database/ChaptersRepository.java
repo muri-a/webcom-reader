@@ -78,6 +78,21 @@ public class ChaptersRepository {
         return null;
     }
 
+    public List<Chapter> getChaptersToDownload(int number) {
+        List<Chapter> toDownload = new ArrayList<>();
+        if(chapters.getValue()!=null){
+            for(Chapter chapter: chapters.getValue()){
+                if(chapter.getStatus() == Chapter.Status.UNREAD && chapter.getDownloadStatus() == Chapter.DownloadStatus.UNDOWNLOADED){
+                    toDownload.add(chapter);
+                    if(toDownload.size() >= number){
+                        return toDownload;
+                    }
+                }
+            }
+        }
+        return toDownload;
+    }
+
     public void update() {
         final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(webcom.getId());
         dbChapters.observeForever(new Observer<List<Chapter>>() {
