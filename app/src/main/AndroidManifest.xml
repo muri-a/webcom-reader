@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".activities.WebcomReaderApplication">
-        <activity android:name=".activities.MyWebcoms.MyWebcomsActivity">
+        <activity android:name=".activities.MyWebcoms.MyWebcomsActivity"
+            android:label="@string/title_activity_my_webcoms">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
