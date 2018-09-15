@@ -30,8 +30,11 @@ public class ChapterListViewModel extends AndroidViewModel {
         return chaptersRepository.getChapterToRead();
     }
 
-    public List<Chapter> getChaptersToDownload(int number) {
-        return chaptersRepository.getChaptersToDownload(number);
+    public void downloadNextChapters(int number) {
+        List<Chapter> chapters = chaptersRepository.getChaptersToDownload(number);
+        for (Chapter chapter : chapters) {
+            downloadChapter(chapter);
+        }
     }
 
 

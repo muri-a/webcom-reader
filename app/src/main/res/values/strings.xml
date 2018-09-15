@@ -7,6 +7,9 @@
     <string name="title_activity_page_list">PageListActivity</string>
     <string name="title_activity_read_webcom">ReadWebcomActivity</string>
 
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
     <string name="webcom_info_format">Format:</string>
     <string name="webcom_info_pages_label">Pages:</string>
     <string name="webcom_info_chapters_label">Chapters:</string>
@@ -33,6 +36,7 @@
     <string name="chapter_list_toolbar_download_1">Download next</string>
     <string name="chapter_list_toolbar_download_10">Download 10</string>
     <string name="chapter_list_toolbar_download_custom">Download few</string>
+    <string name="chapter_list_download_few_title">Insert nuber of chapters</string>
 
 
 

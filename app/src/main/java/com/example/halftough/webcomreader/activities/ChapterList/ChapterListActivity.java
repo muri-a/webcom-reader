@@ -1,5 +1,6 @@
 package com.example.halftough.webcomreader.activities.ChapterList;
 
+import android.app.DialogFragment;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -24,7 +25,7 @@ import com.example.halftough.webcomreader.database.Chapter;
 
 import java.util.List;
 
-public class ChapterListActivity extends AppCompatActivity {
+public class ChapterListActivity extends AppCompatActivity implements PickNumberDialog.NoticeNumberPickerListener {
     public static int READ_CHAPTER_RESULT = 3;
     public static String UPDATE_LIST = "UPDATE_LIST";
     RecyclerView chapterListRecyclerView;
@@ -89,23 +90,24 @@ public class ChapterListActivity extends AppCompatActivity {
             case R.id.chapterListToolbarMenuFilter:
             case R.id.chapterListToolbarMenuChangeOrder:
             case R.id.chapterListToolbarDownload1: {
-                List<Chapter> chapters = viewModel.getChaptersToDownload(1);
-                for (Chapter chapter : chapters) {
-                    downloadChapter(chapter);
-                }
+                viewModel.downloadNextChapters(1);
                 break;
             }
             case R.id.chapterListToolbarDownload10: {
                 //TODO would be even nicer if they would download in odrer
-                List<Chapter> chapters = viewModel.getChaptersToDownload(10);
-                for (Chapter chapter : chapters) {
-                    downloadChapter(chapter);
-                }
+                viewModel.downloadNextChapters(10);
                 break;
             }
             case R.id.chapterListToolbarDownloadCustom:
+                DialogFragment dialog = new PickNumberDialog();
+                dialog.show(getFragmentManager(), "Rubble");
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onNumberPickerPositiveClick(int value) {
+        viewModel.downloadNextChapters(value);
     }
 
     @Override

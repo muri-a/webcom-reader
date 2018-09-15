@@ -6,4 +6,5 @@
     <color name="chapterUnread">#080808</color>
     <color name="chapterRead">#BBB</color>
     <color name="comicVievBackground">#f8f8f8</color>
+    <color name="transparent">#00ffffff</color>
 </resources>
