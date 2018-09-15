@@ -62,15 +62,15 @@ public class DownloaderService extends IntentService {
     public static void updateNewChaptersIn(Context context, String wid){
         Intent intent = new Intent(context, DownloaderService.class);
         intent.setAction(ACTION_UPDATE_NEW_CHAPTERS_IN);
-        intent.putExtra(ChapterListActivity.CHAPTER_WID, wid);
+        intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, wid);
         context.startService(intent);
     }
 
     public static void enqueueChapter(Context context, Chapter chapter) {
         Intent intent = new Intent(context, DownloaderService.class);
         intent.setAction(ACTION_ENQUEUE_CHAPTER);
-        intent.putExtra(ChapterListActivity.CHAPTER_WID, chapter.getWid());
-        intent.putExtra(ChapterListActivity.CHAPTER_NUMBER, chapter.getChapter());
+        intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, chapter.getWid());
+        intent.putExtra(UserRepository.EXTRA_CHAPTER_NUMBER, chapter.getChapter());
         context.startService(intent);
     }
 
@@ -81,10 +81,10 @@ public class DownloaderService extends IntentService {
             if (ACTION_UPDATE_NEW_CHAPTERS.equals(action)) {
                 handleUpdateNewChapters();
             } else if(ACTION_UPDATE_NEW_CHAPTERS_IN.equals(action)){
-                handleUpdateNewChaptersIn(intent.getStringExtra(ChapterListActivity.CHAPTER_WID));
+                handleUpdateNewChaptersIn(intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID));
             } else if (ACTION_ENQUEUE_CHAPTER.equals(action)) {
-                final String wid = intent.getStringExtra(ChapterListActivity.CHAPTER_WID);
-                final String chapter = intent.getStringExtra(ChapterListActivity.CHAPTER_NUMBER);
+                final String wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
+                final String chapter = intent.getStringExtra(UserRepository.EXTRA_CHAPTER_NUMBER);
                 handleEnqueueChapter(wid, chapter);
             }
         }
@@ -243,9 +243,10 @@ public class DownloaderService extends IntentService {
 
     private void broadcastChapterUpdated(Chapter chapter){
         Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(ChapterListReciever.ACTION_CHAPTER_UPDATED);
+        broadcastIntent.setAction(UserRepository.ACTION_CHAPTER_UPDATED);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(MyWebcomsActivity.WEBCOM_ID, chapter.getWid());
+        broadcastIntent.putExtra(UserRepository.EXTRA_WEBCOM_ID, chapter.getWid());
+        broadcastIntent.putExtra(UserRepository.EXTRA_CHAPTER_NUMBER, chapter.getChapter());
         sendBroadcast(broadcastIntent);
     }
 }

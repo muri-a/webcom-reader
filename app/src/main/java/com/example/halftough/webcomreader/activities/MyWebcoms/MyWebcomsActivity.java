@@ -13,6 +13,7 @@ import android.view.View;
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.RecyclerItemClickListener;
+import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.AddWebcomActivity;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
 import com.example.halftough.webcomreader.database.ReadWebcom;
@@ -21,7 +22,6 @@ import java.util.List;
 
 //TODO Alternative views
 public class MyWebcomsActivity extends AppCompatActivity {
-    public static String WEBCOM_ID = "WEBCOM_ID";
     public static int ADD_WEBCOM_RESULT = 1;
 
     RecyclerView myWebcomRecyclerView;
@@ -61,7 +61,7 @@ public class MyWebcomsActivity extends AppCompatActivity {
 
     public void showChapterList(String wid){
         Intent intent = new Intent(this, ChapterListActivity.class);
-        intent.putExtra(WEBCOM_ID, wid);
+        intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, wid);
         startActivity(intent);
     }
 
@@ -70,8 +70,8 @@ public class MyWebcomsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode== ADD_WEBCOM_RESULT && resultCode!=RESULT_CANCELED){
-            if(data.hasExtra(WEBCOM_ID)){
-                String wid = data.getStringExtra(WEBCOM_ID);
+            if(data.hasExtra(UserRepository.EXTRA_WEBCOM_ID)){
+                String wid = data.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
                 viewModel.insert(new ReadWebcom(wid));
                 DownloaderService.updateNewChaptersIn(this, wid);
             }

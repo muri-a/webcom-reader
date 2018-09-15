@@ -5,19 +5,14 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-
+import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.activities.ReadChapter.ComicPageView;
-import com.example.halftough.webcomreader.webcoms.ComicPage;
+import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ReadChapterRepository {
     private ChaptersDAO chaptersDAO;
@@ -25,9 +20,9 @@ public class ReadChapterRepository {
     private LiveData<Chapter> firstChapter, chapter, lastChapter;
     private ComicPageView imageView;
     private boolean wasUpdate = false;
-    private Activity context;
+    private ReadChapterActivity context;
 
-    public ReadChapterRepository(Activity context, Webcom webcom, ComicPageView imageView) {
+    public ReadChapterRepository(ReadChapterActivity context, Webcom webcom, ComicPageView imageView) {
         AppDatabase db = AppDatabase.getDatabase(context.getApplicationContext());
         chaptersDAO = db.chaptersDAO();
         this.webcom = webcom;
@@ -64,30 +59,25 @@ public class ReadChapterRepository {
                 getImageFromStorage();
                 break;
             case UNDOWNLOADED:
-                downloadImage();
-                //TODO no break
+                context.showDownloadingText();
+                wasUpdate = true;
+                Chapter lChapter = chapter.getValue();
+                lChapter.setDownloadStatus(Chapter.DownloadStatus.DOWNLOADING);
+                new ChaptersRepository.setDownloadStatusAsyncTask(chaptersDAO).execute(lChapter);
+                DownloaderService.enqueueChapter(context, chapter.getValue());
+                //no break
             case DOWNLOADING:
-                //TODO wait for download to complite
+                context.listenForDownload(chapter.getValue());
         }
     }
 
-    private void getImageFromStorage(){
+    public void getImageFromStorage(){
+        if(chapter.getValue() == null)
+            return;
+        context.hideDownloadingText();
         File f = chapter.getValue().getFile();
         Picasso.get().load(f).into(imageView);
-    }
-
-    private void downloadImage(){
-        Call<ComicPage> call = webcom.getChapterMetaCall(chapter.getValue().getChapter());
-        call.enqueue(new Callback<ComicPage>() {
-            @Override
-            public void onResponse(Call<ComicPage> call, Response<ComicPage> response) {
-                Picasso.get().load(response.body().getUrl()).into(imageView);
-            }
-            @Override
-            public void onFailure(Call<ComicPage> call, Throwable t) {
-
-            }
-        });
+        markRead();
     }
 
     public void markRead(){
@@ -142,7 +132,6 @@ public class ReadChapterRepository {
             context.setTitle(chapter.getTitle());
             imageView.setCurrentChapter(chapter.getChapter());
             getImage();
-            markRead();
         }
     }
 }

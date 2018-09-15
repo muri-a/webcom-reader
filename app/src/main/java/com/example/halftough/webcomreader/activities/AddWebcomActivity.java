@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.RecyclerItemClickListener;
+import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 import com.example.halftough.webcomreader.webcoms.DilbertWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
@@ -68,10 +69,10 @@ public class AddWebcomActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode==ADD_WEBCOM_RESULT && resultCode!=RESULT_CANCELED){
-            if(data.hasExtra(MyWebcomsActivity.WEBCOM_ID)) {
-                String wid = data.getStringExtra(MyWebcomsActivity.WEBCOM_ID);
+            if(data.hasExtra(UserRepository.EXTRA_WEBCOM_ID)) {
+                String wid = data.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
                 Intent result = new Intent();
-                result.putExtra(MyWebcomsActivity.WEBCOM_ID, wid);
+                result.putExtra(UserRepository.EXTRA_WEBCOM_ID, wid);
                 setResult(RESULT_OK, result);
                 finish();
             }

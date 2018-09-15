@@ -77,7 +77,7 @@ public class WebcomInfoActivity extends AppCompatActivity {
 
     public void addWebcom(View view){
         Intent result = new Intent();
-        result.putExtra(MyWebcomsActivity.WEBCOM_ID, webcom.getId());
+        result.putExtra(UserRepository.EXTRA_WEBCOM_ID, webcom.getId());
         setResult(AddWebcomActivity.ADD_WEBCOM_RESULT, result);
         finish();
     }

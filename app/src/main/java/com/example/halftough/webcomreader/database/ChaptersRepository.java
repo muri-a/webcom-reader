@@ -63,8 +63,19 @@ public class ChaptersRepository {
 
     public void downloadChapter(Chapter chapter){
         chapter.setDownloadStatus(Chapter.DownloadStatus.DOWNLOADING);
-        new setDownloadStatusAsyncTask(chaptersDAO).execute(chapter);
+        new setDownloadStatusAsyncTask(chaptersDAO, this).execute(chapter);
         DownloaderService.enqueueChapter(application, chapter);
+    }
+
+    public Chapter getChapterToRead() {
+        if(chapters.getValue()!=null){
+            for(Chapter chapter : chapters.getValue()){
+                if(chapter.getStatus() == Chapter.Status.UNREAD){
+                    return chapter;
+                }
+            }
+        }
+        return null;
     }
 
     public void update() {
@@ -179,15 +190,19 @@ public class ChaptersRepository {
         }
     }
 
-    private class setDownloadStatusAsyncTask extends AsyncTask<Chapter, Void, Void>{
+    public static class setDownloadStatusAsyncTask extends AsyncTask<Chapter, Void, Void>{
         private ChaptersDAO mAsyncTaskDao;
-        public setDownloadStatusAsyncTask(ChaptersDAO dao) {
+        private ChaptersRepository repository;
+        public setDownloadStatusAsyncTask(ChaptersDAO dao){ this(dao, null); }
+        public setDownloadStatusAsyncTask(ChaptersDAO dao, ChaptersRepository repository) {
             mAsyncTaskDao = dao;
+            this.repository = repository;
         }
         @Override
         protected Void doInBackground(Chapter... chapters) {
             mAsyncTaskDao.setDownloadStatus(chapters[0].getWid(), chapters[0].getChapter(), chapters[0].getDownloadStatus());
-            update();
+            if(repository!=null)
+                repository.update();
             return null;
         }
     }

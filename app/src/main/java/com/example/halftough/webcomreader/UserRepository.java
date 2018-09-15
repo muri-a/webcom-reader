@@ -6,6 +6,10 @@ import com.example.halftough.webcomreader.webcoms.XkcdWebcom;
 
 
 public class UserRepository {
+    public static final String ACTION_CHAPTER_UPDATED = "com.example.halftough.webcomreader.ACTION_CHAPTER_UPDATED";
+
+    public static String EXTRA_WEBCOM_ID = "EXTRA_WEBCOM_ID";
+    public static String EXTRA_CHAPTER_NUMBER = "EXTRA_CHAPTER_NUMBER";
 
     static public Webcom getWebcomInstance(String id) throws NoWebcomClassException {
         switch(id){

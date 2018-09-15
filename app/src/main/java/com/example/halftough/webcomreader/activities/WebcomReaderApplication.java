@@ -12,6 +12,8 @@ public class WebcomReaderApplication extends Application {
     @Override
     public void onCreate(){
         super.onCreate();
+
+        //If for some reason downloading was interrupted but application didn't get to makr it, do it now
         AppDatabase db = AppDatabase.getDatabase(this);
         new AsyncUndownloadedClearer(db.chaptersDAO()).execute();
 

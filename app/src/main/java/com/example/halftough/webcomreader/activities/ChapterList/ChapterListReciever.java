@@ -4,10 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 
 public class ChapterListReciever extends BroadcastReceiver {
-    public static final String ACTION_CHAPTER_UPDATED = "com.example.halftough.webcomreader.ACTION_CHAPTER_UPDATED";
     private ChapterListViewModel chapterListModel;
     private String wid;
 
@@ -18,7 +18,7 @@ public class ChapterListReciever extends BroadcastReceiver {
     }
     @Override
     public void onReceive(Context context, Intent intent) {
-        String recWid = intent.getStringExtra(MyWebcomsActivity.WEBCOM_ID);
+        String recWid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
         if(wid.equals(recWid))
             chapterListModel.update();
     }

@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,15 +16,12 @@ import android.view.View;
 import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
-import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
 import com.example.halftough.webcomreader.database.Chapter;
 
 import java.util.List;
 
 public class ChapterListActivity extends AppCompatActivity {
-    public static String CHAPTER_WID = "CHAPTER_WID";
-    public static String CHAPTER_NUMBER = "CHAPTER_NUMBER";
     public static int READ_CHAPTER_RESULT = 3;
     public static String UPDATE_LIST = "UPDATE_LIST";
     RecyclerView chapterListRecyclerView;
@@ -42,7 +38,7 @@ public class ChapterListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Intent intent = getIntent();
-        wid = intent.getStringExtra(MyWebcomsActivity.WEBCOM_ID);
+        wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
 
         try {
             String title = UserRepository.getWebcomInstance(wid).getTitle();
@@ -51,15 +47,6 @@ public class ChapterListActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, Integer.toString(viewModel.getChapters().getValue().size()), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-            }
-        });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         chapterListRecyclerView = (RecyclerView)findViewById(R.id.chapterListRecyclerView);
@@ -75,13 +62,23 @@ public class ChapterListActivity extends AppCompatActivity {
                 adapter.setChapters(chapters);
             }
         });
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO depending on settings, newest or oldest unread
+                Chapter chapter = viewModel.getChapterToRead();
+                readWebcom(chapter);
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         reciever = new ChapterListReciever(viewModel, wid);
-        IntentFilter filter = new IntentFilter(ChapterListReciever.ACTION_CHAPTER_UPDATED);
+        IntentFilter filter = new IntentFilter(UserRepository.ACTION_CHAPTER_UPDATED);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(reciever, filter);
     }
@@ -105,8 +102,8 @@ public class ChapterListActivity extends AppCompatActivity {
 
     public void readWebcom(Chapter chapter){
         Intent intent = new Intent(this, ReadChapterActivity.class);
-        intent.putExtra(MyWebcomsActivity.WEBCOM_ID, chapter.getWid());
-        intent.putExtra(CHAPTER_NUMBER, chapter.getChapter());
+        intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, chapter.getWid());
+        intent.putExtra(UserRepository.EXTRA_CHAPTER_NUMBER, chapter.getChapter());
         startActivityForResult(intent, READ_CHAPTER_RESULT);
     }
 

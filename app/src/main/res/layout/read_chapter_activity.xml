@@ -22,4 +22,11 @@
 
     <include layout="@layout/read_chapter_content" />
 
+    <TextView
+        android:id="@+id/readChapterDownloadingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:text="@string/chapter_item_downloading" />
+
 </android.support.design.widget.CoordinatorLayout>

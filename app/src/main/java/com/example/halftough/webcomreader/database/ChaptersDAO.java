@@ -28,6 +28,7 @@ public interface ChaptersDAO {
     @Query("SELECT * FROM chapters ORDER BY CAST(chapter AS REAL) DESC LIMIT 1")
     LiveData<Chapter> getLastChapter();
 
+    //Fixes status in case of error. Only use at start of the application.
     @Query("UPDATE chapters SET DownloadStatus=0 WHERE DownloadStatus=1")
     void clearUndownloaded();
 

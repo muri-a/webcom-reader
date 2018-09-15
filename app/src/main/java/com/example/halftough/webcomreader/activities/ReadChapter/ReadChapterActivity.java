@@ -2,15 +2,19 @@ package com.example.halftough.webcomreader.activities.ReadChapter;
 
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
 import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
+import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ReadChapterRepository;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
@@ -18,6 +22,8 @@ public class ReadChapterActivity extends AppCompatActivity {
     private Webcom webcom;
     ComicPageView readChapterImage;
     ReadChapterRepository readChapterRepository;
+    ReadChapterBroadcastReceiver broadcastReceiver;
+    TextView downloadingView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,28 +34,29 @@ public class ReadChapterActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         try {
-            webcom = UserRepository.getWebcomInstance( intent.getStringExtra(MyWebcomsActivity.WEBCOM_ID) );
+            webcom = UserRepository.getWebcomInstance( intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID) );
         } catch (NoWebcomClassException e) {
             //TODO exception
             e.printStackTrace();
         }
 
+        downloadingView = (TextView)findViewById(R.id.readChapterDownloadingTextView);
         readChapterImage = (ComicPageView)findViewById(R.id.readChapterImage);
         readChapterRepository = new ReadChapterRepository(this, webcom, readChapterImage);
-        setChapter( intent.getStringExtra(ChapterListActivity.CHAPTER_NUMBER) );
+        setChapter( intent.getStringExtra(UserRepository.EXTRA_CHAPTER_NUMBER) );
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstance) {
         String number = readChapterRepository.getChapterNumber();
-        savedInstance.putString(ChapterListActivity.CHAPTER_NUMBER, number);
+        savedInstance.putString(UserRepository.EXTRA_CHAPTER_NUMBER, number);
         super.onSaveInstanceState(savedInstance);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        String number = savedInstanceState.getString(ChapterListActivity.CHAPTER_NUMBER);
+        String number = savedInstanceState.getString(UserRepository.EXTRA_CHAPTER_NUMBER);
         setChapter(number);
     }
 
@@ -63,6 +70,10 @@ public class ReadChapterActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         readChapterImage.stop();
+        if(broadcastReceiver!=null) {
+            unregisterReceiver(broadcastReceiver);
+            broadcastReceiver = null;
+        }
     }
 
     @Override
@@ -87,4 +98,27 @@ public class ReadChapterActivity extends AppCompatActivity {
     }
 
     public Webcom getWebcom(){ return webcom; }
+
+    public void hideDownloadingText(){
+        downloadingView.setVisibility(View.GONE);
+    }
+
+    public void showDownloadingText(){
+        downloadingView.setVisibility(View.VISIBLE);
+    }
+
+    public void listenForDownload(Chapter chapter){
+        broadcastReceiver = new ReadChapterBroadcastReceiver(this, chapter);
+        IntentFilter filter = new IntentFilter(UserRepository.ACTION_CHAPTER_UPDATED);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(broadcastReceiver, filter);
+    }
+
+    public void imageDownloaded() {
+        if(broadcastReceiver!=null) {
+            unregisterReceiver(broadcastReceiver);
+            broadcastReceiver = null;
+        }
+        readChapterRepository.getImageFromStorage();
+    }
 }

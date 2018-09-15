@@ -22,9 +22,12 @@ public class ChapterListViewModel extends AndroidViewModel {
     }
 
     public void setWid(String wid){
-        //this.wid = wid;
         chaptersRepository = new ChaptersRepository(application, wid);
         chapters = chaptersRepository.getChapters();
+    }
+
+    public Chapter getChapterToRead() {
+        return chaptersRepository.getChapterToRead();
     }
 
     public LiveData<List<Chapter>> getChapters() {
