@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:enabled="false"
+        android:icon="@drawable/ic_filter_list_white_24dp"
+        android:title="@string/chapter_list_toolbar_menu_filter"
+        app:showAsAction="ifRoom" />
+    <item
+        android:enabled="false"
+        android:icon="@drawable/ic_sorting_order"
+        android:title="@string/chapter_list_toolbar_menu_sorting_order"
+        app:showAsAction="ifRoom" />
+    <item
+        android:enabled="false"
+        android:title="@string/chapter_list_toolbar_menu_download"
+        app:showAsAction="ifRoom" />
+</menu>

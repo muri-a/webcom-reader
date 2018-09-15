@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 
 import com.example.halftough.webcomreader.NoWebcomClassException;
@@ -72,6 +73,12 @@ public class ChapterListActivity extends AppCompatActivity {
                 readWebcom(chapter);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.chapter_list_toolbar_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
