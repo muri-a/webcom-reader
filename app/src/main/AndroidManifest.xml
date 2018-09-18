@@ -14,8 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".activities.WebcomReaderApplication">
-        <activity android:name=".activities.MyWebcoms.MyWebcomsActivity"
-            android:label="@string/title_activity_my_webcoms">
+        <activity android:name=".activities.MyWebcoms.MyWebcomsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -47,6 +46,13 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity" />
+        </activity>
+        <activity
+            android:name=".activities.ChapterList.ChapterPreferencesActivity"
+            android:parentActivityName=".activities.ChapterList.ChapterListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity" />
         </activity>
         <activity
             android:name=".activities.ReadChapter.ReadChapterActivity"

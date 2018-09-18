@@ -4,10 +4,14 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.example.halftough.webcomreader.DownloaderService;
+import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
+import com.google.common.collect.Lists;
 
 import java.util.List;
 
@@ -15,6 +19,7 @@ public class ChapterListViewModel extends AndroidViewModel {
     private ChaptersRepository chaptersRepository;
     private MutableLiveData<List<Chapter>> chapters;
     private Application application;
+    private SharedPreferences preferences;
 
     public ChapterListViewModel(Application application) {
         super(application);
@@ -24,10 +29,16 @@ public class ChapterListViewModel extends AndroidViewModel {
     public void setWid(String wid){
         chaptersRepository = new ChaptersRepository(application, wid);
         chapters = chaptersRepository.getChapters();
+        preferences = application.getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, Context.MODE_PRIVATE);
     }
 
     public Chapter getChapterToRead() {
         return chaptersRepository.getChapterToRead();
+    }
+
+    public void changeOrder(){
+        if(chapters.getValue() != null)
+            chapters.postValue(Lists.reverse(chapters.getValue()));
     }
 
     public void downloadNextChapters(int number) {
@@ -36,7 +47,6 @@ public class ChapterListViewModel extends AndroidViewModel {
             downloadChapter(chapter);
         }
     }
-
 
     public LiveData<List<Chapter>> getChapters() {
         return chapters;
@@ -73,4 +83,5 @@ public class ChapterListViewModel extends AndroidViewModel {
     public void markUnreadFrom(Chapter chapter){
         chaptersRepository.markUnreadFrom(chapter);
     }
+
 }

@@ -10,7 +10,6 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/chapterListToolbarMenuChangeOrder"
-        android:enabled="false"
         android:icon="@drawable/ic_sorting_order"
         android:title="@string/chapter_list_toolbar_menu_sorting_order"
         app:showAsAction="ifRoom" />
@@ -31,4 +30,7 @@
                 android:title="@string/chapter_list_toolbar_download_custom" />
         </menu>
     </item>
+    <item
+        android:id="@+id/chapterListToolbarMenuSettings"
+        android:title="@string/chapter_list_toolbar_menu_settings" />
 </menu>

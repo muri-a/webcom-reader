@@ -25,6 +25,7 @@ import com.example.halftough.webcomreader.database.Chapter;
 
 import java.util.List;
 
+//TODO kep position of the list on screen rotate
 public class ChapterListActivity extends AppCompatActivity implements PickNumberDialog.NoticeNumberPickerListener {
     public static int READ_CHAPTER_RESULT = 3;
     public static String UPDATE_LIST = "UPDATE_LIST";
@@ -89,6 +90,8 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
         switch (item.getItemId()){
             case R.id.chapterListToolbarMenuFilter:
             case R.id.chapterListToolbarMenuChangeOrder:
+                changeOrder();
+                break;
             case R.id.chapterListToolbarDownload1: {
                 viewModel.downloadNextChapters(1);
                 break;
@@ -100,7 +103,12 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
             }
             case R.id.chapterListToolbarDownloadCustom:
                 DialogFragment dialog = new PickNumberDialog();
-                dialog.show(getFragmentManager(), "Rubble");
+                dialog.show(getFragmentManager(), "PickNumberDialog");
+                break;
+            case R.id.chapterListToolbarMenuSettings:
+                Intent intent = new Intent(this, ChapterPreferencesActivity.class);
+                intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, wid);
+                startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -134,6 +142,10 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
     protected void onPause(){
         super.onPause();
         unregisterReceiver(reciever);
+    }
+
+    public void changeOrder(){
+        viewModel.changeOrder();
     }
 
     public void readWebcom(Chapter chapter){
