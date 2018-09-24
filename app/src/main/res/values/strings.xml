@@ -45,6 +45,11 @@
         <item>Ascending</item>
         <item>Decreasing</item>
     </string-array>
+    <string-array name="chapter_perferences_order_list_values">
+        <item>global</item>
+        <item>ascending</item>
+        <item>decreasing</item>
+    </string-array>
 
 
 </resources>

@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.UserRepository;
@@ -37,8 +38,19 @@ public class ChapterListViewModel extends AndroidViewModel {
     }
 
     public void changeOrder(){
-        if(chapters.getValue() != null)
-            chapters.postValue(Lists.reverse(chapters.getValue()));
+        if(chapters.getValue() == null)
+            return;
+        chapters.postValue(Lists.reverse(chapters.getValue()));
+        String pref = preferences.getString("chapter_order", "global");
+        //TODO on global, get value
+        switch (pref){
+            case "global":
+            case "ascending":
+                preferences.edit().putString("chapter_order", "decreasing").apply();
+                break;
+            case "decreasing":
+                preferences.edit().putString("chapter_order", "ascending").apply();
+        }
     }
 
     public void downloadNextChapters(int number) {

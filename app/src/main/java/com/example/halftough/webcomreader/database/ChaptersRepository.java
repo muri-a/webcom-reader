@@ -4,6 +4,8 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
@@ -11,6 +13,7 @@ import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.OneByOneCallDownloader;
 import com.example.halftough.webcomreader.UserRepository;
+import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.webcoms.ComicPage;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
@@ -31,15 +34,24 @@ public class ChaptersRepository {
     private MutableLiveData<List<Chapter>> chapters;
     private Webcom webcom;
     private Application application;
+    private SharedPreferences preferences;
 
     public ChaptersRepository(Application application, final String wid){
         this.application = application;
         AppDatabase db = AppDatabase.getDatabase(application);
         chaptersDAO = db.chaptersDAO();
         chapters = new MutableLiveData<>();
+        preferences = application.getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, Context.MODE_PRIVATE);
         try {
             webcom = UserRepository.getWebcomInstance(wid);
-            final LiveData<List<Chapter>> dChapters = chaptersDAO.getChapters(wid);
+            final LiveData<List<Chapter>> dChapters;
+            //TODO when global
+            if(preferences.getString("chapter_order", "global").equals("ascending")) {
+                dChapters = chaptersDAO.getChapters(wid);
+            }
+            else{
+                dChapters = chaptersDAO.getChaptersDesc(wid);
+            }
             dChapters.observeForever(new Observer<List<Chapter>>() {
                 @Override
                 public void onChanged(@Nullable List<Chapter> chaps) {
@@ -94,7 +106,13 @@ public class ChaptersRepository {
     }
 
     public void update() {
-        final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(webcom.getId());
+        final LiveData<List<Chapter>> dbChapters;
+        if(preferences.getString("chapter_order", "global").equals("ascending")) {
+            dbChapters = chaptersDAO.getChapters(webcom.getId());
+        }
+        else{
+            dbChapters = chaptersDAO.getChaptersDesc(webcom.getId());
+        }
         dbChapters.observeForever(new Observer<List<Chapter>>() {
             @Override
             public void onChanged(@Nullable List<Chapter> chaps) {

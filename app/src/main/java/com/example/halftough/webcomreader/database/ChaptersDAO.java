@@ -16,6 +16,11 @@ public interface ChaptersDAO {
     @Query("SELECT * FROM chapters WHERE wid=:wid ORDER BY CAST(chapter AS REAL)")
     LiveData<List<Chapter>> getChapters(String wid);
 
+    @Query("SELECT * FROM chapters WHERE wid=:wid ORDER BY CAST(chapter AS REAL) DESC")
+    LiveData<List<Chapter>> getChaptersDesc(String wid);
+
+
+
     @Query("SELECT * FROM chapters WHERE wid=:wid AND CAST(chapter AS REAL) > CAST(:chapter AS REAL) ORDER BY CAST(chapter AS REAL) LIMIT 1")
     LiveData<Chapter> getNext(String wid, String chapter);
 

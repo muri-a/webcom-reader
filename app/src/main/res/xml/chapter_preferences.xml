@@ -4,7 +4,7 @@
     <ListPreference
         android:defaultValue="1"
         android:entries="@array/chapter_perferences_order_list"
-        android:entryValues="@array/chapter_perferences_order_list"
-        android:key="list_preference_1"
+        android:entryValues="@array/chapter_perferences_order_list_values"
+        android:key="chapter_order"
         android:title="@string/chapter_preferences_odrer_title" />
 </PreferenceScreen>
