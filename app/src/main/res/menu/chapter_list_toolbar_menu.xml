@@ -15,8 +15,9 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/chapterListToolbarMenuDownload"
+        android:icon="@drawable/ic_file_download_white_24dp"
         android:title="@string/chapter_list_toolbar_menu_download"
-        app:showAsAction="ifRoom" >
+        app:showAsAction="ifRoom">
         <menu>
             <item
                 android:id="@+id/chapterListToolbarDownload1"
@@ -32,5 +33,7 @@
     </item>
     <item
         android:id="@+id/chapterListToolbarMenuSettings"
-        android:title="@string/chapter_list_toolbar_menu_settings" />
+        android:icon="@drawable/ic_settings_white_black_24dp"
+        android:title="@string/settings"
+        app:showAsAction="ifRoom" />
 </menu>

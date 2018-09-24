@@ -7,6 +7,7 @@ import com.example.halftough.webcomreader.webcoms.XkcdWebcom;
 
 public class UserRepository {
     public static final String ACTION_CHAPTER_UPDATED = "com.example.halftough.webcomreader.ACTION_CHAPTER_UPDATED";
+    public static final String GLOBAL_PREFERENCES = "com.example.halftough.webcomreader.GLOBAL_PREFERENCES";
 
     public static String EXTRA_WEBCOM_ID = "EXTRA_WEBCOM_ID";
     public static String EXTRA_CHAPTER_NUMBER = "EXTRA_CHAPTER_NUMBER";

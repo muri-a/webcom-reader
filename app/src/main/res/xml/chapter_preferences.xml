@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="@string/chapter_preferences_order_default"
         android:entries="@array/chapter_perferences_order_list"
         android:entryValues="@array/chapter_perferences_order_list_values"
         android:key="chapter_order"

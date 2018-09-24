@@ -21,6 +21,13 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activities.GlobalSettingsActivity"
+            android:parentActivityName=".activities.GlobalSettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity" />
+        </activity>
+        <activity
             android:name=".activities.AddWebcomActivity"
             android:label="@string/title_activity_add_webcom"
             android:parentActivityName=".activities.MyWebcoms.MyWebcomsActivity"

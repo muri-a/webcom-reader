@@ -2,12 +2,16 @@ package com.example.halftough.webcomreader.activities.MyWebcoms;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.halftough.webcomreader.DownloaderService;
@@ -16,6 +20,8 @@ import com.example.halftough.webcomreader.RecyclerItemClickListener;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.AddWebcomActivity;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
+import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
+import com.example.halftough.webcomreader.activities.GlobalSettingsActivity;
 import com.example.halftough.webcomreader.database.ReadWebcom;
 
 import java.util.List;
@@ -32,16 +38,24 @@ public class MyWebcomsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.my_webcoms_activity);
 
+        PreferenceManager.setDefaultValues(this, UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE, R.xml.global_preferences, false);
+
         myWebcomRecyclerView = (RecyclerView)findViewById(R.id.my_webcom_list);
         final MyWebcomsAdapter adapter = new MyWebcomsAdapter(this);
         myWebcomRecyclerView.setAdapter(adapter);
         myWebcomRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
         viewModel = ViewModelProviders.of(this).get(MyWebcomsViewModel.class);
+        final Context context = this;
         viewModel.getAllReadWebcoms().observe(this, new Observer<List<ReadWebcom>>() {
             @Override
             public void onChanged(@Nullable List<ReadWebcom> readWebcoms) {
+                Context con = context;
                 adapter.setReadWebcoms(readWebcoms);
+                //Set default preferences for all chapters
+                for(ReadWebcom webcom : readWebcoms){
+                    PreferenceManager.setDefaultValues(con, ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+webcom.getWid(), MODE_PRIVATE, R.xml.chapter_preferences, false);
+                }
             }
         });
 
@@ -52,6 +66,22 @@ public class MyWebcomsActivity extends AppCompatActivity {
                 showChapterList(wid);
             }
         }));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.my_webcoms_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.myWebcomsMenuSettings:
+                Intent intent = new Intent(this, GlobalSettingsActivity.class);
+                startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void addNewComic(View view){
