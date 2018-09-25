@@ -104,21 +104,17 @@ public class DownloaderService extends IntentService {
     }
 
     private void handleUpdateNewChaptersIn(String wid) {
-        try {
-            final Webcom webcom = UserRepository.getWebcomInstance(wid);
-            //First we update chapter counter, because it might affect list of all chapters
-            final LiveData<Integer> chapterCountNet = webcom.getChapterCount();
-            final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(wid);
-            new OnLiveDataReady(){
-                @Override
-                public void onReady() {
-                    updateNewChaptersInReady(webcom, dbChapters.getValue());
-                }
-            }.observe(dbChapters, chapterCountNet, OnLiveDataReady.WaitUntil.CHANGED);
-            webcom.updateChapters();
-        } catch (NoWebcomClassException e) {
-            e.printStackTrace();
-        }
+        final Webcom webcom = UserRepository.getWebcomInstance(wid);
+        //First we update chapter counter, because it might affect list of all chapters
+        final LiveData<Integer> chapterCountNet = webcom.getChapterCount();
+        final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(wid);
+        new OnLiveDataReady(){
+            @Override
+            public void onReady() {
+                updateNewChaptersInReady(webcom, dbChapters.getValue());
+            }
+        }.observe(dbChapters, chapterCountNet, OnLiveDataReady.WaitUntil.CHANGED);
+        webcom.updateChapters();
     }
 
     private void updateNewChaptersInReady(Webcom webcom, List<Chapter> dbChapters){
@@ -185,19 +181,15 @@ public class DownloaderService extends IntentService {
     }
 
     private void handleEnqueueChapter(final String wid, final String chapter) {
-        try {
-            Webcom webcom = UserRepository.getWebcomInstance(wid);
-            final LiveData<String> url = webcom.getChapterUrl(chapter);
-            url.observeForever(new Observer<String>() {
-                @Override
-                public void onChanged(@Nullable String s) {
-                    url.removeObserver(this);
-                    downloader.enqueue(s, new Chapter(wid, chapter));
-                }
-            });
-        } catch (NoWebcomClassException e) {
-            e.printStackTrace();
-        }
+        Webcom webcom = UserRepository.getWebcomInstance(wid);
+        final LiveData<String> url = webcom.getChapterUrl(chapter);
+        url.observeForever(new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+            url.removeObserver(this);
+            downloader.enqueue(s, new Chapter(wid, chapter));
+            }
+        });
     }
 
     class ChapterDownloader extends OneByOneUrlDownloader<Chapter> {

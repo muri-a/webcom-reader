@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.database.ReadWebcom;
@@ -50,13 +49,9 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if(readWebcoms != null){
             ReadWebcom readWebcom = readWebcoms.get(position);
-            try {
-                Webcom webcom = UserRepository.getWebcomInstance(readWebcom.getWid());
-                holder.nameTextView.setText(webcom.getTitle());
-                holder.iconView.setImageDrawable(context.getResources().getDrawable(webcom.getIcon()));
-            } catch (NoWebcomClassException e) {
-                e.printStackTrace();
-            }
+            Webcom webcom = UserRepository.getWebcomInstance(readWebcom.getWid());
+            holder.nameTextView.setText(webcom.getTitle());
+            holder.iconView.setImageDrawable(context.getResources().getDrawable(webcom.getIcon()));
         }
     }
 

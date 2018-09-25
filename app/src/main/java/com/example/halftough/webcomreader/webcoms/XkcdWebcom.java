@@ -51,6 +51,10 @@ public class XkcdWebcom extends Webcom {
     public String[] getLanguages() {
         return new String[]{"en"};
     }
+    @Override
+    public ReadingOrder getReadingOrder() {
+        return ReadingOrder.NEWEST_FIRST;
+    }
 
     @Override
     public MutableLiveData<Integer> getChapterCount() {

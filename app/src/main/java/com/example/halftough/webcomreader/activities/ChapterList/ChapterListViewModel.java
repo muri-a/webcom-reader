@@ -9,9 +9,11 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.halftough.webcomreader.DownloaderService;
+import com.example.halftough.webcomreader.GlobalPreferenceValue;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
+import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -21,6 +23,7 @@ public class ChapterListViewModel extends AndroidViewModel {
     private MutableLiveData<List<Chapter>> chapters;
     private Application application;
     private SharedPreferences preferences;
+    private Webcom webcom;
 
     public ChapterListViewModel(Application application) {
         super(application);
@@ -28,7 +31,8 @@ public class ChapterListViewModel extends AndroidViewModel {
     }
 
     public void setWid(String wid){
-        chaptersRepository = new ChaptersRepository(application, wid);
+        webcom = UserRepository.getWebcomInstance(wid);
+        chaptersRepository = new ChaptersRepository(application, webcom);
         chapters = chaptersRepository.getChapters();
         preferences = application.getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, Context.MODE_PRIVATE);
     }
@@ -42,14 +46,12 @@ public class ChapterListViewModel extends AndroidViewModel {
             return;
         chapters.postValue(Lists.reverse(chapters.getValue()));
         String pref = preferences.getString("chapter_order", "global");
-        //TODO on global, get value
-        switch (pref){
-            case "global":
-            case "ascending":
-                preferences.edit().putString("chapter_order", "decreasing").apply();
-                break;
-            case "decreasing":
-                preferences.edit().putString("chapter_order", "ascending").apply();
+        pref = GlobalPreferenceValue.getChapterOrder(application.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE), webcom, pref);
+        if (pref.equals("ascending")) {
+            preferences.edit().putString("chapter_order", "decreasing").apply();
+        }
+        else{
+            preferences.edit().putString("chapter_order", "ascending").apply();
         }
     }
 

@@ -11,6 +11,7 @@ import retrofit2.Response;
 
 public abstract class Webcom {
     public enum format { CHAPTERS, PAGES }
+    public enum ReadingOrder {OLDEST_FIRST, NEWEST_FIRST}
 
     public abstract String getId();
     public abstract String getTitle();
@@ -19,6 +20,7 @@ public abstract class Webcom {
     public abstract format getFormat();
     public abstract String[] getTags();
     public abstract String[] getLanguages();
+    public abstract ReadingOrder getReadingOrder();
 
     public abstract MutableLiveData<Integer> getChapterCount(); //Returns number of all available pages/chapters of comic
     public LiveData<String> getChapterUrl(String chapter){

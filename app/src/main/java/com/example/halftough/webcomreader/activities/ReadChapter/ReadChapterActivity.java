@@ -9,11 +9,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
-import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ReadChapterRepository;
 import com.example.halftough.webcomreader.webcoms.Webcom;
@@ -33,12 +31,7 @@ public class ReadChapterActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Intent intent = getIntent();
-        try {
-            webcom = UserRepository.getWebcomInstance( intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID) );
-        } catch (NoWebcomClassException e) {
-            //TODO exception
-            e.printStackTrace();
-        }
+        webcom = UserRepository.getWebcomInstance( intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID) );
 
         downloadingView = (TextView)findViewById(R.id.readChapterDownloadingTextView);
         readChapterImage = (ComicPageView)findViewById(R.id.readChapterImage);

@@ -10,24 +10,15 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
 import com.example.halftough.webcomreader.DownloaderService;
-import com.example.halftough.webcomreader.NoWebcomClassException;
-import com.example.halftough.webcomreader.OneByOneCallDownloader;
+import com.example.halftough.webcomreader.GlobalPreferenceValue;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
-import com.example.halftough.webcomreader.webcoms.ComicPage;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeSet;
-
-import retrofit2.Call;
-import retrofit2.Response;
 
 public class ChaptersRepository {
     private ChaptersDAO chaptersDAO;
@@ -36,32 +27,23 @@ public class ChaptersRepository {
     private Application application;
     private SharedPreferences preferences;
 
-    public ChaptersRepository(Application application, final String wid){
+    public ChaptersRepository(Application application, final Webcom webcom){
         this.application = application;
         AppDatabase db = AppDatabase.getDatabase(application);
         chaptersDAO = db.chaptersDAO();
         chapters = new MutableLiveData<>();
-        preferences = application.getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, Context.MODE_PRIVATE);
-        try {
-            webcom = UserRepository.getWebcomInstance(wid);
-            final LiveData<List<Chapter>> dChapters;
-            //TODO when global
-            if(preferences.getString("chapter_order", "global").equals("ascending")) {
-                dChapters = chaptersDAO.getChapters(wid);
+        preferences = application.getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+webcom.getId(), Context.MODE_PRIVATE);
+        this.webcom = webcom;
+        final LiveData<List<Chapter>> dChapters;
+
+        dChapters = getDatabaseChapters();
+        dChapters.observeForever(new Observer<List<Chapter>>() {
+            @Override
+            public void onChanged(@Nullable List<Chapter> chaps) {
+                dChapters.removeObserver(this);
+                chapters.postValue(chaps);
             }
-            else{
-                dChapters = chaptersDAO.getChaptersDesc(wid);
-            }
-            dChapters.observeForever(new Observer<List<Chapter>>() {
-                @Override
-                public void onChanged(@Nullable List<Chapter> chaps) {
-                    dChapters.removeObserver(this);
-                    chapters.postValue(chaps);
-                }
-            });
-        } catch (NoWebcomClassException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     public MutableLiveData<List<Chapter>> getChapters(){
@@ -106,13 +88,7 @@ public class ChaptersRepository {
     }
 
     public void update() {
-        final LiveData<List<Chapter>> dbChapters;
-        if(preferences.getString("chapter_order", "global").equals("ascending")) {
-            dbChapters = chaptersDAO.getChapters(webcom.getId());
-        }
-        else{
-            dbChapters = chaptersDAO.getChaptersDesc(webcom.getId());
-        }
+        final LiveData<List<Chapter>> dbChapters = getDatabaseChapters();
         dbChapters.observeForever(new Observer<List<Chapter>>() {
             @Override
             public void onChanged(@Nullable List<Chapter> chaps) {
@@ -120,6 +96,17 @@ public class ChaptersRepository {
                 chapters.postValue(chaps);
             }
         });
+    }
+
+    private LiveData<List<Chapter>> getDatabaseChapters(){
+        String chapterOrder = preferences.getString("chapter_order", "global");
+        chapterOrder = GlobalPreferenceValue.getChapterOrder(application.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE), webcom, chapterOrder);
+        if(chapterOrder.equals("ascending")) {
+            return chaptersDAO.getChapters(webcom.getId());
+        }
+        else{
+            return chaptersDAO.getChaptersDesc(webcom.getId());
+        }
     }
 
     private static class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {

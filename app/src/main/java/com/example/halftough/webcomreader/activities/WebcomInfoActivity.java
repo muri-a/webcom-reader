@@ -10,10 +10,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
-import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 //TODO hide/change add button if already on the list
@@ -37,12 +35,7 @@ public class WebcomInfoActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Intent intent = getIntent();
-        try {
-            webcom = UserRepository.getWebcomInstance(intent.getStringExtra(WEBCOM_INFO_ID));
-        } catch (NoWebcomClassException e) {
-            e.printStackTrace();
-            //TODO better error handling
-        }
+        webcom = UserRepository.getWebcomInstance(intent.getStringExtra(WEBCOM_INFO_ID));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

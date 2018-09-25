@@ -12,12 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.halftough.webcomreader.DownloaderService;
-import com.example.halftough.webcomreader.NoWebcomClassException;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
@@ -28,6 +27,7 @@ import java.util.List;
 //TODO kep position of the list on screen rotate
 public class ChapterListActivity extends AppCompatActivity implements PickNumberDialog.NoticeNumberPickerListener {
     public static int READ_CHAPTER_RESULT = 3;
+    public static int SETTINGS_RESULT = 4;
     public static String UPDATE_LIST = "UPDATE_LIST";
     RecyclerView chapterListRecyclerView;
     ChapterListAdapter adapter;
@@ -45,12 +45,8 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
         Intent intent = getIntent();
         wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
 
-        try {
-            String title = UserRepository.getWebcomInstance(wid).getTitle();
-            setTitle(title);
-        } catch (NoWebcomClassException e) {
-            e.printStackTrace();
-        }
+        String title = UserRepository.getWebcomInstance(wid).getTitle();
+        setTitle(title);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -108,7 +104,7 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
             case R.id.chapterListToolbarMenuSettings:
                 Intent intent = new Intent(this, ChapterPreferencesActivity.class);
                 intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, wid);
-                startActivity(intent);
+                startActivityForResult(intent, SETTINGS_RESULT);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -135,6 +131,9 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
             if(update){
                 viewModel.update();
             }
+        }
+        else if(requestCode == SETTINGS_RESULT){
+            viewModel.update();
         }
     }
 
