@@ -1,4 +1,4 @@
-This is very early version of application, wait for at least few weeks if you want to use it. It won't be finished by that time, but it very likely has something more to offer than most basic functionality.
+This is early version of application, but it should be usable enough to actually quite comfortably read comics that are available. Once I add little more functionality I'll try to submit it to F-Droid (and later possibly Google Play Store). Until that time, anyone who wants to use it should compile it themselves.
 
 In the meantime, feel free to suggest features or comics that should ba available by opening an issue.
 
