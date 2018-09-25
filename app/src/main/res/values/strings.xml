@@ -42,6 +42,7 @@
     <string name="chapter_list_filters_menu_unread">Unread</string>
     <string name="chapter_list_filters_menu_downloaded">Downloaded</string>
     <string name="chapter_list_filters_menu_undownloaded">Undownloaded</string>
+    <string name="chapter_list_filters_menu_clear">Clear</string>
 
 
     <string name="chapter_preferences_odrer_title">Order</string>

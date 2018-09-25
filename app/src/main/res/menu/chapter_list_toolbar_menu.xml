@@ -25,6 +25,9 @@
                 android:id="@+id/chapterListFiltersMenuUndownloaded"
                 android:checkable="true"
                 android:title="@string/chapter_list_filters_menu_undownloaded" />
+            <item
+                android:id="@+id/chapterListFiltersMenuClear"
+                android:title="@string/chapter_list_filters_menu_clear" />
         </menu>
     </item>
     <item

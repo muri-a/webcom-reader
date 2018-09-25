@@ -87,18 +87,7 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.chapter_list_toolbar_menu, menu);
         this.menu = menu;
-        boolean read = chapterPreferences.getBoolean("filter_read", false);
-        boolean unread = chapterPreferences.getBoolean("filter_unread", false);
-        boolean downloaded = chapterPreferences.getBoolean("filter_downloaded", false);
-        boolean undownloaded = chapterPreferences.getBoolean("filter_undownloaded", false);
-        menu.findItem(R.id.chapterListFiltersMenuRead).setChecked(read);
-        menu.findItem(R.id.chapterListFiltersMenuRead).setEnabled(!unread);
-        menu.findItem(R.id.chapterListFiltersMenuUnread).setChecked(unread);
-        menu.findItem(R.id.chapterListFiltersMenuUnread).setEnabled(!read);
-        menu.findItem(R.id.chapterListFiltersMenuDownloaded).setChecked(downloaded);
-        menu.findItem(R.id.chapterListFiltersMenuDownloaded).setEnabled(!undownloaded);
-        menu.findItem(R.id.chapterListFiltersMenuUndownloaded).setChecked(undownloaded);
-        menu.findItem(R.id.chapterListFiltersMenuUndownloaded).setEnabled(!downloaded);
+        updateFilterMenu();
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -110,6 +99,12 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
             case R.id.chapterListFiltersMenuDownloaded:
             case R.id.chapterListFiltersMenuUndownloaded:
                 changeFilter(item);
+                break;
+            case R.id.chapterListFiltersMenuClear:
+                chapterPreferences.edit().putBoolean("filter_read", false).putBoolean("filter_unread", false)
+                        .putBoolean("filter_downloaded", false).putBoolean("filter_undownloaded", false).apply();
+                updateFilterMenu();
+                adapter.clearFilter();
                 break;
             case R.id.chapterListToolbarMenuChangeOrder:
                 changeOrder();
@@ -159,6 +154,21 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
         chapterPreferences.edit().putBoolean(setting_key, item.isChecked()).apply();
         ChapterFilter filter = makeChapterFilter();
         adapter.changeFilter(filter);
+    }
+
+    private void updateFilterMenu(){
+        boolean read = chapterPreferences.getBoolean("filter_read", false);
+        boolean unread = chapterPreferences.getBoolean("filter_unread", false);
+        boolean downloaded = chapterPreferences.getBoolean("filter_downloaded", false);
+        boolean undownloaded = chapterPreferences.getBoolean("filter_undownloaded", false);
+        menu.findItem(R.id.chapterListFiltersMenuRead).setChecked(read);
+        menu.findItem(R.id.chapterListFiltersMenuRead).setEnabled(!unread);
+        menu.findItem(R.id.chapterListFiltersMenuUnread).setChecked(unread);
+        menu.findItem(R.id.chapterListFiltersMenuUnread).setEnabled(!read);
+        menu.findItem(R.id.chapterListFiltersMenuDownloaded).setChecked(downloaded);
+        menu.findItem(R.id.chapterListFiltersMenuDownloaded).setEnabled(!undownloaded);
+        menu.findItem(R.id.chapterListFiltersMenuUndownloaded).setChecked(undownloaded);
+        menu.findItem(R.id.chapterListFiltersMenuUndownloaded).setEnabled(!downloaded);
     }
 
     private ChapterFilter makeChapterFilter() {

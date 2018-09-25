@@ -158,6 +158,11 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
         notifyDataSetChanged();
     }
 
+    void clearFilter(){
+        filter = null;
+        setChapters(chapters);
+    }
+
     void setChapters(List<Chapter> chapters){
         this.chapters = chapters;
         if(filter == null){
