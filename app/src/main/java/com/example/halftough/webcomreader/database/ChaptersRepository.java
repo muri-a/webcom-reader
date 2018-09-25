@@ -125,6 +125,7 @@ public class ChaptersRepository {
     public void markRead(Chapter chapter){
         chapter.setStatus(Chapter.Status.READ);
         new updateAsyncTask(chaptersDAO).execute(chapter);
+        update();
     }
 
     public void markReadTo(Chapter chapter){
@@ -139,6 +140,7 @@ public class ChaptersRepository {
         }
         if(toUpdate.size()>0)
             new updateListAsyncTask(chaptersDAO).execute(toUpdate);
+        update();
     }
 
     public void markReadFrom(Chapter chapter){
@@ -153,11 +155,13 @@ public class ChaptersRepository {
         }
         if(toUpdate.size()>0)
             new updateListAsyncTask(chaptersDAO).execute(toUpdate);
+        update();
     }
 
     public void markUnread(Chapter chapter){
         chapter.setStatus(Chapter.Status.UNREAD);
         new updateAsyncTask(chaptersDAO).execute(chapter);
+        update();
     }
 
     public void markUnreadTo(Chapter chapter){
@@ -172,6 +176,7 @@ public class ChaptersRepository {
         }
         if(toUpdate.size()>0)
             new updateListAsyncTask(chaptersDAO).execute(toUpdate);
+        update();
     }
 
     public void markUnreadFrom(Chapter chapter){
@@ -186,6 +191,7 @@ public class ChaptersRepository {
         }
         if(toUpdate.size()>0)
             new updateListAsyncTask(chaptersDAO).execute(toUpdate);
+        update();
     }
 
     private static class updateAsyncTask extends AsyncTask<Chapter, Void, Void>{
