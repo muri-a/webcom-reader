@@ -12,20 +12,22 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.halftough.webcomreader.ChapterFilter;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.database.Chapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.ViewHolder>{
 
     public class ViewHolder extends RecyclerView.ViewHolder{
+
         public View item;
         public TextView chapterNumber;
         public TextView chapterTitle;
         public TextView downloadedText;
         public ImageButton menuButton;
-
         public ViewHolder(View itemView) {
             super(itemView);
             chapterNumber = (TextView)itemView.findViewById(R.id.chapterListItemNumber);
@@ -34,12 +36,13 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
             downloadedText = (TextView)itemView.findViewById(R.id.chapterListItemDownloaded);
             item = itemView;
         }
+
     }
-
     private final LayoutInflater mInflater;
-    private List<Chapter> chapters;
-    private ChapterListActivity context;
 
+    private List<Chapter> chapters, filtered;
+    private ChapterFilter filter;
+    private ChapterListActivity context;
     public ChapterListAdapter(ChapterListActivity context){
         this.context = context;
         mInflater = LayoutInflater.from(context);
@@ -54,8 +57,8 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if(chapters!=null) {
-            final Chapter chapter = chapters.get(position);
+        if(filtered != null) {
+            final Chapter chapter = filtered.get(position);
             if(chapter.getStatus() == Chapter.Status.READ){
                 holder.chapterNumber.setTextColor(ContextCompat.getColor(context, R.color.chapterRead));
                 holder.chapterTitle.setTextColor(ContextCompat.getColor(context, R.color.chapterRead));
@@ -143,14 +146,38 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
 
     @Override
     public int getItemCount() {
-        if(chapters != null){
-            return chapters.size();
+        if(filtered != null){
+            return filtered.size();
         }
         return 0;
     }
 
-    void setChapters(List<Chapter> chapters){
-        this.chapters = chapters;
+    void changeFilter(ChapterFilter filter){
+        this.filter = filter;
+        filterChapters();
         notifyDataSetChanged();
     }
+
+    void setChapters(List<Chapter> chapters){
+        this.chapters = chapters;
+        if(filter == null){
+            filtered = chapters;
+        }
+        else{
+            filterChapters();
+        }
+        notifyDataSetChanged();
+    }
+
+    private void filterChapters(){
+        if(chapters == null)
+            return;
+        filtered = new ArrayList<>();
+        for(Chapter chapter : chapters){
+            if(filter.allows(chapter)){
+                filtered.add(chapter);
+            }
+        }
+    }
+
 }

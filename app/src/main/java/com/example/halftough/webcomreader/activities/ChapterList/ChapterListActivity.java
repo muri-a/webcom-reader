@@ -5,7 +5,9 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.halftough.webcomreader.ChapterFilter;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
@@ -33,6 +36,8 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
     ChapterListAdapter adapter;
     ChapterListViewModel viewModel;
     ChapterListReciever reciever;
+    SharedPreferences chapterPreferences;
+    Menu menu;
     String wid;
 
     @Override
@@ -47,6 +52,7 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
 
         String title = UserRepository.getWebcomInstance(wid).getTitle();
         setTitle(title);
+        chapterPreferences = getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, MODE_PRIVATE);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -61,6 +67,8 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
             @Override
             public void onChanged(@Nullable List<Chapter> chapters) {
                 adapter.setChapters(chapters);
+                ChapterFilter filter = makeChapterFilter();
+                adapter.changeFilter(filter);
             }
         });
 
@@ -78,13 +86,23 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.chapter_list_toolbar_menu, menu);
+        this.menu = menu;
+        menu.findItem(R.id.chapterListFiltersMenuRead).setChecked(chapterPreferences.getBoolean("filter_read", false));
+        menu.findItem(R.id.chapterListFiltersMenuUnread).setChecked(chapterPreferences.getBoolean("filter_unread", false));
+        menu.findItem(R.id.chapterListFiltersMenuDownloaded).setChecked(chapterPreferences.getBoolean("filter_downloaded", false));
+        menu.findItem(R.id.chapterListFiltersMenuUndownloaded).setChecked(chapterPreferences.getBoolean("filter_undownloaded", false));
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.chapterListToolbarMenuFilter:
+            case R.id.chapterListFiltersMenuUnread:
+            case R.id.chapterListFiltersMenuRead:
+            case R.id.chapterListFiltersMenuDownloaded:
+            case R.id.chapterListFiltersMenuUndownloaded:
+                changeFilter(item);
+                break;
             case R.id.chapterListToolbarMenuChangeOrder:
                 changeOrder();
                 break;
@@ -107,6 +125,37 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
                 startActivityForResult(intent, SETTINGS_RESULT);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void changeFilter(MenuItem item) {
+        String setting_key = null;
+        switch (item.getItemId()) {
+            case R.id.chapterListFiltersMenuRead:
+                setting_key = "filter_read";
+                break;
+            case R.id.chapterListFiltersMenuUnread:
+                setting_key = "filter_unread";
+                break;
+            case R.id.chapterListFiltersMenuDownloaded:
+                setting_key = "filter_downloaded";
+                break;
+            case R.id.chapterListFiltersMenuUndownloaded:
+                setting_key = "filter_undownloaded";
+                break;
+        }
+        item.setChecked(!item.isChecked());
+        chapterPreferences.edit().putBoolean(setting_key, item.isChecked()).apply();
+        ChapterFilter filter = makeChapterFilter();
+        adapter.changeFilter(filter);
+    }
+
+    private ChapterFilter makeChapterFilter() {
+        ChapterFilter filter = new ChapterFilter();
+        filter.setRead(chapterPreferences.getBoolean("filter_read", false));
+        filter.setUnread(chapterPreferences.getBoolean("filter_unread", false));
+        filter.setDownloaded(chapterPreferences.getBoolean("filter_downloaded", false));
+        filter.setUndownloaded(chapterPreferences.getBoolean("filter_undownloaded", false));
+        return filter;
     }
 
     @Override

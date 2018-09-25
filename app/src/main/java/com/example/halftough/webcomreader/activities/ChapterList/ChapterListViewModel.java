@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.example.halftough.webcomreader.ChapterFilter;
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.GlobalPreferenceValue;
 import com.example.halftough.webcomreader.UserRepository;
@@ -97,5 +98,4 @@ public class ChapterListViewModel extends AndroidViewModel {
     public void markUnreadFrom(Chapter chapter){
         chaptersRepository.markUnreadFrom(chapter);
     }
-
 }
