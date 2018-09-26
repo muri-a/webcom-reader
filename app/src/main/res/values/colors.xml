@@ -3,8 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="transparent">#00ffffff</color>
     <color name="chapterUnread">#080808</color>
     <color name="chapterRead">#BBB</color>
     <color name="comicVievBackground">#f8f8f8</color>
-    <color name="transparent">#00ffffff</color>
+    <color name="markerBackground">#277aa1</color>
+    <color name="markerStroke">#000000</color>
+    <color name="markerText">#ffffff</color>
 </resources>

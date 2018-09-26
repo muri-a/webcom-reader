@@ -4,11 +4,13 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,11 +29,14 @@ import com.example.halftough.webcomreader.database.ReadWebcom;
 import java.util.List;
 
 //TODO Alternative views
+//TODO Removing webcoms
+//TODO Autoupdates
 public class MyWebcomsActivity extends AppCompatActivity {
     public static int ADD_WEBCOM_RESULT = 1;
 
     RecyclerView myWebcomRecyclerView;
     MyWebcomsViewModel viewModel;
+    SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +44,12 @@ public class MyWebcomsActivity extends AppCompatActivity {
         setContentView(R.layout.my_webcoms_activity);
 
         PreferenceManager.setDefaultValues(this, UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE, R.xml.global_preferences, false);
+        preferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
 
         myWebcomRecyclerView = (RecyclerView)findViewById(R.id.my_webcom_list);
         final MyWebcomsAdapter adapter = new MyWebcomsAdapter(this);
         myWebcomRecyclerView.setAdapter(adapter);
-        myWebcomRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+
 
         viewModel = ViewModelProviders.of(this).get(MyWebcomsViewModel.class);
         final Context context = this;
@@ -66,6 +72,19 @@ public class MyWebcomsActivity extends AppCompatActivity {
                 showChapterList(wid);
             }
         }));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        RecyclerView.LayoutManager layoutManager;
+        if(preferences.getString("library_style", getString(R.string.global_preferences_librery_style_default)).equals("list")) {
+            layoutManager = new LinearLayoutManager(this);
+        }
+        else{
+            layoutManager = new GridLayoutManager(this, 3);
+        }
+        myWebcomRecyclerView.setLayoutManager(layoutManager);
     }
 
     @Override

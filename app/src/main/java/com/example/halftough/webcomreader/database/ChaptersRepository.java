@@ -22,6 +22,7 @@ import java.util.ListIterator;
 
 public class ChaptersRepository {
     private ChaptersDAO chaptersDAO;
+    private ReadWebcomsDAO webcomsDAO;
     private MutableLiveData<List<Chapter>> chapters;
     private Webcom webcom;
     private Application application;
@@ -31,6 +32,7 @@ public class ChaptersRepository {
         this.application = application;
         AppDatabase db = AppDatabase.getDatabase(application);
         chaptersDAO = db.chaptersDAO();
+        webcomsDAO = db.readWebcomsDAO();
         chapters = new MutableLiveData<>();
         preferences = application.getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+webcom.getId(), Context.MODE_PRIVATE);
         this.webcom = webcom;
@@ -48,11 +50,6 @@ public class ChaptersRepository {
 
     public MutableLiveData<List<Chapter>> getChapters(){
         return chapters;
-    }
-
-    //TODO? might remove it
-    public void insertChapter(Chapter chapter){
-        new insertAsyncTask(chaptersDAO).execute(chapter);
     }
 
     public void downloadChapter(Chapter chapter){
@@ -94,6 +91,13 @@ public class ChaptersRepository {
             public void onChanged(@Nullable List<Chapter> chaps) {
                 dbChapters.removeObserver(this);
                 chapters.postValue(chaps);
+                int readCount = 0;
+                for(Chapter chapter : chaps){
+                    if(chapter.getStatus() == Chapter.Status.READ){
+                        readCount += 1;
+                    }
+                }
+                updateReadChapters(readCount);
             }
         });
     }
@@ -106,19 +110,6 @@ public class ChaptersRepository {
         }
         else{
             return chaptersDAO.getChaptersDesc(webcom.getId());
-        }
-    }
-
-    private static class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
-        private ChaptersDAO mAsyncTaskDao;
-        insertAsyncTask(ChaptersDAO dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final Chapter... params) {
-            mAsyncTaskDao.insert(params[0]);
-            return null;
         }
     }
 
@@ -229,6 +220,24 @@ public class ChaptersRepository {
             mAsyncTaskDao.setDownloadStatus(chapters[0].getWid(), chapters[0].getChapter(), chapters[0].getDownloadStatus());
             if(repository!=null)
                 repository.update();
+            return null;
+        }
+    }
+
+    public void updateReadChapters(int count){
+        ReadWebcom readWebcom = new ReadWebcom(webcom.getId());
+        readWebcom.setReadChapters(count);
+        new updateWebcomReadChapterCountAsyncTask(webcomsDAO).execute(readWebcom);
+    }
+
+    private static class updateWebcomReadChapterCountAsyncTask extends AsyncTask<ReadWebcom, Void, Void> {
+        private ReadWebcomsDAO mAsyncTaskDao;
+        updateWebcomReadChapterCountAsyncTask(ReadWebcomsDAO dao){
+            mAsyncTaskDao = dao;
+        }
+        @Override
+        protected Void doInBackground(ReadWebcom... readWebcoms) {
+            mAsyncTaskDao.updateReadChapterCount(readWebcoms[0].getWid(), readWebcoms[0].getReadChapters());
             return null;
         }
     }

@@ -1,6 +1,7 @@
 package com.example.halftough.webcomreader.activities.MyWebcoms;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,12 +21,14 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
 
     class ViewHolder extends RecyclerView.ViewHolder{
         public TextView nameTextView;
+        public TextView unreadMarker;
         public ImageView iconView;
 
         public ViewHolder(View itemView){
             super(itemView);
             nameTextView = (TextView)itemView.findViewById(R.id.myWebcomTitle);
             iconView = (ImageView)itemView.findViewById(R.id.myWebcomIcon);
+            unreadMarker = (TextView)itemView.findViewById(R.id.myWebcomUnread);
         }
     }
 
@@ -41,7 +44,14 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = mInflater.inflate(R.layout.my_webcoms_list_item, parent, false);
+        SharedPreferences preferences = context.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE);
+        View itemView;
+        if(preferences.getString("library_style", context.getString(R.string.global_preferences_librery_style_default)).equals("list")) {
+            itemView = mInflater.inflate(R.layout.my_webcoms_list_item, parent, false);
+        }
+        else{
+            itemView = mInflater.inflate(R.layout.my_webcoms_grid_item, parent, false);
+        }
         return new ViewHolder(itemView);
     }
 
@@ -52,6 +62,14 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
             Webcom webcom = UserRepository.getWebcomInstance(readWebcom.getWid());
             holder.nameTextView.setText(webcom.getTitle());
             holder.iconView.setImageDrawable(context.getResources().getDrawable(webcom.getIcon()));
+            int unread = readWebcom.getChapterCount()-readWebcom.getReadChapters();
+            if(unread == 0){
+                holder.unreadMarker.setVisibility(View.GONE);
+            }
+            else {
+                holder.unreadMarker.setText(Integer.toString(unread));
+                holder.unreadMarker.setVisibility(View.VISIBLE);
+            }
         }
     }
 

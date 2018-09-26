@@ -12,7 +12,7 @@ public class DilbertWebcom extends Webcom {
     public DilbertWebcom(){
         if(chapterCount==null){
             chapterCount = new MutableLiveData<>();
-            chapterCount.setValue(new Integer(0));
+            chapterCount.postValue(new Integer(0));
         }
     }
     @Override

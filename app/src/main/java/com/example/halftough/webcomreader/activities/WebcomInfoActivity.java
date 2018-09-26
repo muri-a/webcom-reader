@@ -15,6 +15,7 @@ import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 //TODO hide/change add button if already on the list
+//TODO Adress
 //TODO tags
 
 public class WebcomInfoActivity extends AppCompatActivity {

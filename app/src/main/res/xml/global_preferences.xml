@@ -2,6 +2,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
+        android:defaultValue="@string/global_preferences_librery_style_default"
+        android:entries="@array/global_preferences_librery_style"
+        android:entryValues="@array/global_preferences_librery_style_values"
+        android:key="library_style"
+        android:title="@string/global_preferences_librery_style_title" />
+    <ListPreference
         android:defaultValue="@string/global_preferences_order_default"
         android:entries="@array/global_preferences_order_list"
         android:entryValues="@array/global_perferences_order_list_values"

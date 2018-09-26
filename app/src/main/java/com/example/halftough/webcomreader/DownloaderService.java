@@ -9,9 +9,6 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
-import com.example.halftough.webcomreader.activities.ChapterList.ChapterListReciever;
-import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 import com.example.halftough.webcomreader.database.AppDatabase;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersDAO;
@@ -22,9 +19,9 @@ import com.example.halftough.webcomreader.webcoms.Webcom;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -122,6 +119,9 @@ public class DownloaderService extends IntentService {
         Queue<Call<ComicPage>> calls = new LinkedList<>();
         Queue<Chapter> extra = new LinkedList<>(); // References to chapters that will be downloaded
 
+        if(netChapters == null || dbChapters == null)
+            return;
+
         Iterator<String> netIt = netChapters.iterator();
         Iterator<Chapter> dbIt = dbChapters.iterator();
 
@@ -149,6 +149,8 @@ public class DownloaderService extends IntentService {
             }
         }while(netChapter != null || dbChapter != null);
 
+        updateWebcomCount(webcom.getId(), dbChapters.size()+calls.size());
+
         new OneByOneCallDownloader<ComicPage, Chapter>(calls, extra, 5){
             @Override
             public void onResponse(Call<ComicPage> call, Response<ComicPage> response, Chapter extra) {
@@ -161,21 +163,39 @@ public class DownloaderService extends IntentService {
         }.download();
     }
 
-    //TODO Duplicated code, wonder if I should move it somewhere
-    public void insertChapter(Chapter chapter){
-        new insertAsyncTask(chaptersDAO).execute(chapter);
+    private void updateWebcomCount(String wid, int count) {
+        ReadWebcom webcom = new ReadWebcom(wid);
+        webcom.setChapterCount(count);
+        new updateReadWebcomAsyncTask(readWebcomsDAO).execute(webcom);
     }
 
-    private class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
+    public void insertChapter(Chapter chapter){
+        new insertAsyncTask(chaptersDAO, this).execute(chapter);
+    }
+
+    private static class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
         private ChaptersDAO mAsyncTaskDao;
-        insertAsyncTask(ChaptersDAO dao) {
+        WeakReference<DownloaderService> dService;
+        insertAsyncTask(ChaptersDAO dao, DownloaderService downloaderService) {
             mAsyncTaskDao = dao;
+            dService = new WeakReference<>(downloaderService);
         }
         @Override
         protected Void doInBackground(final Chapter... params) {
             mAsyncTaskDao.insert(params[0]);
-            Intent broadcastIntent = new Intent();
-            broadcastChapterUpdated(params[0]);
+            dService.get().broadcastChapterUpdated(params[0]);
+            return null;
+        }
+    }
+
+    private static class updateReadWebcomAsyncTask extends AsyncTask<ReadWebcom, Void, Void> {
+        private ReadWebcomsDAO mAsyncTaskDao;
+        updateReadWebcomAsyncTask(ReadWebcomsDAO dao){
+            mAsyncTaskDao = dao;
+        }
+        @Override
+        protected Void doInBackground(ReadWebcom... readWebcoms) {
+            mAsyncTaskDao.updateChapterCount(readWebcoms[0].getWid(), readWebcoms[0].getChapterCount());
             return null;
         }
     }

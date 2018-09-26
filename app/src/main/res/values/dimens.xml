@@ -1,4 +1,6 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="item_padding">14dp</dimen>
+    <dimen name="unread_marker_padding_vertical">1dp</dimen>
+    <dimen name="unread_marker_padding_horizontal">4dp</dimen>
 </resources>

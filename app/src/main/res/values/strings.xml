@@ -44,6 +44,28 @@
     <string name="chapter_list_filters_menu_undownloaded">Undownloaded</string>
     <string name="chapter_list_filters_menu_clear">Clear</string>
 
+    <string name="global_preferences_librery_style_title">Librery style</string>
+    <string-array name="global_preferences_librery_style">
+        <item>List</item>
+        <item>Grid</item>
+    </string-array>
+    <string-array name="global_preferences_librery_style_values">
+        <item>list</item>
+        <item>grid</item>
+    </string-array>
+    <string name="global_preferences_librery_style_default">grid</string>
+    <string name="global_preferences_odrer_title">Default list order</string>
+    <string-array name="global_preferences_order_list">
+        <item>Smart</item>
+        <item>Ascending</item>
+        <item>Decreasing</item>
+    </string-array>
+    <string-array name="global_perferences_order_list_values">
+        <item>smart</item>
+        <item>ascending</item>
+        <item>decreasing</item>
+    </string-array>
+    <string name="global_preferences_order_default">smart</string>
 
     <string name="chapter_preferences_odrer_title">Order</string>
     <string-array name="chapter_perferences_order_list">
@@ -57,17 +79,5 @@
         <item>decreasing</item>
     </string-array>
     <string name="chapter_preferences_order_default">global</string>
-    <string name="global_preferences_odrer_title">Default list order</string>
-    <string-array name="global_preferences_order_list">
-        <item>Smart</item>
-        <item>Ascending</item>
-        <item>Decreasing</item>
-    </string-array>
-    <string-array name="global_perferences_order_list_values">
-        <item>smart</item>
-        <item>ascending</item>
-        <item>decreasing</item>
-    </string-array>
-    <string name="global_preferences_order_default">smart</string>
 
 </resources>
