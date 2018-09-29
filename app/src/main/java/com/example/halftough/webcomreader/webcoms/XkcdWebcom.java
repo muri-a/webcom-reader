@@ -38,7 +38,7 @@ public class XkcdWebcom extends Webcom {
             "\"The subject matter of the comic varies from statements on life and love to mathematical, programming, and scientific in-jokes. Some strips feature simple humor or pop-culture references. Although it has a cast of stick figures, the comic occasionally features landscapes, graphs and charts, and intricate mathematical patterns such as fractals. New cartoons are added three times a week, on Mondays, Wednesdays, and Fridays.";}
     @Override
     public int getIcon() {
-        return R.mipmap.xkcd_ico;
+        return R.drawable.wicon_xkcd;
     }
     @Override
     public format getFormat() {

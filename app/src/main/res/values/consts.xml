@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Strings that should not be translated-->
+<resources>
+    <string-array name="global_preferences_librery_style_values">
+        <item>list</item>
+        <item>grid</item>
+    </string-array>
+    <string name="global_preferences_librery_style_default">grid</string>
+    <string name="global_preferences_grid_columns_vertical_default">3</string>
+    <string name="global_preferences_grid_columns_horizontal_default">4</string>
+    <string-array name="global_perferences_order_list_values">
+        <item>smart</item>
+        <item>ascending</item>
+        <item>decreasing</item>
+    </string-array>
+    <string name="global_preferences_order_default">smart</string>
+    <string-array name="chapter_perferences_order_list_values">
+        <item>global</item>
+        <item>ascending</item>
+        <item>decreasing</item>
+    </string-array>
+    <string name="chapter_preferences_order_default">global</string>
+</resources>

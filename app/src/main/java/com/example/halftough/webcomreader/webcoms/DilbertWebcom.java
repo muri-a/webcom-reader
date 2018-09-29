@@ -23,7 +23,7 @@ public class DilbertWebcom extends Webcom {
     public String getDescription(){ return ""; }
     @Override
     public int getIcon() {
-        return R.mipmap.dilbert_ico;
+        return R.drawable.wicon_dilbert;
     }
     @Override
     public format getFormat() {

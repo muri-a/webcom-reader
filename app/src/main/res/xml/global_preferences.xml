@@ -5,8 +5,25 @@
         android:defaultValue="@string/global_preferences_librery_style_default"
         android:entries="@array/global_preferences_librery_style"
         android:entryValues="@array/global_preferences_librery_style_values"
+        android:fragment="TEST"
         android:key="library_style"
         android:title="@string/global_preferences_librery_style_title" />
+    <EditTextPreference
+        android:id="@+id/global_preferences_grid_vertical"
+        android:defaultValue="@string/global_preferences_grid_columns_vertical_default"
+        android:inputType="numberDecimal"
+        android:key="columns_vertical"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/global_preferences_grid_columns_vertical" />
+    <EditTextPreference
+        android:id="@+id/global_preferences_grid_horizontal"
+        android:defaultValue="@string/global_preferences_grid_columns_horizontal_default"
+        android:inputType="numberDecimal"
+        android:key="columns_horizontal"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/global_preferences_grid_columns_horizontal" />
     <ListPreference
         android:defaultValue="@string/global_preferences_order_default"
         android:entries="@array/global_preferences_order_list"

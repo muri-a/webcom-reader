@@ -1,6 +1,8 @@
 package com.example.halftough.webcomreader;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 
@@ -24,5 +26,16 @@ public class GlobalPreferenceValue {
             }
         }
         return pref;
+    }
+
+    public static int getCurrentGridCols(Context context, SharedPreferences preferences){
+        if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            String defaultVal = context.getString(R.string.global_preferences_grid_columns_vertical_default);
+            return Integer.parseInt(preferences.getString("columns_horizontal", defaultVal));
+        }
+        else{
+            String defaultVal = context.getString(R.string.global_preferences_grid_columns_horizontal_default);
+            return Integer.parseInt(preferences.getString("columns_vertical", defaultVal));
+        }
     }
 }
