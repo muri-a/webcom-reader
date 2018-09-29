@@ -232,4 +232,8 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
     public void downloadChapter(Chapter chapter) {
         viewModel.downloadChapter(chapter);
     }
+
+    public void deleteChapter(Chapter chapter) {
+        viewModel.deleteChapter(chapter);
+    }
 }

@@ -107,7 +107,7 @@ public class ChapterListAdapter extends RecyclerView.Adapter<ChapterListAdapter.
                                     context.downloadChapter(chap);
                                     return true;
                                 case R.id.chapterItemMenuRemove:
-                                    // TODO implement manual removing
+                                    context.deleteChapter(chap);
                                     return true;
                                 case R.id.chapterItemMenuMarkRead:
                                     context.getViewModel().markRead(chap);

@@ -71,6 +71,10 @@ public class ChapterListViewModel extends AndroidViewModel {
         chaptersRepository.downloadChapter(chapter);
     }
 
+    public void deleteChapter(Chapter chapter){
+        chaptersRepository.deleteChapter(chapter);
+    }
+
     public void update() {
         chaptersRepository.update();
     }

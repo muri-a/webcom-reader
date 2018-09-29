@@ -58,6 +58,12 @@ public class ChaptersRepository {
         DownloaderService.enqueueChapter(application, chapter);
     }
 
+    public void deleteChapter(Chapter chapter){
+        chapter.setDownloadStatus(Chapter.DownloadStatus.UNDOWNLOADED);
+        new setDownloadStatusAsyncTask(chaptersDAO, this).execute(chapter);
+        UserRepository.deleteChapter(chapter);
+    }
+
     public Chapter getChapterToRead() {
         if(chapters.getValue()!=null){
             for(Chapter chapter : chapters.getValue()){

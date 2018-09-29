@@ -1,8 +1,11 @@
 package com.example.halftough.webcomreader;
 
+import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.webcoms.DilbertWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.example.halftough.webcomreader.webcoms.XkcdWebcom;
+
+import java.io.File;
 
 
 public class UserRepository {
@@ -12,7 +15,7 @@ public class UserRepository {
     public static String EXTRA_WEBCOM_ID = "EXTRA_WEBCOM_ID";
     public static String EXTRA_CHAPTER_NUMBER = "EXTRA_CHAPTER_NUMBER";
 
-    static public Webcom getWebcomInstance(String id) {
+    public static Webcom getWebcomInstance(String id) {
         switch(id){
             case "dilbert":
                 return new DilbertWebcom();
@@ -21,6 +24,12 @@ public class UserRepository {
             default:
                 return null;
         }
+    }
+
+    //TODO temorary location. might change in future
+    public static void deleteChapter(Chapter chapter){
+        File file = chapter.getFile();
+        file.delete();
     }
 
 }

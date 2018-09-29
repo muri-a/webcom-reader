@@ -31,9 +31,8 @@ import com.example.halftough.webcomreader.database.ReadWebcom;
 
 import java.util.List;
 
-//TODO Alternative views
 //TODO Removing webcoms
-//TODO Autoupdates`
+//TODO Autoupdates
 public class MyWebcomsActivity extends AppCompatActivity {
     public static int ADD_WEBCOM_RESULT = 1;
 
