@@ -1,4 +1,4 @@
-package com.example.halftough.webcomreader.activities.MyWebcoms;
+package com.example.halftough.webcomreader.activities.Library;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -42,6 +42,7 @@ public class LibraryModel extends AndroidViewModel {
         new deleteWebcomAsyncTask(chaptersDAO, readWebcomsDAO).execute(wid);
     }
 
+    //TODO something if can't remove file?
     private void deleteDir(File dir){
         if(dir.isDirectory()){
             for(File f : dir.listFiles()){

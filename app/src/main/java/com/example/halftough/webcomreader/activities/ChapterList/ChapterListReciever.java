@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.example.halftough.webcomreader.UserRepository;
-import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 
 public class ChapterListReciever extends BroadcastReceiver {
     private ChapterListViewModel chapterListModel;

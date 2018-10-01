@@ -1,13 +1,11 @@
-package com.example.halftough.webcomreader.activities.MyWebcoms;
+package com.example.halftough.webcomreader.activities.Library;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +20,7 @@ import com.example.halftough.webcomreader.webcoms.Webcom;
 
 import java.util.List;
 
-public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.ViewHolder>{
+public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHolder>{
 
     class ViewHolder extends RecyclerView.ViewHolder{
         public View item;
@@ -41,9 +39,9 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
 
     private final LayoutInflater mInflater;
     private List<ReadWebcom> readWebcoms;
-    private MyWebcomsActivity context;
+    private LibraryActivity context;
 
-    public MyWebcomsAdapter(MyWebcomsActivity context){
+    public LibraryAdapter(LibraryActivity context){
         this.context = context;
         mInflater = LayoutInflater.from(context);
     }
@@ -92,7 +90,7 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
             holder.item.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(context.getMode() == MyWebcomsActivity.ActivityMode.NORMAL) {
+                    if(context.getMode() == LibraryActivity.ActivityMode.NORMAL) {
                         context.showChapterList(readWebcom.getWid());
                     }
                     else{

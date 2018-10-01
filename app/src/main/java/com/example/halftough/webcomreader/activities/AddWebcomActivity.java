@@ -11,7 +11,6 @@ import android.view.View;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.RecyclerItemClickListener;
 import com.example.halftough.webcomreader.UserRepository;
-import com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity;
 import com.example.halftough.webcomreader.webcoms.DilbertWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.example.halftough.webcomreader.webcoms.XkcdWebcom;

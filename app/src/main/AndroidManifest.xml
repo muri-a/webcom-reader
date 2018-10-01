@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".activities.WebcomReaderApplication">
-        <activity android:name=".activities.MyWebcoms.MyWebcomsActivity">
+        <activity android:name=".activities.Library.LibraryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -25,16 +25,16 @@
             android:parentActivityName=".activities.GlobalSettingsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity" />
+                android:value="com.example.halftough.webcomreader.activities.Library.LibraryActivity" />
         </activity>
         <activity
             android:name=".activities.AddWebcomActivity"
             android:label="@string/title_activity_add_webcom"
-            android:parentActivityName=".activities.MyWebcoms.MyWebcomsActivity"
+            android:parentActivityName=".activities.Library.LibraryActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity" />
+                android:value="com.example.halftough.webcomreader.activities.Library.LibraryActivity" />
         </activity>
         <activity
             android:name=".activities.WebcomInfoActivity"
@@ -48,11 +48,11 @@
         <activity
             android:name=".activities.ChapterList.ChapterListActivity"
             android:label="@string/title_activity_page_list"
-            android:parentActivityName=".activities.MyWebcoms.MyWebcomsActivity"
+            android:parentActivityName=".activities.Library.LibraryActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.halftough.webcomreader.activities.MyWebcoms.MyWebcomsActivity" />
+                android:value="com.example.halftough.webcomreader.activities.Library.LibraryActivity" />
         </activity>
         <activity
             android:name=".activities.ChapterList.ChapterPreferencesActivity"

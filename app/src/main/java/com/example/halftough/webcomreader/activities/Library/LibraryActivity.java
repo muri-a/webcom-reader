@@ -1,4 +1,4 @@
-package com.example.halftough.webcomreader.activities.MyWebcoms;
+package com.example.halftough.webcomreader.activities.Library;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -34,12 +34,12 @@ import java.util.List;
 
 //TODO Removing webcoms
 //TODO Autoupdates
-public class MyWebcomsActivity extends AppCompatActivity {
+public class LibraryActivity extends AppCompatActivity {
     enum ActivityMode { NORMAL, SELECTING }
     public static int ADD_WEBCOM_RESULT = 1;
 
     RecyclerView libraryRecyclerView;
-    MyWebcomsAdapter adapter;
+    LibraryAdapter adapter;
     LibraryModel viewModel;
     SharedPreferences preferences;
     Toolbar selectingToolbar;
@@ -65,7 +65,7 @@ public class MyWebcomsActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.librerySelectingDelete:
-                        new AlertDialog.Builder(MyWebcomsActivity.this)
+                        new AlertDialog.Builder(LibraryActivity.this)
                                 .setMessage(R.string.library_delete_selected_dialog_message)
                                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                     @Override
@@ -92,7 +92,7 @@ public class MyWebcomsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        adapter = new MyWebcomsAdapter(this);
+        adapter = new LibraryAdapter(this);
         libraryRecyclerView.setAdapter(adapter);
 
         viewModel = ViewModelProviders.of(this).get(LibraryModel.class);
