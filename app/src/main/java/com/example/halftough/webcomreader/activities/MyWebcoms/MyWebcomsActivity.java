@@ -3,17 +3,18 @@ package com.example.halftough.webcomreader.activities.MyWebcoms;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +22,6 @@ import android.view.View;
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.GlobalPreferenceValue;
 import com.example.halftough.webcomreader.R;
-import com.example.halftough.webcomreader.RecyclerItemClickListener;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.AddWebcomActivity;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
@@ -29,17 +29,23 @@ import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferen
 import com.example.halftough.webcomreader.activities.GlobalSettingsActivity;
 import com.example.halftough.webcomreader.database.ReadWebcom;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //TODO Removing webcoms
 //TODO Autoupdates
 public class MyWebcomsActivity extends AppCompatActivity {
+    enum ActivityMode { NORMAL, SELECTING }
     public static int ADD_WEBCOM_RESULT = 1;
 
-    RecyclerView myWebcomRecyclerView;
+    RecyclerView libraryRecyclerView;
     MyWebcomsAdapter adapter;
-    MyWebcomsViewModel viewModel;
+    LibraryModel viewModel;
     SharedPreferences preferences;
+    Toolbar selectingToolbar;
+    ActivityMode mode = ActivityMode.NORMAL;
+
+    List<ReadWebcom> selectedWebcoms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,24 +55,47 @@ public class MyWebcomsActivity extends AppCompatActivity {
         PreferenceManager.setDefaultValues(this, UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE, R.xml.global_preferences, false);
         preferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
 
-        myWebcomRecyclerView = (RecyclerView)findViewById(R.id.my_webcom_list);
+        libraryRecyclerView = (RecyclerView)findViewById(R.id.my_webcom_list);
+        selectingToolbar = (Toolbar)findViewById(R.id.myWebcomsSelectingToolbar);
+        selectedWebcoms = new ArrayList<>();
 
-        myWebcomRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+        getMenuInflater().inflate(R.menu.library_selecting_menu, selectingToolbar.getMenu());
+        selectingToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                String wid = viewModel.getAllReadWebcoms().getValue().get(position).getWid();
-                showChapterList(wid);
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.librerySelectingDelete:
+                        new AlertDialog.Builder(MyWebcomsActivity.this)
+                                .setMessage(R.string.library_delete_selected_dialog_message)
+                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        for(ReadWebcom webcom : selectedWebcoms){
+                                            viewModel.deleteWebcom(webcom.getWid());
+                                        }
+                                        selectedWebcoms.clear();
+                                        setModeNormal();
+                                    }
+                                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                }).create().show();
+                        return true;
+                }
+                return false;
             }
-        }));
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         adapter = new MyWebcomsAdapter(this);
-        myWebcomRecyclerView.setAdapter(adapter);
+        libraryRecyclerView.setAdapter(adapter);
 
-        viewModel = ViewModelProviders.of(this).get(MyWebcomsViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(LibraryModel.class);
         final Context context = this;
         viewModel.getAllReadWebcoms().observe(this, new Observer<List<ReadWebcom>>() {
             @Override
@@ -88,12 +117,12 @@ public class MyWebcomsActivity extends AppCompatActivity {
             int spanCount = GlobalPreferenceValue.getCurrentGridCols(context, preferences);
             layoutManager = new GridLayoutManager(this, spanCount);
         }
-        myWebcomRecyclerView.setLayoutManager(layoutManager);
+        libraryRecyclerView.setLayoutManager(layoutManager);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.my_webcoms_menu, menu);
+        getMenuInflater().inflate(R.menu.library_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -105,6 +134,37 @@ public class MyWebcomsActivity extends AppCompatActivity {
                 startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public ActivityMode getMode(){ return mode; }
+
+    //Selects or unselects chapter, returns true if selected
+    //TODO better animations
+    public boolean triggerChapterSelect(ReadWebcom webcom){
+        if(selectedWebcoms.contains(webcom)){
+            selectedWebcoms.remove(webcom);
+            selectingToolbar.setTitle(String.format(getString(R.string.library_selecting), selectedWebcoms.size()));
+            if( selectedWebcoms.isEmpty()){
+                setModeNormal();
+            }
+            return false;
+        }
+        else{
+            selectedWebcoms.add(webcom);
+            selectingToolbar.setTitle(String.format(getString(R.string.library_selecting), selectedWebcoms.size()));
+            if(mode != ActivityMode.SELECTING) {
+                mode = ActivityMode.SELECTING;
+                getSupportActionBar().hide();
+                selectingToolbar.setVisibility(View.VISIBLE);
+            }
+            return true;
+        }
+    }
+
+    private void setModeNormal(){
+        mode = ActivityMode.NORMAL;
+        getSupportActionBar().show();
+        selectingToolbar.setVisibility(View.GONE);
     }
 
     public void addNewComic(View view){

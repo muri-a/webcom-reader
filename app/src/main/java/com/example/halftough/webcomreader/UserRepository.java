@@ -1,6 +1,7 @@
 package com.example.halftough.webcomreader;
 
 import com.example.halftough.webcomreader.database.Chapter;
+import com.example.halftough.webcomreader.database.ReadWebcom;
 import com.example.halftough.webcomreader.webcoms.DilbertWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.example.halftough.webcomreader.webcoms.XkcdWebcom;
@@ -31,5 +32,4 @@ public class UserRepository {
         File file = chapter.getFile();
         file.delete();
     }
-
 }

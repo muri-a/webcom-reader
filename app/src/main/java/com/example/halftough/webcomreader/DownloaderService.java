@@ -75,14 +75,19 @@ public class DownloaderService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_UPDATE_NEW_CHAPTERS.equals(action)) {
-                handleUpdateNewChapters();
-            } else if(ACTION_UPDATE_NEW_CHAPTERS_IN.equals(action)){
-                handleUpdateNewChaptersIn(intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID));
-            } else if (ACTION_ENQUEUE_CHAPTER.equals(action)) {
-                final String wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
-                final String chapter = intent.getStringExtra(UserRepository.EXTRA_CHAPTER_NUMBER);
-                handleEnqueueChapter(wid, chapter);
+            switch(action){
+                case ACTION_UPDATE_NEW_CHAPTERS:
+                    handleUpdateNewChapters();
+                    break;
+                case ACTION_UPDATE_NEW_CHAPTERS_IN:
+                    handleUpdateNewChaptersIn(intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID));
+                    break;
+                case ACTION_ENQUEUE_CHAPTER: {
+                    final String wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
+                    final String chapter = intent.getStringExtra(UserRepository.EXTRA_CHAPTER_NUMBER);
+                    handleEnqueueChapter(wid, chapter);
+                    break;
+                }
             }
         }
     }
@@ -122,6 +127,7 @@ public class DownloaderService extends IntentService {
         if(netChapters == null || dbChapters == null)
             return;
 
+        //We run through list of chapters from db and net and see if they differ
         Iterator<String> netIt = netChapters.iterator();
         Iterator<Chapter> dbIt = dbChapters.iterator();
 
@@ -170,20 +176,29 @@ public class DownloaderService extends IntentService {
     }
 
     public void insertChapter(Chapter chapter){
-        new insertAsyncTask(chaptersDAO, this).execute(chapter);
+        new insertAsyncTask(chaptersDAO, readWebcomsDAO, this).execute(chapter);
     }
 
     private static class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
         private ChaptersDAO mAsyncTaskDao;
+        private ReadWebcomsDAO webcomsDao;
         WeakReference<DownloaderService> dService;
-        insertAsyncTask(ChaptersDAO dao, DownloaderService downloaderService) {
+        insertAsyncTask(ChaptersDAO dao, ReadWebcomsDAO webcomDao, DownloaderService downloaderService) {
             mAsyncTaskDao = dao;
+            this.webcomsDao = webcomDao;
             dService = new WeakReference<>(downloaderService);
         }
         @Override
         protected Void doInBackground(final Chapter... params) {
-            mAsyncTaskDao.insert(params[0]);
-            dService.get().broadcastChapterUpdated(params[0]);
+            //don't insert if webcom isn't on the list (possible wher deleting webcom while updating)
+            ReadWebcom webcom = webcomsDao.get(params[0].getWid());
+            if(webcom != null){
+                mAsyncTaskDao.insert(params[0]);
+                dService.get().broadcastChapterUpdated(params[0]);
+            }
+            else{
+                Log.e("It's null", "null");
+            }
             return null;
         }
     }
@@ -215,7 +230,6 @@ public class DownloaderService extends IntentService {
     class ChapterDownloader extends OneByOneUrlDownloader<Chapter> {
         @Override
         void onResponse(BufferedInputStream bufferInStream, Chapter extra, String extentsion) {
-            // TODO option to save internal or external
             saveBufferToFile(bufferInStream, extra, extentsion);
         }
         void onFail(Chapter chapter, String extentsion){
@@ -224,6 +238,7 @@ public class DownloaderService extends IntentService {
         }
 
         private void saveBufferToFile(BufferedInputStream bufferedInputStream, Chapter chapter, String extension){
+            // TODO option to save internal or external
             File root = android.os.Environment.getExternalStorageDirectory();
             File dir = new File(root.getAbsolutePath()+"/webcom/"+chapter.getWid());
             if(!dir.exists()){

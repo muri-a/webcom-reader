@@ -46,6 +46,9 @@ public interface ChaptersDAO {
     @Update
     void update(List<Chapter> chapters);
 
+    @Query("DELETE FROM chapters WHERE wid=:wid")
+    void deleteWebcom(String wid);
+
     @Query("UPDATE chapters SET DownloadStatus=:status WHERE wid=:wid AND chapter=:chapter")
     @TypeConverters(DownloadStatusConverter.class)
     void setDownloadStatus(String wid, String chapter, Chapter.DownloadStatus status);

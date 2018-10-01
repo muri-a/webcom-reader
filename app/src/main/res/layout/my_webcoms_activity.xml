@@ -6,10 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".activities.MyWebcoms.MyWebcomsActivity">
 
-    <include
-        layout="@layout/my_webcoms_content"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/myWebcomsSelectingToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            android:visibility="gone"
+            app:title="@string/library_selecting" />
+
+        <include
+            layout="@layout/my_webcoms_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButton"

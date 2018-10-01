@@ -7,6 +7,7 @@ import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,9 +41,9 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
 
     private final LayoutInflater mInflater;
     private List<ReadWebcom> readWebcoms;
-    private Activity context;
+    private MyWebcomsActivity context;
 
-    public MyWebcomsAdapter(Activity context){
+    public MyWebcomsAdapter(MyWebcomsActivity context){
         this.context = context;
         mInflater = LayoutInflater.from(context);
     }
@@ -64,8 +65,8 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         if(readWebcoms != null){
-            ReadWebcom readWebcom = readWebcoms.get(position);
-            Webcom webcom = UserRepository.getWebcomInstance(readWebcom.getWid());
+            final ReadWebcom readWebcom = readWebcoms.get(position);
+            final Webcom webcom = UserRepository.getWebcomInstance(readWebcom.getWid());
 
             holder.nameTextView.setText(webcom.getTitle());
             holder.iconView.setImageDrawable(context.getResources().getDrawable(webcom.getIcon()));
@@ -87,6 +88,34 @@ public class MyWebcomsAdapter extends RecyclerView.Adapter<MyWebcomsAdapter.View
                 float width = size.x/GlobalPreferenceValue.getCurrentGridCols(context, preferences) - 30*metrics.density;
                 holder.iconView.getLayoutParams().height = (int)width;
             }
+            holder.item.setBackgroundResource(0);
+            holder.item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(context.getMode() == MyWebcomsActivity.ActivityMode.NORMAL) {
+                        context.showChapterList(readWebcom.getWid());
+                    }
+                    else{
+                        triggerSelected(v, readWebcom);
+                    }
+                }
+            });
+            holder.item.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    triggerSelected(v, readWebcom);
+                    return true;
+                }
+            });
+        }
+    }
+
+    private void triggerSelected(View v, ReadWebcom webcom){
+        if( context.triggerChapterSelect(webcom) ){
+            v.setBackground(context.getResources().getDrawable(R.drawable.library_entry_background_selected));
+        }
+        else{
+            v.setBackgroundResource(0);
         }
     }
 

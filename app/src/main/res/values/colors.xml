@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimaryDark">#303f9f</color>
     <color name="colorAccent">#FF4081</color>
     <color name="transparent">#00ffffff</color>
+    <color name="selected">#b5dfd4</color>
     <color name="chapterUnread">#080808</color>
     <color name="chapterRead">#BBB</color>
     <color name="comicVievBackground">#f8f8f8</color>
