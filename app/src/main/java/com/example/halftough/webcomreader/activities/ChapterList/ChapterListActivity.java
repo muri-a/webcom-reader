@@ -1,15 +1,19 @@
 package com.example.halftough.webcomreader.activities.ChapterList;
 
+import android.Manifest;
 import android.app.DialogFragment;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.halftough.webcomreader.ChapterFilter;
+import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
@@ -219,6 +224,7 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
     }
 
     public void readWebcom(Chapter chapter){
+        viewModel.markWebcomBeingRead();
         Intent intent = new Intent(this, ReadChapterActivity.class);
         intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, chapter.getWid());
         intent.putExtra(UserRepository.EXTRA_CHAPTER_NUMBER, chapter.getChapter());
@@ -230,6 +236,10 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
     }
 
     public void downloadChapter(Chapter chapter) {
+        if( ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
         viewModel.downloadChapter(chapter);
     }
 

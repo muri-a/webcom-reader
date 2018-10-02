@@ -1,10 +1,14 @@
 package com.example.halftough.webcomreader.database;
 
+import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.activities.ReadChapter.ComicPageView;
@@ -59,6 +63,10 @@ public class ReadChapterRepository {
                 getImageFromStorage();
                 break;
             case UNDOWNLOADED:
+                if( ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                }
                 context.showDownloadingText();
                 wasUpdate = true;
                 Chapter lChapter = chapter.getValue();

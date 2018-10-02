@@ -1,12 +1,17 @@
 package com.example.halftough.webcomreader;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.IntentService;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.example.halftough.webcomreader.database.AppDatabase;
@@ -22,6 +27,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -155,6 +162,9 @@ public class DownloaderService extends IntentService {
             }
         }while(netChapter != null || dbChapter != null);
 
+        if(!calls.isEmpty()){
+            new setUpdateDateAsyncTask(readWebcomsDAO).execute(webcom.getId());
+        }
         updateWebcomCount(webcom.getId(), dbChapters.size()+calls.size());
 
         new OneByOneCallDownloader<ComicPage, Chapter>(calls, extra, 5){
@@ -275,5 +285,17 @@ public class DownloaderService extends IntentService {
         broadcastIntent.putExtra(UserRepository.EXTRA_WEBCOM_ID, chapter.getWid());
         broadcastIntent.putExtra(UserRepository.EXTRA_CHAPTER_NUMBER, chapter.getChapter());
         sendBroadcast(broadcastIntent);
+    }
+
+    private static class setUpdateDateAsyncTask extends AsyncTask<String, Void, Void>{
+        ReadWebcomsDAO mAsyncDao;
+        setUpdateDateAsyncTask(ReadWebcomsDAO dao){ mAsyncDao = dao; }
+        @Override
+        protected Void doInBackground(String... strings) {
+            Date now = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            mAsyncDao.setLastUpdateDate(strings[0], sdf.format(now));
+            return null;
+        }
     }
 }

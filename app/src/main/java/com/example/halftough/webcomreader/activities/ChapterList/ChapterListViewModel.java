@@ -102,4 +102,8 @@ public class ChapterListViewModel extends AndroidViewModel {
     public void markUnreadFrom(Chapter chapter){
         chaptersRepository.markUnreadFrom(chapter);
     }
+
+    public void markWebcomBeingRead() {
+        chaptersRepository.markWebcomBeingRead();
+    }
 }

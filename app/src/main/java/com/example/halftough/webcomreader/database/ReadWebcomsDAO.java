@@ -22,6 +22,12 @@ public interface ReadWebcomsDAO {
     @Query("SELECT chapterCount from read_webcoms WHERE wid=:wid")
     LiveData<Integer> getChapterCount(String wid);
 
+    @Query("UPDATE read_webcoms SET lastRead = :date WHERE wid=:wid")
+    void setLastReadDate(String wid, String date);
+
+    @Query("UPDATE read_webcoms SET lastUpdated = :date WHERE wid=:wid")
+    void setLastUpdateDate(String wid, String date);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(ReadWebcom readWebcoms);
 

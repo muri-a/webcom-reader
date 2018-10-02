@@ -83,6 +83,6 @@ public class Chapter implements Comparable<Chapter> {
             }
         });
         //TODO if more than one file, pick "best"
-        return files.length>0?files[0]:null;
+        return files!=null && files.length>0?files[0]:null;
     }
 }

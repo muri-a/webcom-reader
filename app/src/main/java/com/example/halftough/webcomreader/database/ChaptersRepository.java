@@ -15,7 +15,9 @@ import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -191,6 +193,10 @@ public class ChaptersRepository {
         update();
     }
 
+    public void markWebcomBeingRead() {
+        new markWebcomReadAsyncTask(webcomsDAO).execute(webcom.getId());
+    }
+
     private static class updateAsyncTask extends AsyncTask<Chapter, Void, Void>{
         private ChaptersDAO mAsyncTaskDao;
         updateAsyncTask(ChaptersDAO dao) {
@@ -244,6 +250,17 @@ public class ChaptersRepository {
         @Override
         protected Void doInBackground(ReadWebcom... readWebcoms) {
             mAsyncTaskDao.updateReadChapterCount(readWebcoms[0].getWid(), readWebcoms[0].getReadChapters());
+            return null;
+        }
+    }
+
+    private static class markWebcomReadAsyncTask extends AsyncTask<String, Void, Void> {
+        private ReadWebcomsDAO mAsyncDao;
+        markWebcomReadAsyncTask(ReadWebcomsDAO dao){ mAsyncDao = dao; }
+        @Override
+        protected Void doInBackground(String... readWebcoms) {
+            Date date = new Date();
+            mAsyncDao.setLastReadDate(readWebcoms[0], new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date));
             return null;
         }
     }
