@@ -12,6 +12,8 @@ public class ReadWebcom {
     private String wid;
     private int chapterCount = 0;
     private int readChapters = 0;
+    private String lastRead;
+    private String lastUpdated;
 
     public ReadWebcom(String wid){
         this.wid = wid;
@@ -36,5 +38,19 @@ public class ReadWebcom {
     }
     public void setReadChapters(int readChapters) {
         this.readChapters = readChapters;
+    }
+
+    public String getLastRead() {
+        return lastRead;
+    }
+    public void setLastRead(String lastRead) {
+        this.lastRead = lastRead;
+    }
+
+    public String getLastUpdated() {
+        return lastUpdated;
+    }
+    public void setLastUpdated(String lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 }

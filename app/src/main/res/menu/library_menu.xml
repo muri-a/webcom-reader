@@ -3,7 +3,27 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/myWebcomsMenuSettings"
+        android:id="@+id/libraryMenuSorting"
+        android:icon="@drawable/ic_sort_white_24dp"
+        android:title="@string/sorting"
+        app:showAsAction="never|ifRoom">
+        <menu>
+            <item
+                android:id="@+id/libraryMenuSortingTitle"
+                android:title="@string/sorting_title" />
+            <item
+                android:id="@+id/libraryMenuSortingRead"
+                android:title="@string/sorting_last_read" />
+            <item
+                android:id="@+id/libraryMenuSortingUpdated"
+                android:title="@string/sorting_last_updated" />
+            <item
+                android:id="@+id/libraryMenuSortingUnread"
+                android:title="@string/sorting_unread" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/libraryMenuSettings"
         android:icon="@drawable/ic_settings_white_black_24dp"
         android:title="@string/settings"
         app:showAsAction="ifRoom" />

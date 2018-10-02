@@ -37,6 +37,7 @@ import java.util.List;
 public class LibraryActivity extends AppCompatActivity {
     enum ActivityMode { NORMAL, SELECTING }
     public static int ADD_WEBCOM_RESULT = 1;
+    public static final String SORTING_KEY = "library_sorting";
 
     RecyclerView libraryRecyclerView;
     LibraryAdapter adapter;
@@ -59,6 +60,8 @@ public class LibraryActivity extends AppCompatActivity {
         selectingToolbar = (Toolbar)findViewById(R.id.myWebcomsSelectingToolbar);
         selectedWebcoms = new ArrayList<>();
 
+        setTitle(R.string.title_activity_library);
+
         getMenuInflater().inflate(R.menu.library_selecting_menu, selectingToolbar.getMenu());
         selectingToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -66,22 +69,22 @@ public class LibraryActivity extends AppCompatActivity {
                 switch (item.getItemId()){
                     case R.id.librerySelectingDelete:
                         new AlertDialog.Builder(LibraryActivity.this)
-                                .setMessage(R.string.library_delete_selected_dialog_message)
-                                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        for(ReadWebcom webcom : selectedWebcoms){
-                                            viewModel.deleteWebcom(webcom.getWid());
-                                        }
-                                        selectedWebcoms.clear();
-                                        setModeNormal();
+                            .setMessage(R.string.library_delete_selected_dialog_message)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    for(ReadWebcom webcom : selectedWebcoms){
+                                        viewModel.deleteWebcom(webcom.getWid());
                                     }
-                                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    selectedWebcoms.clear();
+                                    setModeNormal();
+                                }
+                            }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
-                                    }
-                                }).create().show();
+                                }
+                            }).create().show();
                         return true;
                 }
                 return false;
@@ -96,15 +99,15 @@ public class LibraryActivity extends AppCompatActivity {
         libraryRecyclerView.setAdapter(adapter);
 
         viewModel = ViewModelProviders.of(this).get(LibraryModel.class);
-        final Context context = this;
         viewModel.getAllReadWebcoms().observe(this, new Observer<List<ReadWebcom>>() {
             @Override
             public void onChanged(@Nullable List<ReadWebcom> readWebcoms) {
-                Context con = context;
+                Context context = LibraryActivity.this;
+                viewModel.sort();
                 adapter.setReadWebcoms(readWebcoms);
                 //Set default preferences for all chapters
                 for(ReadWebcom webcom : readWebcoms){
-                    PreferenceManager.setDefaultValues(con, ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+webcom.getWid(), MODE_PRIVATE, R.xml.chapter_preferences, false);
+                    PreferenceManager.setDefaultValues(context, ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+webcom.getWid(), MODE_PRIVATE, R.xml.chapter_preferences, false);
                 }
             }
         });
@@ -114,7 +117,7 @@ public class LibraryActivity extends AppCompatActivity {
             layoutManager = new LinearLayoutManager(this);
         }
         else{
-            int spanCount = GlobalPreferenceValue.getCurrentGridCols(context, preferences);
+            int spanCount = GlobalPreferenceValue.getCurrentGridCols(this, preferences);
             layoutManager = new GridLayoutManager(this, spanCount);
         }
         libraryRecyclerView.setLayoutManager(layoutManager);
@@ -129,11 +132,35 @@ public class LibraryActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
-            case R.id.myWebcomsMenuSettings:
+            case R.id.libraryMenuSortingTitle:
+                sortLibrary(LibraryModel.SortBy.TITLE);
+                break;
+            case R.id.libraryMenuSortingRead:
+                sortLibrary(LibraryModel.SortBy.READ);
+                break;
+            case R.id.libraryMenuSortingUpdated:
+                sortLibrary(LibraryModel.SortBy.UPDATED);
+                break;
+            case R.id.libraryMenuSortingUnread:
+                sortLibrary(LibraryModel.SortBy.UNREAD);
+                break;
+            case R.id.libraryMenuSettings:
                 Intent intent = new Intent(this, GlobalSettingsActivity.class);
                 startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sortLibrary(LibraryModel.SortBy choosenSort){
+        LibraryModel.SortBy current = LibraryModel.SortBy.fromInt(preferences.getInt(SORTING_KEY, 0));
+        if(current == choosenSort){
+            preferences.edit().putInt(SORTING_KEY, choosenSort.reverse().toInt()).apply();
+        }
+        else{
+            preferences.edit().putInt(SORTING_KEY, choosenSort.toInt()).apply();
+        }
+        viewModel.sort();
+        adapter.notifyDataSetChanged();
     }
 
     public ActivityMode getMode(){ return mode; }
