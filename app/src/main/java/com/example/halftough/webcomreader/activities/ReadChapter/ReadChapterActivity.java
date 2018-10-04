@@ -97,6 +97,12 @@ public class ReadChapterActivity extends AppCompatActivity {
     }
 
     public void showDownloadingText(){
+        downloadingView.setText(R.string.read_chapter_downloading);
+        downloadingView.setVisibility(View.VISIBLE);
+    }
+
+    public void showCouldntDownloadText() {
+        downloadingView.setText(R.string.read_chapter_cant_download);
         downloadingView.setVisibility(View.VISIBLE);
     }
 

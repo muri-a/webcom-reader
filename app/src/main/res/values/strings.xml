@@ -53,6 +53,9 @@
     <string name="chapter_list_filters_menu_undownloaded">Undownloaded</string>
     <string name="chapter_list_filters_menu_clear">Clear</string>
 
+    <string name="read_chapter_downloading">Downloading</string>
+    <string name="read_chapter_cant_download">Unable to download page</string>
+
     <string name="global_preferences_librery_style_title">Librery style</string>
     <string-array name="global_preferences_librery_style">
         <item>List</item>

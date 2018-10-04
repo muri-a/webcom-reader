@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -18,13 +17,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.example.halftough.webcomreader.ChapterFilter;
-import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
@@ -61,6 +58,17 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //TODO hide button when list is empty
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO depending on settings, newest or oldest unread
+                Chapter chapter = viewModel.getChapterToRead();
+                readWebcom(chapter);
+            }
+        });
+
         chapterListRecyclerView = (RecyclerView)findViewById(R.id.chapterListRecyclerView);
         adapter = new ChapterListAdapter(this);
         chapterListRecyclerView.setAdapter(adapter);
@@ -74,16 +82,6 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
                 adapter.setChapters(chapters);
                 ChapterFilter filter = makeChapterFilter();
                 adapter.changeFilter(filter);
-            }
-        });
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO depending on settings, newest or oldest unread
-                Chapter chapter = viewModel.getChapterToRead();
-                readWebcom(chapter);
             }
         });
     }
@@ -224,6 +222,8 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
     }
 
     public void readWebcom(Chapter chapter){
+        if(chapter==null)
+            return;
         viewModel.markWebcomBeingRead();
         Intent intent = new Intent(this, ReadChapterActivity.class);
         intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, chapter.getWid());

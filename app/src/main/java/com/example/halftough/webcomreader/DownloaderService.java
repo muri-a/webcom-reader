@@ -17,6 +17,8 @@ import android.util.Log;
 import com.example.halftough.webcomreader.database.AppDatabase;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersDAO;
+import com.example.halftough.webcomreader.database.ChaptersRepository;
+import com.example.halftough.webcomreader.database.ReadChapterRepository;
 import com.example.halftough.webcomreader.database.ReadWebcom;
 import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 import com.example.halftough.webcomreader.webcoms.ComicPage;
@@ -205,9 +207,6 @@ public class DownloaderService extends IntentService {
             if(webcom != null){
                 mAsyncTaskDao.insert(params[0]);
                 dService.get().broadcastChapterUpdated(params[0]);
-            }
-            else{
-                Log.e("It's null", "null");
             }
             return null;
         }

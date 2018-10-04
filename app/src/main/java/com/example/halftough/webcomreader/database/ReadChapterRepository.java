@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.activities.ReadChapter.ComicPageView;
@@ -82,10 +83,24 @@ public class ReadChapterRepository {
     public void getImageFromStorage(){
         if(chapter.getValue() == null)
             return;
-        context.hideDownloadingText();
         File f = chapter.getValue().getFile();
-        Picasso.get().load(f).into(imageView);
-        markRead();
+        if(f != null) {
+            context.hideDownloadingText();
+            Picasso.get().load(f).into(imageView);
+            markRead();
+        }
+        else{
+            chapter = chaptersDAO.getChapter(chapter.getValue().getWid(), chapter.getValue().getChapter());
+            chapter.observe(context, new Observer<Chapter>() {
+                @Override
+                public void onChanged(@Nullable Chapter chapter) {
+                    ReadChapterRepository.this.chapter.removeObserver(this);
+                    if(chapter.getDownloadStatus() == Chapter.DownloadStatus.UNDOWNLOADED){
+                        context.showCouldntDownloadText();
+                    }
+                }
+            });
+        }
     }
 
     public void markRead(){
@@ -93,7 +108,7 @@ public class ReadChapterRepository {
             return;
         wasUpdate = true;
         chapter.getValue().setStatus(Chapter.Status.READ);
-        new updateAsyncTask(chaptersDAO).execute(chapter.getValue());
+        new setStatusAsyncTask(chaptersDAO).execute(chapter.getValue());
     }
 
     public boolean getUpdateMarker() {
@@ -114,6 +129,7 @@ public class ReadChapterRepository {
         return chapter.getValue()!=null?chapter.getValue().getChapter():null;
     }
 
+    //TODO remove?
     private static class updateAsyncTask extends AsyncTask<Chapter, Void, Void> {
         private ChaptersDAO mAsyncTaskDao;
         updateAsyncTask(ChaptersDAO dao) {
@@ -123,6 +139,19 @@ public class ReadChapterRepository {
         @Override
         protected Void doInBackground(Chapter...chapters) {
             mAsyncTaskDao.update(chapters[0]);
+            return null;
+        }
+    }
+
+    private static class setStatusAsyncTask extends AsyncTask<Chapter, Void, Void> {
+        private ChaptersDAO mAsyncTaskDao;
+        setStatusAsyncTask(ChaptersDAO dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Chapter...chapters) {
+            mAsyncTaskDao.setStatus(chapters[0].getWid(), chapters[0].getChapter(), chapters[0].getStatus());
             return null;
         }
     }
