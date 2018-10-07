@@ -5,6 +5,7 @@ In the meantime, feel free to suggest features or comics that should ba availabl
 Lis of working webcoms:
 
 1. [xkcd](https://www.xkcd.com/)
+2. [Cyanide & Happiness](http://explosm.net)
 
 list of planned webcoms:
 
