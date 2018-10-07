@@ -1,8 +1,7 @@
 package com.example.halftough.webcomreader;
 
 import com.example.halftough.webcomreader.database.Chapter;
-import com.example.halftough.webcomreader.database.ReadWebcom;
-import com.example.halftough.webcomreader.webcoms.DilbertWebcom;
+import com.example.halftough.webcomreader.webcoms.CyanideAndHappinessWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.example.halftough.webcomreader.webcoms.XkcdWebcom;
 
@@ -18,8 +17,8 @@ public class UserRepository {
 
     public static Webcom getWebcomInstance(String id) {
         switch(id){
-            case "dilbert":
-                return new DilbertWebcom();
+            case "cyanideandhappiness":
+                return new CyanideAndHappinessWebcom();
             case "xkcd":
                 return new XkcdWebcom();
             default:

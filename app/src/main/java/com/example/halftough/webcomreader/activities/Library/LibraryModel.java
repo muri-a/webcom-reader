@@ -152,6 +152,8 @@ public class LibraryModel extends AndroidViewModel {
         dir.delete();
     }
 
+    //TODO clean this up
+
     private static class insertAsyncTask extends AsyncTask<ReadWebcom, Void, Void> {
         private ReadWebcomsDAO mAsyncTaskDao;
         insertAsyncTask(ReadWebcomsDAO dao) {

@@ -2,13 +2,12 @@ package com.example.halftough.webcomreader.webcoms;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.NonNull;
+import android.arch.lifecycle.Observer;
+import android.support.annotation.Nullable;
 
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.example.halftough.webcomreader.DownloaderService;
+import com.example.halftough.webcomreader.database.ChaptersDAO;
+import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 
 public abstract class Webcom {
     public enum format { CHAPTERS, PAGES }
@@ -16,6 +15,7 @@ public abstract class Webcom {
 
     public abstract String getId();
     public abstract String getTitle();
+    public abstract String getWebpage();
     public abstract String getDescription();
     public abstract int getIcon();
     public abstract format getFormat();
@@ -24,25 +24,26 @@ public abstract class Webcom {
     public abstract ReadingOrder getReadingOrder();
 
     public abstract MutableLiveData<Integer> getChapterCount(); //Returns number of all available pages/chapters of comic
+
     public LiveData<String> getChapterUrl(String chapter){
         final MutableLiveData<String> chapterUrl = new MutableLiveData<>();
-        Call<ComicPage> call = getChapterMetaCall(chapter);
-        call.enqueue(new Callback<ComicPage>() {
+        final LiveData<ComicPage> call = getChapterMeta(chapter);
+        call.observeForever(new Observer<ComicPage>() {
             @Override
-            public void onResponse(Call<ComicPage> call, Response<ComicPage> response) {
-                chapterUrl.setValue(response.body().getUrl());
-            }
-
-            @Override
-            public void onFailure(Call<ComicPage> call, Throwable t) {
-                chapterUrl.setValue("");
+            public void onChanged(@Nullable ComicPage comicPage) {
+                call.removeObserver(this);
+                if(comicPage != null)
+                    chapterUrl.postValue(comicPage.getImage());
+                else
+                    chapterUrl.postValue("");
             }
         });
         return chapterUrl;
     }
-    public abstract Call<ComicPage> getChapterMetaCall(String number);
-    public abstract List<String> getChapterList();
-    public String getFirstChapterId(){ return getChapterList().get(0); }
-    public String getLastChapterId(){ return getChapterList().get(getChapterList().size()-1); }
-    public abstract void updateChapters();
+    public abstract void updateChapterList(DownloaderService downloaderService, ChaptersDAO chaptersDAO, ReadWebcomsDAO readWebcomsDAO);
+    public abstract LiveData<ComicPage> getChapterMeta(String number);
+    //public abstract List<String> getChapterList();
+    //public String getFirstChapterId(){ return getChapterList().get(0); }
+    //public String getLastChapterId(){ return getChapterList().get(getChapterList().size()-1); }
+    //public abstract void updateChapters();
 }

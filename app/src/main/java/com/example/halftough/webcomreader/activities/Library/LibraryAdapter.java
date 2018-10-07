@@ -52,10 +52,10 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHold
         SharedPreferences preferences = context.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE);
         View itemView;
         if(preferences.getString("library_style", context.getString(R.string.global_preferences_librery_style_default)).equals("list")) {
-            itemView = mInflater.inflate(R.layout.my_webcoms_list_item, parent, false);
+            itemView = mInflater.inflate(R.layout.library_list_item, parent, false);
         }
         else{
-            itemView = mInflater.inflate(R.layout.my_webcoms_grid_item, parent, false);
+            itemView = mInflater.inflate(R.layout.library_grid_item, parent, false);
         }
         return new ViewHolder(itemView);
     }

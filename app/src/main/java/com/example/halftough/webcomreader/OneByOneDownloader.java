@@ -27,7 +27,7 @@ public abstract class OneByOneDownloader<ElementType, Extra> {
             while (free > 0 && !queue.isEmpty()) {
                 downloading = true;
                 free--;
-                ElementType element  = queue.remove();
+                ElementType element = queue.remove();
                 Extra extra = extras!=null?extras.remove():null;
 
                 downloadElement(element, extra);

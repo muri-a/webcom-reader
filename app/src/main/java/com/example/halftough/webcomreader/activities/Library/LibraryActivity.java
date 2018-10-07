@@ -51,7 +51,7 @@ public class LibraryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.my_webcoms_activity);
+        setContentView(R.layout.library_activity);
 
         PreferenceManager.setDefaultValues(this, UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE, R.xml.global_preferences, false);
         preferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
@@ -106,6 +106,7 @@ public class LibraryActivity extends AppCompatActivity {
                 viewModel.sort();
                 adapter.setReadWebcoms(readWebcoms);
                 //Set default preferences for all chapters
+                //TODO maybe move to when adding a webcom
                 for(ReadWebcom webcom : readWebcoms){
                     PreferenceManager.setDefaultValues(context, ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+webcom.getWid(), MODE_PRIVATE, R.xml.chapter_preferences, false);
                 }

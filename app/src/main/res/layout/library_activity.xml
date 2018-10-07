@@ -22,7 +22,7 @@
             app:title="@string/library_selecting" />
 
         <include
-            layout="@layout/my_webcoms_content"
+            layout="@layout/library_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>

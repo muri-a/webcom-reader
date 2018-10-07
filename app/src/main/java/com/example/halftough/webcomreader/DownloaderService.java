@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -116,113 +117,45 @@ public class DownloaderService extends IntentService {
 
     private void handleUpdateNewChaptersIn(String wid) {
         final Webcom webcom = UserRepository.getWebcomInstance(wid);
-        //First we update chapter counter, because it might affect list of all chapters
-        final LiveData<Integer> chapterCountNet = webcom.getChapterCount();
-        final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(wid);
-        new OnLiveDataReady(){
-            @Override
-            public void onReady() {
-                updateNewChaptersInReady(webcom, dbChapters.getValue());
-            }
-        }.observe(dbChapters, chapterCountNet, OnLiveDataReady.WaitUntil.CHANGED);
-        webcom.updateChapters();
+        webcom.updateChapterList(this, chaptersDAO, readWebcomsDAO);
     }
 
-    private void updateNewChaptersInReady(Webcom webcom, List<Chapter> dbChapters){
-        List<String> netChapters = webcom.getChapterList();
-        Queue<Call<ComicPage>> calls = new LinkedList<>();
-        Queue<Chapter> extra = new LinkedList<>(); // References to chapters that will be downloaded
+//    public void insertChapter(Chapter chapter){
+//        new insertAsyncTask(chaptersDAO, readWebcomsDAO, this).execute(chapter);
+//    }
 
-        if(netChapters == null || dbChapters == null)
-            return;
+//    private static class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
+//        private ChaptersDAO mAsyncTaskDao;
+//        private ReadWebcomsDAO webcomsDao;
+//        WeakReference<DownloaderService> dService;
+//        insertAsyncTask(ChaptersDAO dao, ReadWebcomsDAO webcomDao, DownloaderService downloaderService) {
+//            mAsyncTaskDao = dao;
+//            this.webcomsDao = webcomDao;
+//            dService = new WeakReference<>(downloaderService);
+//        }
+//        @Override
+//        protected Void doInBackground(final Chapter... params) {
+//            //don't insert if webcom isn't on the list (possible wher deleting webcom while updating)
+//            ReadWebcom webcom = webcomsDao.get(params[0].getWid());
+//            if(webcom != null){
+//                mAsyncTaskDao.insert(params[0]);
+//                dService.get().broadcastChapterUpdated(params[0]);
+//            }
+//            return null;
+//        }
+//    }
 
-        //We run through list of chapters from db and net and see if they differ
-        Iterator<String> netIt = netChapters.iterator();
-        Iterator<Chapter> dbIt = dbChapters.iterator();
-
-        String netChapter = netIt.hasNext()?netIt.next():null;
-        Chapter dbChapter = dbIt.hasNext()?dbIt.next():null;
-        if(netChapter == null && dbChapter == null)
-            return;
-        do{
-            //If there is chapter on list that isn't in our database
-            if(dbChapter==null || (netChapter!=null && Float.parseFloat(netChapter) < Float.parseFloat(dbChapter.getChapter())) ){
-                Chapter chapter = new Chapter(webcom.getId(), netChapter);
-                calls.add(webcom.getChapterMetaCall(netChapter));
-                extra.add(chapter);
-                netChapter = netIt.hasNext()?netIt.next():null;
-            }
-            //If there is chapter in database that isn't on the list
-            else if(netChapter==null || Float.parseFloat(netChapter) > Float.parseFloat(dbChapter.getChapter())){
-                //TODO remove it from database if it haven't been downloaded
-                dbChapter = dbIt.hasNext()?dbIt.next():null;
-            }
-            //If chapter is both in database and on the list
-            else{
-                netChapter = netIt.hasNext()?netIt.next():null;
-                dbChapter = dbIt.hasNext()?dbIt.next():null;
-            }
-        }while(netChapter != null || dbChapter != null);
-
-        if(!calls.isEmpty()){
-            new setUpdateDateAsyncTask(readWebcomsDAO).execute(webcom.getId());
-        }
-        updateWebcomCount(webcom.getId(), dbChapters.size()+calls.size());
-
-        new OneByOneCallDownloader<ComicPage, Chapter>(calls, extra, 5){
-            @Override
-            public void onResponse(Call<ComicPage> call, Response<ComicPage> response, Chapter extra) {
-                if(response.body() != null) {
-                    //extra is reference to chapter in the list we use, so we can update it from here.
-                    extra.setTitle(response.body().getTitle());
-                    insertChapter(extra);
-                }
-            }
-        }.download();
-    }
-
-    private void updateWebcomCount(String wid, int count) {
-        ReadWebcom webcom = new ReadWebcom(wid);
-        webcom.setChapterCount(count);
-        new updateReadWebcomAsyncTask(readWebcomsDAO).execute(webcom);
-    }
-
-    public void insertChapter(Chapter chapter){
-        new insertAsyncTask(chaptersDAO, readWebcomsDAO, this).execute(chapter);
-    }
-
-    private static class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
-        private ChaptersDAO mAsyncTaskDao;
-        private ReadWebcomsDAO webcomsDao;
-        WeakReference<DownloaderService> dService;
-        insertAsyncTask(ChaptersDAO dao, ReadWebcomsDAO webcomDao, DownloaderService downloaderService) {
-            mAsyncTaskDao = dao;
-            this.webcomsDao = webcomDao;
-            dService = new WeakReference<>(downloaderService);
-        }
-        @Override
-        protected Void doInBackground(final Chapter... params) {
-            //don't insert if webcom isn't on the list (possible wher deleting webcom while updating)
-            ReadWebcom webcom = webcomsDao.get(params[0].getWid());
-            if(webcom != null){
-                mAsyncTaskDao.insert(params[0]);
-                dService.get().broadcastChapterUpdated(params[0]);
-            }
-            return null;
-        }
-    }
-
-    private static class updateReadWebcomAsyncTask extends AsyncTask<ReadWebcom, Void, Void> {
-        private ReadWebcomsDAO mAsyncTaskDao;
-        updateReadWebcomAsyncTask(ReadWebcomsDAO dao){
-            mAsyncTaskDao = dao;
-        }
-        @Override
-        protected Void doInBackground(ReadWebcom... readWebcoms) {
-            mAsyncTaskDao.updateChapterCount(readWebcoms[0].getWid(), readWebcoms[0].getChapterCount());
-            return null;
-        }
-    }
+//    private static class updateReadWebcomAsyncTask extends AsyncTask<ReadWebcom, Void, Void> {
+//        private ReadWebcomsDAO mAsyncTaskDao;
+//        updateReadWebcomAsyncTask(ReadWebcomsDAO dao){
+//            mAsyncTaskDao = dao;
+//        }
+//        @Override
+//        protected Void doInBackground(ReadWebcom... readWebcoms) {
+//            mAsyncTaskDao.updateChapterCount(readWebcoms[0].getWid(), readWebcoms[0].getChapterCount());
+//            return null;
+//        }
+//    }
 
     private void handleEnqueueChapter(final String wid, final String chapter) {
         Webcom webcom = UserRepository.getWebcomInstance(wid);
@@ -231,7 +164,8 @@ public class DownloaderService extends IntentService {
             @Override
             public void onChanged(@Nullable String s) {
             url.removeObserver(this);
-            downloader.enqueue(s, new Chapter(wid, chapter));
+            if(!s.isEmpty())
+                downloader.enqueue(s, new Chapter(wid, chapter));
             }
         });
     }
@@ -277,7 +211,7 @@ public class DownloaderService extends IntentService {
         }
     }
 
-    private void broadcastChapterUpdated(Chapter chapter){
+    public void broadcastChapterUpdated(Chapter chapter){
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(UserRepository.ACTION_CHAPTER_UPDATED);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -286,15 +220,4 @@ public class DownloaderService extends IntentService {
         sendBroadcast(broadcastIntent);
     }
 
-    private static class setUpdateDateAsyncTask extends AsyncTask<String, Void, Void>{
-        ReadWebcomsDAO mAsyncDao;
-        setUpdateDateAsyncTask(ReadWebcomsDAO dao){ mAsyncDao = dao; }
-        @Override
-        protected Void doInBackground(String... strings) {
-            Date now = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            mAsyncDao.setLastUpdateDate(strings[0], sdf.format(now));
-            return null;
-        }
-    }
 }

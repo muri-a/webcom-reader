@@ -24,6 +24,7 @@ public class WebcomInfoActivity extends AppCompatActivity {
     TextView title;
     TextView description;
     ImageView icon;
+    TextView webpageTextView;
     TextView formatTextView;
     TextView pagesLabelTextView;
     TextView pagesTextView;
@@ -43,12 +44,14 @@ public class WebcomInfoActivity extends AppCompatActivity {
         title = (TextView)findViewById(R.id.webcomInfoTitle);
         description = (TextView)findViewById(R.id.webcomInfoDescription);
         icon = (ImageView)findViewById(R.id.webcomInfoIcon);
+        webpageTextView = (TextView)findViewById(R.id.webcomInfoWebpage);
         formatTextView = (TextView)findViewById(R.id.webcomInfoFormat);
         pagesLabelTextView = (TextView)findViewById(R.id.webcomInfoPagesLabel);
         pagesTextView = (TextView)findViewById(R.id.webcomInfoPageNumber);
 
         title.setText(webcom.getTitle());
         setTitle(webcom.getTitle());
+        webpageTextView.setText(webcom.getWebpage());
         description.setText(webcom.getDescription());
         icon.setImageDrawable(getResources().getDrawable(webcom.getIcon()));
         switch (webcom.getFormat()){

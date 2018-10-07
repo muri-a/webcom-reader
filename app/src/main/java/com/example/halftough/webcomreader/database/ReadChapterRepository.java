@@ -38,7 +38,7 @@ public class ReadChapterRepository {
     public void setChapter(String c){
         chapter = chaptersDAO.getChapter(webcom.getId(), c);
         chapter.observeForever(new ChapterChangedObserver(chapter, context));
-        firstChapter = chaptersDAO.getFirstChapter();
+        firstChapter = chaptersDAO.getFirstChapter(webcom.getId());
         firstChapter.observeForever(new Observer<Chapter>() {
             @Override
             public void onChanged(@Nullable Chapter chapter) {
@@ -46,7 +46,7 @@ public class ReadChapterRepository {
                 imageView.setFirstChapterId(chapter.getChapter());
             }
         });
-        lastChapter = chaptersDAO.getLastChapter();
+        lastChapter = chaptersDAO.getLastChapter(webcom.getId());
         lastChapter.observeForever(new Observer<Chapter>() {
             @Override
             public void onChanged(@Nullable Chapter chapter) {

@@ -15,6 +15,7 @@ import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -261,6 +262,37 @@ public class ChaptersRepository {
         protected Void doInBackground(String... readWebcoms) {
             Date date = new Date();
             mAsyncDao.setLastReadDate(readWebcoms[0], new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date));
+            return null;
+        }
+    }
+
+    public static void insertChapter(Chapter chapter, ChaptersDAO chaptersDAO){
+        new insertChapterAsyncTask(chaptersDAO).execute(chapter);
+    }
+
+    public static void insertChapter(Chapter chapter, ChaptersDAO chaptersDAO, ReadWebcomsDAO readWebcomsDAO, DownloaderService downloaderService){
+        new insertChapterAsyncTask(chaptersDAO, readWebcomsDAO, downloaderService).execute(chapter);
+    }
+
+    private static class insertChapterAsyncTask extends AsyncTask<Chapter, Void, Void>{
+        private ChaptersDAO chaptersDAO;
+        private ReadWebcomsDAO readWebcomsDAO;
+        private WeakReference<DownloaderService> downloaderService;
+        insertChapterAsyncTask(ChaptersDAO dao){ this(dao, null, null); }
+        insertChapterAsyncTask(ChaptersDAO dao, ReadWebcomsDAO readWebcomsDAO, DownloaderService downloaderService){
+            chaptersDAO = dao;
+            this.readWebcomsDAO = readWebcomsDAO;
+            this.downloaderService = new WeakReference<>(downloaderService);
+        }
+        @Override
+        protected Void doInBackground(Chapter... chapters) {
+            chaptersDAO.insert(chapters[0]);
+            if(readWebcomsDAO != null){
+                int count = chaptersDAO.getChaptersCount(chapters[0].getWid());
+                readWebcomsDAO.updateChapterCount(chapters[0].getWid(), count);
+            }
+            if(downloaderService != null)
+                downloaderService.get().broadcastChapterUpdated(chapters[0]);
             return null;
         }
     }

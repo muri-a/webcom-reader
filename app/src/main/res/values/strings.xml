@@ -20,6 +20,7 @@
     <string name="library_selecting_menu_delete">Delete from library</string>
     <string name="library_delete_selected_dialog_message">This will delete all downloaded comics and reading progress. Continue?</string>
 
+    <string name="webcom_info_webpage">Webpage:</string>
     <string name="webcom_info_format">Format:</string>
     <string name="webcom_info_pages_label">Pages:</string>
     <string name="webcom_info_chapters_label">Chapters:</string>

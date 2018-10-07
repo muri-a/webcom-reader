@@ -19,19 +19,17 @@ public interface ChaptersDAO {
     @Query("SELECT * FROM chapters WHERE wid=:wid ORDER BY CAST(chapter AS REAL) DESC")
     LiveData<List<Chapter>> getChaptersDesc(String wid);
 
-
-
     @Query("SELECT * FROM chapters WHERE wid=:wid AND CAST(chapter AS REAL) > CAST(:chapter AS REAL) ORDER BY CAST(chapter AS REAL) LIMIT 1")
     LiveData<Chapter> getNext(String wid, String chapter);
 
     @Query("SELECT * FROM chapters WHERE wid=:wid AND CAST(chapter AS REAL) < CAST(:chapter AS REAL) ORDER BY CAST(chapter AS REAL) DESC LIMIT 1")
     LiveData<Chapter> getPrevious(String wid, String chapter);
 
-    @Query("SELECT * FROM chapters ORDER BY CAST(chapter AS REAL) LIMIT 1")
-    LiveData<Chapter> getFirstChapter();
+    @Query("SELECT * FROM chapters WHERE wid=:wid ORDER BY CAST(chapter AS REAL) LIMIT 1")
+    LiveData<Chapter> getFirstChapter(String wid);
 
-    @Query("SELECT * FROM chapters ORDER BY CAST(chapter AS REAL) DESC LIMIT 1")
-    LiveData<Chapter> getLastChapter();
+    @Query("SELECT * FROM chapters WHERE wid=:wid ORDER BY CAST(chapter AS REAL) DESC LIMIT 1")
+    LiveData<Chapter> getLastChapter(String wid);
 
     //Fixes status in case of error. Only use at start of the application.
     @Query("UPDATE chapters SET DownloadStatus=0 WHERE DownloadStatus=1")
@@ -60,4 +58,6 @@ public interface ChaptersDAO {
     @Query("SELECT * FROM chapters WHERE wid LIKE :wid AND chapter LIKE :number")
     LiveData<Chapter> getChapter(String wid, String number);
 
+    @Query("SELECT COUNT(*) FROM chapters WHERE wid=:wid")
+    int getChaptersCount(String wid);
 }
