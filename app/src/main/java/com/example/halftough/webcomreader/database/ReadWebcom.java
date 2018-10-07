@@ -53,4 +53,14 @@ public class ReadWebcom {
     public void setLastUpdated(String lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof ReadWebcom){
+            return wid.equals( ((ReadWebcom)obj).getWid() );
+        }
+        else{
+            return super.equals(obj);
+        }
+    }
 }

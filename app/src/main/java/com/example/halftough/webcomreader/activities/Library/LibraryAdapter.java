@@ -86,7 +86,12 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHold
                 float width = size.x/GlobalPreferenceValue.getCurrentGridCols(context, preferences) - 30*metrics.density;
                 holder.iconView.getLayoutParams().height = (int)width;
             }
-            holder.item.setBackgroundResource(0);
+            if(context.getSelectedWebcoms().contains(readWebcom)){
+                holder.item.setBackground(context.getResources().getDrawable(R.drawable.library_entry_background_selected));
+            }
+            else {
+                holder.item.setBackgroundResource(0);
+            }
             holder.item.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -218,4 +218,6 @@ public class LibraryActivity extends AppCompatActivity {
             }
         }
     }
+
+    public List<ReadWebcom> getSelectedWebcoms(){ return selectedWebcoms; }
 }
