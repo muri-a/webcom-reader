@@ -3,8 +3,6 @@ package com.example.halftough.webcomreader;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.preference.Preference;
-import android.preference.PreferenceManager;
 
 import com.example.halftough.webcomreader.webcoms.Webcom;
 

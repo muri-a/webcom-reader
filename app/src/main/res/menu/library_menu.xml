@@ -27,4 +27,7 @@
         android:icon="@drawable/ic_settings_white_black_24dp"
         android:title="@string/settings"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/libraryMenuAbout"
+        android:title="@string/title_activity_about" />
 </menu>

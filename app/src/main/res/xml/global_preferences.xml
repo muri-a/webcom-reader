@@ -3,11 +3,10 @@
 
     <ListPreference
         android:defaultValue="@string/global_preferences_librery_style_default"
-        android:entries="@array/global_preferences_librery_style"
+        android:entries="@array/global_preferences_library_style"
         android:entryValues="@array/global_preferences_librery_style_values"
-        android:fragment="TEST"
         android:key="library_style"
-        android:title="@string/global_preferences_librery_style_title" />
+        android:title="@string/global_preferences_library_style_title" />
     <EditTextPreference
         android:id="@+id/global_preferences_grid_vertical"
         android:defaultValue="@string/global_preferences_grid_columns_vertical_default"
@@ -29,5 +28,5 @@
         android:entries="@array/global_preferences_order_list"
         android:entryValues="@array/global_perferences_order_list_values"
         android:key="chapter_order"
-        android:title="@string/global_preferences_odrer_title" />
+        android:title="@string/global_preferences_order_title" />
 </PreferenceScreen>

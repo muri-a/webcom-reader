@@ -58,7 +58,7 @@ public class GlobalSettingsFragment extends PreferenceFragment implements Shared
         switch (key){
             case "library_style":
                 type = FieldType.ARRAY;
-                namesId = R.array.global_preferences_librery_style;
+                namesId = R.array.global_preferences_library_style;
                 valuesId = R.array.global_preferences_librery_style_values;
                 defaultId = R.string.global_preferences_librery_style_default;
                 break;

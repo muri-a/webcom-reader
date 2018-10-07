@@ -6,6 +6,7 @@
     <string name="title_activity_webcom_info">WebcomInfoActivity</string>
     <string name="title_activity_page_list">PageListActivity</string>
     <string name="title_activity_read_webcom">ReadWebcomActivity</string>
+    <string name="title_activity_about">About</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -57,14 +58,14 @@
     <string name="read_chapter_downloading">Downloading</string>
     <string name="read_chapter_cant_download">Unable to download page</string>
 
-    <string name="global_preferences_librery_style_title">Librery style</string>
-    <string-array name="global_preferences_librery_style">
+    <string name="global_preferences_library_style_title">Librery style</string>
+    <string-array name="global_preferences_library_style">
         <item>List</item>
         <item>Grid</item>
     </string-array>
     <string name="global_preferences_grid_columns_vertical">Grid columns vertical</string>
     <string name="global_preferences_grid_columns_horizontal">Grid columns horizontal</string>
-    <string name="global_preferences_odrer_title">Default list order</string>
+    <string name="global_preferences_order_title">Default list order</string>
     <string-array name="global_preferences_order_list">
         <item>Smart</item>
         <item>Ascending</item>
@@ -77,5 +78,12 @@
         <item>Ascending</item>
         <item>Decreasing</item>
     </string-array>
+
+    <string name="about_general_title">General</string>
+    <string name="about_general_content">This is free and open project aiming to provide comfortable wey to read and keep track of internet comics.
+    Have in mind this is still early version. It might lack features and polish, but it is developing quickly.</string>
+    <string name="about_issues_title">Issues</string>
+    <string name="about_issues_content">If you found a bug or want to request a feature or new comic to be added, create an issue under https://gitlab.com/halftough/webcom-reader/issues.
+        It helps making application better.</string>
 
 </resources>

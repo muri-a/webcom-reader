@@ -23,6 +23,7 @@ import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.GlobalPreferenceValue;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
+import com.example.halftough.webcomreader.activities.AboutActivity;
 import com.example.halftough.webcomreader.activities.AddWebcomActivity;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterListActivity;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
@@ -145,9 +146,16 @@ public class LibraryActivity extends AppCompatActivity {
             case R.id.libraryMenuSortingUnread:
                 sortLibrary(LibraryModel.SortBy.UNREAD);
                 break;
-            case R.id.libraryMenuSettings:
+            case R.id.libraryMenuSettings: {
                 Intent intent = new Intent(this, GlobalSettingsActivity.class);
                 startActivity(intent);
+                break;
+            }
+            case R.id.libraryMenuAbout: {
+                Intent intent = new Intent(this, AboutActivity.class);
+                startActivity(intent);
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
