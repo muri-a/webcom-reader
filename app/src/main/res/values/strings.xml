@@ -71,6 +71,20 @@
         <item>Ascending</item>
         <item>Decreasing</item>
     </string-array>
+    <string name="global_preferences_autodownload_title">Autodownload</string>
+    <string-array name="global_preferences_autodownload_list">
+        <item>Don\'t download chapters automatically</item>
+        <item>Preferred reading order</item>
+        <item>Oldest</item>
+        <item>Newest</item>
+    </string-array>
+    <string name="global_preferences_autoremove_title">Autoremove</string>
+    <string-array name="global_preferences_autoremove_list">
+        <item>Don\'t remove chapters automatically</item>
+        <item>Preferred reading order</item>
+        <item>Oldest</item>
+        <item>Newest</item>
+    </string-array>
 
     <string name="chapter_preferences_odrer_title">Order</string>
     <string-array name="chapter_perferences_order_list">

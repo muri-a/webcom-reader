@@ -175,13 +175,15 @@ public class CyanideAndHappinessWebcom extends Webcom {
             Element previous = doc.selectFirst(".nav-previous");
             if(previous != null){
                 String href = previous.attr("href");
-                int index = href.lastIndexOf("/");
-                if(index == href.length()-1){
-                    href = href.substring(0, href.length()-1);
-                    index = href.lastIndexOf("/");
+                if(!href.equals("")) {
+                    int index = href.lastIndexOf("/");
+                    if (index == href.length() - 1) {
+                        href = href.substring(0, href.length() - 1);
+                        index = href.lastIndexOf("/");
+                    }
+                    href = href.substring(index + 1);
+                    page.setPrevious(href);
                 }
-                href = href.substring(index+1);
-                page.setPrevious(href);
             }
             return page;
         }
