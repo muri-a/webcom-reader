@@ -7,4 +7,38 @@
         android:entryValues="@array/chapter_perferences_order_list_values"
         android:key="chapter_order"
         android:title="@string/chapter_preferences_odrer_title" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="autodownload_global"
+        android:title="@string/chapter_preferences_autodownload_global" />
+    <ListPreference
+        android:defaultValue="@string/chapter_preferences_autodownload_default"
+        android:enabled="false"
+        android:entries="@array/chapter_preferences_autodownload_list"
+        android:entryValues="@array/chapter_preferences_autodownload_values"
+        android:key="autodownload"
+        android:title="@string/chapter_preferences_autodownload_title" />
+    <EditTextPreference
+        android:enabled="false"
+        android:inputType="numberDecimal"
+        android:key="autodownload_number"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/chapter_preferences_autodownload_number" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="autoremove_global"
+        android:title="@string/chapter_preferences_autoremove_global" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:enabled="false"
+        android:key="autoremove"
+        android:title="@string/chapter_preferences_autoremove_title" />
+    <EditTextPreference
+        android:enabled="false"
+        android:inputType="numberDecimal"
+        android:key="autoremove_save"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/chapter_preferences_autoremove_number" />
 </PreferenceScreen>

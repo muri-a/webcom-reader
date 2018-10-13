@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.halftough.webcomreader.GlobalPreferenceValue;
+import com.example.halftough.webcomreader.PreferenceHelper;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.database.ReadWebcom;
@@ -83,7 +83,7 @@ public class LibraryAdapter extends RecyclerView.Adapter<LibraryAdapter.ViewHold
                 DisplayMetrics metrics = new DisplayMetrics();
                 context.getWindowManager().getDefaultDisplay().getSize(size);
                 context.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-                float width = size.x/GlobalPreferenceValue.getCurrentGridCols(context, preferences) - 30*metrics.density;
+                float width = size.x/PreferenceHelper.getCurrentGridCols(context, preferences) - 30*metrics.density;
                 holder.iconView.getLayoutParams().height = (int)width;
             }
             if(context.getSelectedWebcoms().contains(readWebcom)){

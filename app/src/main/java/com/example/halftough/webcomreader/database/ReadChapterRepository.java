@@ -3,15 +3,19 @@ package com.example.halftough.webcomreader.database;
 import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.example.halftough.webcomreader.DownloaderService;
+import com.example.halftough.webcomreader.TaskDelegate;
 import com.example.halftough.webcomreader.activities.ReadChapter.ComicPageView;
 import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
 import com.example.halftough.webcomreader.webcoms.Webcom;
@@ -108,7 +112,12 @@ public class ReadChapterRepository {
             return;
         wasUpdate = true;
         chapter.getValue().setStatus(Chapter.Status.READ);
-        new setStatusAsyncTask(chaptersDAO).execute(chapter.getValue());
+        new setStatusAsyncTask(chaptersDAO, new TaskDelegate() {
+            @Override
+            public void onFinish() {
+                DownloaderService.autodownload(context, webcom.getId());
+            }
+        }).execute(chapter.getValue());
     }
 
     public boolean getUpdateMarker() {
@@ -129,29 +138,21 @@ public class ReadChapterRepository {
         return chapter.getValue()!=null?chapter.getValue().getChapter():null;
     }
 
-    //TODO remove?
-    private static class updateAsyncTask extends AsyncTask<Chapter, Void, Void> {
-        private ChaptersDAO mAsyncTaskDao;
-        updateAsyncTask(ChaptersDAO dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(Chapter...chapters) {
-            mAsyncTaskDao.update(chapters[0]);
-            return null;
-        }
-    }
-
     private static class setStatusAsyncTask extends AsyncTask<Chapter, Void, Void> {
         private ChaptersDAO mAsyncTaskDao;
-        setStatusAsyncTask(ChaptersDAO dao) {
+        private TaskDelegate taskDelegate;
+        setStatusAsyncTask(ChaptersDAO dao){ this(dao, null); }
+        setStatusAsyncTask(ChaptersDAO dao, TaskDelegate delegate) {
             mAsyncTaskDao = dao;
+            taskDelegate = delegate;
         }
 
         @Override
         protected Void doInBackground(Chapter...chapters) {
             mAsyncTaskDao.setStatus(chapters[0].getWid(), chapters[0].getChapter(), chapters[0].getStatus());
+            if(taskDelegate != null){
+                taskDelegate.onFinish();
+            }
             return null;
         }
     }

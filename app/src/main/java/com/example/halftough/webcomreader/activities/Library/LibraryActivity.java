@@ -20,7 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.halftough.webcomreader.DownloaderService;
-import com.example.halftough.webcomreader.GlobalPreferenceValue;
+import com.example.halftough.webcomreader.PreferenceHelper;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.AboutActivity;
@@ -119,7 +119,7 @@ public class LibraryActivity extends AppCompatActivity {
             layoutManager = new LinearLayoutManager(this);
         }
         else{
-            int spanCount = GlobalPreferenceValue.getCurrentGridCols(this, preferences);
+            int spanCount = PreferenceHelper.getCurrentGridCols(this, preferences);
             layoutManager = new GridLayoutManager(this, spanCount);
         }
         libraryRecyclerView.setLayoutManager(layoutManager);

@@ -2,24 +2,19 @@ package com.example.halftough.webcomreader.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
+import com.example.halftough.webcomreader.UserRepository.FieldType;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public class GlobalSettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     SharedPreferences sharedPreferences;
-    enum FieldType{ ARRAY, SINGLE }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,6 +34,9 @@ public class GlobalSettingsFragment extends PreferenceFragment implements Shared
         updateSummary("columns_vertical");
         updateSummary("columns_horizontal");
         updateSummary("chapter_order");
+        updateSummary("autodownload");
+        updateSummary("autodownload_number");
+        updateSummary("autoremove_save");
     }
 
     @Override
@@ -75,6 +73,20 @@ public class GlobalSettingsFragment extends PreferenceFragment implements Shared
                 namesId = R.array.global_preferences_order_list;
                 valuesId = R.array.global_perferences_order_list_values;
                 defaultId = R.string.global_preferences_order_default;
+                break;
+            case "autodownload":
+                type = FieldType.ARRAY;
+                namesId = R.array.global_preferences_autodownload_list;
+                valuesId = R.array.global_preferences_autodownload_values;
+                defaultId = R.string.global_preferences_autodownload_default;
+                break;
+            case "autodownload_number":
+                type = FieldType.SINGLE;
+                defaultId = R.string.global_preferences_autodownload_number_default;
+                break;
+            case "autoremove_save":
+                type = FieldType.SINGLE;
+                defaultId = R.string.global_preferences_autoremoved_number_default;
                 break;
         }
         if(type == null)

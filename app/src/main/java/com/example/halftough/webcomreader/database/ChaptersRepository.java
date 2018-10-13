@@ -10,7 +10,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
 import com.example.halftough.webcomreader.DownloaderService;
-import com.example.halftough.webcomreader.GlobalPreferenceValue;
+import com.example.halftough.webcomreader.PreferenceHelper;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.webcoms.Webcom;
@@ -113,7 +113,7 @@ public class ChaptersRepository {
 
     private LiveData<List<Chapter>> getDatabaseChapters(){
         String chapterOrder = preferences.getString("chapter_order", "global");
-        chapterOrder = GlobalPreferenceValue.getChapterOrder(application.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE), webcom, chapterOrder);
+        chapterOrder = PreferenceHelper.getChapterOrder(application.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE), webcom, chapterOrder);
         if(chapterOrder.equals("ascending")) {
             return chaptersDAO.getChapters(webcom.getId());
         }
@@ -220,6 +220,11 @@ public class ChaptersRepository {
         }
     }
 
+    public static void setDownloadStatus(Chapter chapter, Chapter.DownloadStatus status, ChaptersDAO chaptersDAO){
+        chapter.setDownloadStatus(status);
+        new setDownloadStatusAsyncTask(chaptersDAO).execute(chapter);
+    }
+
     public static class setDownloadStatusAsyncTask extends AsyncTask<Chapter, Void, Void>{
         private ChaptersDAO mAsyncTaskDao;
         private ChaptersRepository repository;
@@ -291,7 +296,7 @@ public class ChaptersRepository {
                 int count = chaptersDAO.getChaptersCount(chapters[0].getWid());
                 readWebcomsDAO.updateChapterCount(chapters[0].getWid(), count);
             }
-            if(downloaderService != null)
+            if(downloaderService != null && downloaderService.get() != null)
                 downloaderService.get().broadcastChapterUpdated(chapters[0]);
             return null;
         }

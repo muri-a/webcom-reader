@@ -6,11 +6,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import com.example.halftough.webcomreader.ChapterFilter;
-import com.example.halftough.webcomreader.DownloaderService;
-import com.example.halftough.webcomreader.GlobalPreferenceValue;
+import com.example.halftough.webcomreader.PreferenceHelper;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
@@ -47,7 +44,7 @@ public class ChapterListViewModel extends AndroidViewModel {
             return;
         chapters.postValue(Lists.reverse(chapters.getValue()));
         String pref = preferences.getString("chapter_order", "global");
-        pref = GlobalPreferenceValue.getChapterOrder(application.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE), webcom, pref);
+        pref = PreferenceHelper.getChapterOrder(application.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE), webcom, pref);
         if (pref.equals("ascending")) {
             preferences.edit().putString("chapter_order", "decreasing").apply();
         }

@@ -29,4 +29,28 @@
         android:entryValues="@array/global_perferences_order_list_values"
         android:key="chapter_order"
         android:title="@string/global_preferences_order_title" />
+    <ListPreference
+        android:defaultValue="@string/global_preferences_autodownload_default"
+        android:entries="@array/global_preferences_autodownload_list"
+        android:entryValues="@array/global_preferences_autodownload_values"
+        android:key="autodownload"
+        android:title="@string/global_preferences_autodownload_title" />
+    <EditTextPreference
+        android:defaultValue="@string/global_preferences_autodownload_number_default"
+        android:inputType="numberDecimal"
+        android:key="autodownload_number"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/global_preferences_autodownload_number" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="autoremove"
+        android:title="@string/global_preferences_autoremove_title" />
+    <EditTextPreference
+        android:defaultValue="@string/global_preferences_autoremoved_number_default"
+        android:inputType="numberDecimal"
+        android:key="autoremove_save"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/global_preferences_autoremove_number" />
 </PreferenceScreen>

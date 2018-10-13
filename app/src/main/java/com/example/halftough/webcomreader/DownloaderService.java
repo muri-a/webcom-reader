@@ -1,52 +1,36 @@
 package com.example.halftough.webcomreader;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.IntentService;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.AsyncTask;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
+import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.database.AppDatabase;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersDAO;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
-import com.example.halftough.webcomreader.database.ReadChapterRepository;
 import com.example.halftough.webcomreader.database.ReadWebcom;
 import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
-import com.example.halftough.webcomreader.webcoms.ComicPage;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-
-import retrofit2.Call;
-import retrofit2.Response;
 
 /**
  * Subclass for checking number of chapters, updating lists of chapters and downloading webcomics
  */
 public class DownloaderService extends IntentService {
     private static final String ACTION_UPDATE_NEW_CHAPTERS = "UPDATE_NEW_CHAPTERS";
-    private static final String ACTION_ENQUEUE_CHAPTER = "ACTION_ENQUEUE_CHAPTER";
     private static final String ACTION_UPDATE_NEW_CHAPTERS_IN = "UPDATE_NEW_CHAPTERS_IN";
+    private static final String ACTION_AUTODOWNLOAD = "ACTION_AUTODOWNLOAD";
+    private static final String ACTION_ENQUEUE_CHAPTER = "ACTION_ENQUEUE_CHAPTER";
 
     OneByOneUrlDownloader downloader;
     private ChaptersDAO chaptersDAO;
@@ -73,6 +57,13 @@ public class DownloaderService extends IntentService {
         context.startService(intent);
     }
 
+    public static void autodownload(Context context, String wid){
+        Intent intent = new Intent(context, DownloaderService.class);
+        intent.setAction(ACTION_AUTODOWNLOAD);
+        intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, wid);
+        context.startService(intent);
+    }
+
     public static void enqueueChapter(Context context, Chapter chapter) {
         Intent intent = new Intent(context, DownloaderService.class);
         intent.setAction(ACTION_ENQUEUE_CHAPTER);
@@ -92,6 +83,11 @@ public class DownloaderService extends IntentService {
                 case ACTION_UPDATE_NEW_CHAPTERS_IN:
                     handleUpdateNewChaptersIn(intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID));
                     break;
+                case ACTION_AUTODOWNLOAD: {
+                    String wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
+                    handleAutodownload(wid);
+                    break;
+                }
                 case ACTION_ENQUEUE_CHAPTER: {
                     final String wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
                     final String chapter = intent.getStringExtra(UserRepository.EXTRA_CHAPTER_NUMBER);
@@ -110,6 +106,8 @@ public class DownloaderService extends IntentService {
                 webcoms.removeObserver(this);
                 for(ReadWebcom webcom : readWebcoms){
                     handleUpdateNewChaptersIn(webcom.getWid());
+                    //TODO only autodownload after update is finished
+                    handleAutodownload(webcom.getWid());
                 }
             }
         });
@@ -120,43 +118,6 @@ public class DownloaderService extends IntentService {
         webcom.updateChapterList(this, chaptersDAO, readWebcomsDAO);
     }
 
-//    public void insertChapter(Chapter chapter){
-//        new insertAsyncTask(chaptersDAO, readWebcomsDAO, this).execute(chapter);
-//    }
-
-//    private static class insertAsyncTask extends AsyncTask<Chapter, Void, Void> {
-//        private ChaptersDAO mAsyncTaskDao;
-//        private ReadWebcomsDAO webcomsDao;
-//        WeakReference<DownloaderService> dService;
-//        insertAsyncTask(ChaptersDAO dao, ReadWebcomsDAO webcomDao, DownloaderService downloaderService) {
-//            mAsyncTaskDao = dao;
-//            this.webcomsDao = webcomDao;
-//            dService = new WeakReference<>(downloaderService);
-//        }
-//        @Override
-//        protected Void doInBackground(final Chapter... params) {
-//            //don't insert if webcom isn't on the list (possible wher deleting webcom while updating)
-//            ReadWebcom webcom = webcomsDao.get(params[0].getWid());
-//            if(webcom != null){
-//                mAsyncTaskDao.insert(params[0]);
-//                dService.get().broadcastChapterUpdated(params[0]);
-//            }
-//            return null;
-//        }
-//    }
-
-//    private static class updateReadWebcomAsyncTask extends AsyncTask<ReadWebcom, Void, Void> {
-//        private ReadWebcomsDAO mAsyncTaskDao;
-//        updateReadWebcomAsyncTask(ReadWebcomsDAO dao){
-//            mAsyncTaskDao = dao;
-//        }
-//        @Override
-//        protected Void doInBackground(ReadWebcom... readWebcoms) {
-//            mAsyncTaskDao.updateChapterCount(readWebcoms[0].getWid(), readWebcoms[0].getChapterCount());
-//            return null;
-//        }
-//    }
-
     private void handleEnqueueChapter(final String wid, final String chapter) {
         Webcom webcom = UserRepository.getWebcomInstance(wid);
         final LiveData<String> url = webcom.getChapterUrl(chapter);
@@ -166,6 +127,39 @@ public class DownloaderService extends IntentService {
             url.removeObserver(this);
             if(!s.isEmpty())
                 downloader.enqueue(s, new Chapter(wid, chapter));
+            }
+        });
+    }
+
+    private void handleAutodownload(String wid){
+        Webcom webcom = UserRepository.getWebcomInstance(wid);
+        SharedPreferences chapterPreferences = getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, MODE_PRIVATE);
+        SharedPreferences globalPreferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
+        PreferenceHelper.AutodownloadSetting mode = PreferenceHelper.getAutodownloadSetting(this, chapterPreferences, globalPreferences, webcom);
+        if(mode == PreferenceHelper.AutodownloadSetting.NONE){
+            return;
+        }
+
+        int autodownloadNumber = PreferenceHelper.getAutodownloadnumber(this, chapterPreferences, globalPreferences);
+
+        final LiveData<List<Chapter>> chapters;
+        if(mode == PreferenceHelper.AutodownloadSetting.NEWEST){
+            chapters = chaptersDAO.getNewestUnread(wid, autodownloadNumber);
+        }
+        else{
+            chapters = chaptersDAO.getOldestUnread(wid, autodownloadNumber);
+        }
+        chapters.observeForever( new Observer<List<Chapter>>() {
+            @Override
+            public void onChanged(@Nullable List<Chapter> changed) {
+                chapters.removeObserver(this);
+                for(Chapter chapter : changed){
+                    if(chapter.getDownloadStatus() == Chapter.DownloadStatus.UNDOWNLOADED){
+                        ChaptersRepository.setDownloadStatus(chapter, Chapter.DownloadStatus.DOWNLOADING, chaptersDAO);
+                        //TODO wait for setDownloadStatus to finish
+                        handleEnqueueChapter(chapter.getWid(), chapter.getChapter());
+                    }
+                }
             }
         });
     }

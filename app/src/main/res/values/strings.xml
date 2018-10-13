@@ -71,30 +71,37 @@
         <item>Ascending</item>
         <item>Decreasing</item>
     </string-array>
-    <string name="global_preferences_autodownload_title">Autodownload</string>
+    <string name="global_preferences_autodownload_title">Autodownload unread chapters</string>
     <string-array name="global_preferences_autodownload_list">
         <item>Don\'t download chapters automatically</item>
-        <item>Preferred reading order</item>
+        <item>Default reading order</item>
         <item>Oldest</item>
         <item>Newest</item>
     </string-array>
-    <string name="global_preferences_autoremove_title">Autoremove</string>
-    <string-array name="global_preferences_autoremove_list">
-        <item>Don\'t remove chapters automatically</item>
-        <item>Preferred reading order</item>
-        <item>Oldest</item>
-        <item>Newest</item>
-    </string-array>
+    <string name="global_preferences_autodownload_number">Number of chapters to autodownload</string>
+    <string name="global_preferences_autoremove_title">Autodelete read chapters</string>
+    <string name="global_preferences_autoremove_number">Skip last when autoremoving</string>
 
-    <string name="chapter_preferences_odrer_title">Order</string>
+    <string name="chapter_preferences_odrer_title">List order</string>
     <string-array name="chapter_perferences_order_list">
-        <item>Global</item>
+        <item>Use global setting</item>
         <item>Ascending</item>
         <item>Decreasing</item>
     </string-array>
+    <string name="chapter_preferences_autodownload_global">Use global settings for autodownloading</string>
+    <string name="chapter_preferences_autodownload_title">Autodownload unread chapters</string>
+    <string-array name="chapter_preferences_autodownload_list">
+        <item>Don\'t download chapters automatically</item>
+        <item>Oldest</item>
+        <item>Newest</item>
+    </string-array>
+    <string name="chapter_preferences_autodownload_number">Number of chapters to autodownload</string>
+    <string name="chapter_preferences_autoremove_global">Use global settings for autodeleting</string>
+    <string name="chapter_preferences_autoremove_title">Autodelete read chapters</string>
+    <string name="chapter_preferences_autoremove_number">Skip last when autoremoving</string>
 
     <string name="about_general_title">General</string>
-    <string name="about_general_content">This is free and open project aiming to provide comfortable wey to read and keep track of internet comics.
+    <string name="about_general_content">This is free and open project aiming to provide comfortable wey to read and keep track of internet comics.\n
     Have in mind this is still early version. It might lack features and polish, but it is developing quickly.</string>
     <string name="about_issues_title">Issues</string>
     <string name="about_issues_content">If you found a bug or want to request a feature or new comic to be added, create an issue under https://gitlab.com/halftough/webcom-reader/issues.

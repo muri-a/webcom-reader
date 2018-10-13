@@ -9,6 +9,8 @@ import java.io.File;
 
 
 public class UserRepository {
+    public enum FieldType{ ARRAY, SINGLE, SWITCH }
+
     public static final String ACTION_CHAPTER_UPDATED = "com.example.halftough.webcomreader.ACTION_CHAPTER_UPDATED";
     public static final String GLOBAL_PREFERENCES = "com.example.halftough.webcomreader.GLOBAL_PREFERENCES";
 

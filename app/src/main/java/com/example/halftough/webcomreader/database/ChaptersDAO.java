@@ -60,4 +60,10 @@ public interface ChaptersDAO {
 
     @Query("SELECT COUNT(*) FROM chapters WHERE wid=:wid")
     int getChaptersCount(String wid);
+
+    @Query("SELECT * FROM chapters WHERE wid=:wid AND status=0 ORDER BY CAST(chapter AS REAL) DESC LIMIT :count")
+    LiveData<List<Chapter>> getNewestUnread(String wid, int count);
+
+    @Query("SELECT * FROM chapters WHERE wid=:wid AND status=0 ORDER BY CAST(chapter AS REAL) ASC LIMIT :count")
+    LiveData<List<Chapter>> getOldestUnread(String wid, int count);
 }

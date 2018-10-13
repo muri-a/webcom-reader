@@ -19,5 +19,21 @@
         <item>ascending</item>
         <item>decreasing</item>
     </string-array>
+    <string-array name="global_preferences_autodownload_values">
+        <item>none</item>
+        <item>default</item>
+        <item>oldest</item>
+        <item>newest</item>
+    </string-array>
+    <string name="global_preferences_autodownload_default">default</string>
+    <string name="global_preferences_autodownload_number_default">5</string>
+    <string name="global_preferences_autoremoved_number_default">2</string>
+
     <string name="chapter_preferences_order_default">global</string>
+    <string-array name="chapter_preferences_autodownload_values">
+        <item>none</item>
+        <item>oldest</item>
+        <item>newest</item>
+    </string-array>
+    <string name="chapter_preferences_autodownload_default">none</string>
 </resources>

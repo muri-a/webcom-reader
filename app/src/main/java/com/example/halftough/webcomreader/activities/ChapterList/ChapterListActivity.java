@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.halftough.webcomreader.ChapterFilter;
+import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
@@ -208,6 +209,7 @@ public class ChapterListActivity extends AppCompatActivity implements PickNumber
         }
         else if(requestCode == SETTINGS_RESULT){
             viewModel.update();
+            DownloaderService.autodownload(this, wid);
         }
     }
 
