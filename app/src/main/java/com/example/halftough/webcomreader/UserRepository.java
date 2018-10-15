@@ -31,6 +31,8 @@ public class UserRepository {
     //TODO temorary location. might change in future
     public static void deleteChapter(Chapter chapter){
         File file = chapter.getFile();
-        file.delete();
+        if(file != null) {
+            file.delete();
+        }
     }
 }

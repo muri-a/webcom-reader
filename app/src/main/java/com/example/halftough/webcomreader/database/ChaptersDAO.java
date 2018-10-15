@@ -16,6 +16,10 @@ public interface ChaptersDAO {
     @Query("SELECT * FROM chapters WHERE wid=:wid ORDER BY CAST(chapter AS REAL)")
     LiveData<List<Chapter>> getChapters(String wid);
 
+    @Query("SELECT * FROM chapters WHERE wid=:wid AND status=:status AND downloadStatus=:downloadStatus")
+    @TypeConverters({StatusConverter.class, DownloadStatusConverter.class})
+    LiveData<List<Chapter>> getChapters(String wid, Chapter.Status status, Chapter.DownloadStatus downloadStatus);
+
     @Query("SELECT * FROM chapters WHERE wid=:wid ORDER BY CAST(chapter AS REAL) DESC")
     LiveData<List<Chapter>> getChaptersDesc(String wid);
 
@@ -66,4 +70,5 @@ public interface ChaptersDAO {
 
     @Query("SELECT * FROM chapters WHERE wid=:wid AND status=0 ORDER BY CAST(chapter AS REAL) ASC LIMIT :count")
     LiveData<List<Chapter>> getOldestUnread(String wid, int count);
+
 }

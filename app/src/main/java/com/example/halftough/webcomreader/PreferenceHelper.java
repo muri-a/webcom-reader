@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 
+import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
 public class PreferenceHelper {
@@ -79,5 +80,29 @@ public class PreferenceHelper {
             autodownloadnumber = chapterPreferences.getString("autodownload_number", context.getString(R.string.global_preferences_autodownload_number_default));
         }
         return Integer.parseInt(autodownloadnumber);
+    }
+
+    public static int getAutoremoveSave(Context context, String wid) {
+        SharedPreferences chapterPreferences = context.getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, Context.MODE_PRIVATE);
+        SharedPreferences globalPreferences = context.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE);
+        String autoremoveSave;
+        if(chapterPreferences.getBoolean("autoremove_global", true)){
+            autoremoveSave = globalPreferences.getString("autoremove_save", context.getString(R.string.global_preferences_autoremove_save_default));
+        }
+        else{
+            autoremoveSave = chapterPreferences.getString("autoremove_save", context.getString(R.string.global_preferences_autodownload_number_default));
+        }
+        return Integer.parseInt(autoremoveSave);
+    }
+
+    public static boolean getAutoremove(Context context, String wid){
+        SharedPreferences chapterPreferences = context.getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, Context.MODE_PRIVATE);
+        SharedPreferences globalPreferences = context.getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, Context.MODE_PRIVATE);
+        if(chapterPreferences.getBoolean("autoremove_global", true)){
+            return globalPreferences.getBoolean("autoremove", true);
+        }
+        else{
+            return chapterPreferences.getBoolean("autoremove", true);
+        }
     }
 }

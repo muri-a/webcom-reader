@@ -17,11 +17,16 @@ import com.example.halftough.webcomreader.database.ReadWebcom;
 import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Subclass for checking number of chapters, updating lists of chapters and downloading webcomics
@@ -30,6 +35,7 @@ public class DownloaderService extends IntentService {
     private static final String ACTION_UPDATE_NEW_CHAPTERS = "UPDATE_NEW_CHAPTERS";
     private static final String ACTION_UPDATE_NEW_CHAPTERS_IN = "UPDATE_NEW_CHAPTERS_IN";
     private static final String ACTION_AUTODOWNLOAD = "ACTION_AUTODOWNLOAD";
+    private static final String ACTION_AUTOREMOVE = "ACTION_AUTOREMOVE";
     private static final String ACTION_ENQUEUE_CHAPTER = "ACTION_ENQUEUE_CHAPTER";
 
     OneByOneUrlDownloader downloader;
@@ -64,6 +70,13 @@ public class DownloaderService extends IntentService {
         context.startService(intent);
     }
 
+    public static void autoremove(Context context, String wid){
+        Intent intent = new Intent(context, DownloaderService.class);
+        intent.setAction(ACTION_AUTOREMOVE);
+        intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, wid);
+        context.startService(intent);
+    }
+
     public static void enqueueChapter(Context context, Chapter chapter) {
         Intent intent = new Intent(context, DownloaderService.class);
         intent.setAction(ACTION_ENQUEUE_CHAPTER);
@@ -86,6 +99,11 @@ public class DownloaderService extends IntentService {
                 case ACTION_AUTODOWNLOAD: {
                     String wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
                     handleAutodownload(wid);
+                    break;
+                }
+                case ACTION_AUTOREMOVE: {
+                    String wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
+                    handleAutoremove(wid);
                     break;
                 }
                 case ACTION_ENQUEUE_CHAPTER: {
@@ -162,6 +180,37 @@ public class DownloaderService extends IntentService {
                 }
             }
         });
+    }
+
+    private void handleAutoremove(String wid){
+        //If autoreme is enabled for this webcom
+        if( PreferenceHelper.getAutoremove(this, wid) ) {
+            final LiveData<List<Chapter>> readChapters = chaptersDAO.getChapters(wid, Chapter.Status.READ, Chapter.DownloadStatus.DOWNLOADED);
+            SharedPreferences preferences = getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, MODE_PRIVATE);
+            final Set<String> last = new TreeSet<>();
+            try {
+                JSONArray jarr = new JSONArray(preferences.getString("last_list", "[]"));
+                for(int i=0; i<jarr.length(); i++){
+                    last.add(jarr.getString(i));
+                }
+            } catch (JSONException e) {
+            }
+            readChapters.observeForever(new Observer<List<Chapter>>() {
+                @Override
+                public void onChanged(@Nullable List<Chapter> chapters) {
+                    if(chapters != null) {
+                        readChapters.removeObserver(this);
+                        for(Chapter chapter : chapters){
+                            if(!last.contains(chapter.getChapter())){
+                                UserRepository.deleteChapter(chapter);
+                                ChaptersRepository.setDownloadStatus(chapter, Chapter.DownloadStatus.UNDOWNLOADED, chaptersDAO);
+                                broadcastChapterUpdated(chapter);
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
     class ChapterDownloader extends OneByOneUrlDownloader<Chapter> {

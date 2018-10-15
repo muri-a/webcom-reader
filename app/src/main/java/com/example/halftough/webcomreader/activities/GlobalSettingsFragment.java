@@ -86,7 +86,7 @@ public class GlobalSettingsFragment extends PreferenceFragment implements Shared
                 break;
             case "autoremove_save":
                 type = FieldType.SINGLE;
-                defaultId = R.string.global_preferences_autoremoved_number_default;
+                defaultId = R.string.global_preferences_autoremove_save_default;
                 break;
         }
         if(type == null)

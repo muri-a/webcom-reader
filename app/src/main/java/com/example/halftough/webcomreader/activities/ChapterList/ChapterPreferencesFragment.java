@@ -87,7 +87,7 @@ public class ChapterPreferencesFragment extends PreferenceFragment implements Sh
                 break;
             case "autoremove_save":
                 type = FieldType.SINGLE;
-                defaultVal = globalPreferences.getString("autoremove_save", getString(R.string.global_preferences_autoremoved_number_default));
+                defaultVal = globalPreferences.getString("autoremove_save", getString(R.string.global_preferences_autoremove_save_default));
                 break;
         }
         if(type == null)

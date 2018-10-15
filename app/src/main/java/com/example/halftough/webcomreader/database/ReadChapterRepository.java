@@ -3,23 +3,26 @@ package com.example.halftough.webcomreader.database;
 import android.Manifest;
 import android.app.Activity;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.example.halftough.webcomreader.DownloaderService;
+import com.example.halftough.webcomreader.PreferenceHelper;
 import com.example.halftough.webcomreader.TaskDelegate;
+import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.activities.ReadChapter.ComicPageView;
 import com.example.halftough.webcomreader.activities.ReadChapter.ReadChapterActivity;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.File;
 
@@ -118,6 +121,7 @@ public class ReadChapterRepository {
                 DownloaderService.autodownload(context, webcom.getId());
             }
         }).execute(chapter.getValue());
+        DownloaderService.autoremove(context, webcom.getId());
     }
 
     public boolean getUpdateMarker() {
@@ -139,6 +143,7 @@ public class ReadChapterRepository {
     }
 
     private static class setStatusAsyncTask extends AsyncTask<Chapter, Void, Void> {
+
         private ChaptersDAO mAsyncTaskDao;
         private TaskDelegate taskDelegate;
         setStatusAsyncTask(ChaptersDAO dao){ this(dao, null); }
@@ -146,7 +151,6 @@ public class ReadChapterRepository {
             mAsyncTaskDao = dao;
             taskDelegate = delegate;
         }
-
         @Override
         protected Void doInBackground(Chapter...chapters) {
             mAsyncTaskDao.setStatus(chapters[0].getWid(), chapters[0].getChapter(), chapters[0].getStatus());
@@ -155,9 +159,10 @@ public class ReadChapterRepository {
             }
             return null;
         }
-    }
 
+    }
     private class ChapterChangedObserver implements Observer<Chapter>{
+
         private final LiveData<Chapter> chapter;
         private final Activity context;
         public ChapterChangedObserver(LiveData<Chapter> chapter, Activity context){
@@ -170,6 +175,32 @@ public class ReadChapterRepository {
             context.setTitle(chapter.getTitle());
             imageView.setCurrentChapter(chapter.getChapter());
             getImage();
+            saveLastRead(chapter.getChapter());
+        }
+    }
+
+    private void saveLastRead(String c) {
+        SharedPreferences chapterPreferences = context.getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+webcom.getId(), Context.MODE_PRIVATE);
+        int toSave = PreferenceHelper.getAutoremoveSave(context, webcom.getId());
+        String last = chapterPreferences.getString("last_list", "[]");
+        try {
+            JSONArray jarr = new JSONArray(last);
+            //Handle if chapter was read recently
+            for(int i=0; i<jarr.length(); i++){
+                if( jarr.getString(i).equals(c) ){
+                    jarr.remove(i--);
+                }
+            }
+            //Remove excess
+            while(jarr.length() >= toSave){
+                jarr.remove(0);
+            }
+            jarr.put(c);
+            chapterPreferences.edit().putString("last_list", jarr.toString()).apply();
+        } catch (JSONException e) {
+            JSONArray jarr = new JSONArray();
+            jarr.put(c);
+            chapterPreferences.edit().putString("last_list", jarr.toString()).apply();
         }
     }
 }
