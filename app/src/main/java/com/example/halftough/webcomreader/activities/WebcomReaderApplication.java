@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.AsyncTask;
 
 import com.example.halftough.webcomreader.DownloaderService;
+import com.example.halftough.webcomreader.UpdateWebcomsService;
 import com.example.halftough.webcomreader.database.AppDatabase;
 import com.example.halftough.webcomreader.database.ChaptersDAO;
 
@@ -17,7 +18,7 @@ public class WebcomReaderApplication extends Application {
         AppDatabase db = AppDatabase.getDatabase(this);
         new AsyncUndownloadedClearer(db.chaptersDAO()).execute();
 
-        DownloaderService.updateNewChapters(this);
+        UpdateWebcomsService.updateNewChapters(this);
     }
 
     private static class AsyncUndownloadedClearer extends AsyncTask<Void, Void, Void>{

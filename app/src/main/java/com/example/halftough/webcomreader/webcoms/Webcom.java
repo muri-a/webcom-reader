@@ -5,7 +5,8 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.Nullable;
 
-import com.example.halftough.webcomreader.DownloaderService;
+import com.example.halftough.webcomreader.ChapterUpdateBroadcaster;
+import com.example.halftough.webcomreader.TaskDelegate;
 import com.example.halftough.webcomreader.database.ChaptersDAO;
 import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 
@@ -40,7 +41,7 @@ public abstract class Webcom {
         });
         return chapterUrl;
     }
-    public abstract void updateChapterList(DownloaderService downloaderService, ChaptersDAO chaptersDAO, ReadWebcomsDAO readWebcomsDAO);
+    public abstract void updateChapterList(ChapterUpdateBroadcaster chapterUpdateBroadcaster, ChaptersDAO chaptersDAO, ReadWebcomsDAO readWebcomsDAO, TaskDelegate delegate);
     public abstract LiveData<ComicPage> getChapterMeta(String number);
     //public abstract List<String> getChapterList();
     //public String getFirstChapterId(){ return getChapterList().get(0); }

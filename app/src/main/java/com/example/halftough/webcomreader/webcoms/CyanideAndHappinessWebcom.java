@@ -4,9 +4,11 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
-import com.example.halftough.webcomreader.DownloaderService;
+import com.example.halftough.webcomreader.ChapterUpdateBroadcaster;
 import com.example.halftough.webcomreader.R;
+import com.example.halftough.webcomreader.TaskDelegate;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersDAO;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
@@ -104,21 +106,21 @@ public class CyanideAndHappinessWebcom extends Webcom {
         }
         public void setPrevious(String previous) { this.previous = previous; }
 
-        public void insertUntilEnd(final ChaptersDAO dao, ReadWebcomsDAO readWebcomsDAO, final DownloaderService downloaderService){
-            insertUntil(null, dao, readWebcomsDAO, downloaderService);
+        public void insertUntilEnd(final ChaptersDAO dao, ReadWebcomsDAO readWebcomsDAO, final ChapterUpdateBroadcaster broadcaster, TaskDelegate delegate){
+            insertUntil(null, dao, readWebcomsDAO, broadcaster, delegate);
         }
 
-        public void insertUntil(final String until, final ChaptersDAO dao, final ReadWebcomsDAO readWebcomsDAO, final DownloaderService downloaderService){
+        public void insertUntil(final String until, final ChaptersDAO dao, final ReadWebcomsDAO readWebcomsDAO, final ChapterUpdateBroadcaster broadcaster, final TaskDelegate delegate){
             Chapter insert = new Chapter(getId(), chapter);
             insert.setTitle(title);
-            ChaptersRepository.insertChapter(insert, dao, readWebcomsDAO, downloaderService);
+            ChaptersRepository.insertChapter(insert, dao, readWebcomsDAO, broadcaster);
             if(!previous.isEmpty() && !previous.equals(until)){
                 Call<CyanideComicPage> call = service.getChapter(previous);
                 call.enqueue(new Callback<CyanideComicPage>() {
                     @Override
                     public void onResponse(Call<CyanideComicPage> call, Response<CyanideComicPage> response) {
                         if(response.isSuccessful()) {
-                            response.body().insertUntil(until, dao, readWebcomsDAO, downloaderService);
+                            response.body().insertUntil(until, dao, readWebcomsDAO, broadcaster, delegate);
                         }
                         else {
                             onFailure(call, new Throwable());
@@ -127,9 +129,12 @@ public class CyanideAndHappinessWebcom extends Webcom {
 
                     @Override
                     public void onFailure(Call<CyanideComicPage> call, Throwable t) {
-                        //TODO of failure
+                        delegate.onFinish();
                     }
                 });
+            }
+            else{
+                delegate.onFinish();
             }
         }
     }
@@ -223,63 +228,94 @@ public class CyanideAndHappinessWebcom extends Webcom {
         return page;
     }
 
+    private boolean a = false, b = false;
+
     //Downloader Service is here for broadcasting. Might move it somewhere
     @Override
-    public void updateChapterList(final DownloaderService downloaderService, final ChaptersDAO chaptersDAO, final ReadWebcomsDAO readWebcomsDAO) {
+    public void updateChapterList(final ChapterUpdateBroadcaster broadcaster, final ChaptersDAO chaptersDAO, final ReadWebcomsDAO readWebcomsDAO, final TaskDelegate delegate) {
         initService();
         Call<CyanideComicPage> call = service.getLast();
+
         call.enqueue(new Callback<CyanideComicPage>() {
             @Override
             public void onResponse(Call<CyanideComicPage> call, final Response<CyanideComicPage> response) {
-                if(response.isSuccessful()){
-                    final int lastChapter = Integer.parseInt(response.body().getChapterNumber());
-                    final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(getId());
-                    dbChapters.observeForever(new Observer<List<Chapter>>() {
-                        @Override
-                        public void onChanged(@Nullable List<Chapter> chapters) {
-                            dbChapters.removeObserver(this);
-                            if(!chapters.isEmpty()){
-                                Chapter lastDb = chapters.get(chapters.size()-1);
-                                if(Integer.parseInt(lastDb.getChapter()) < lastChapter){
-                                    //// pobieraj wszystkie nowe
-                                    ReadWebcomRepository.setLastUpdateDate(getId(), response.body().title.replaceAll("\\.", "-"), readWebcomsDAO);
-                                    response.body().insertUntil(lastDb.getChapter(), chaptersDAO, readWebcomsDAO, downloaderService);
-                                }
-                                Chapter firstDb = chapters.get(0);
-                                final LiveData<ComicPage> oldest = getChapterMeta(firstDb.getChapter());
-                                oldest.observeForever(new Observer<ComicPage>() {
+                if(!response.isSuccessful()){
+                    onFailure(call, new Throwable());
+                    return;
+                }
+                final int lastChapter = Integer.parseInt(response.body().getChapterNumber());
+                final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(getId());
+                dbChapters.observeForever(new Observer<List<Chapter>>() {
+                    @Override
+                    public void onChanged(@Nullable List<Chapter> chapters) {
+                        dbChapters.removeObserver(this);
+                        if(!chapters.isEmpty()){
+                            Chapter lastDb = chapters.get(chapters.size()-1);
+                            if(Integer.parseInt(lastDb.getChapter()) < lastChapter){
+                                //// pobieraj wszystkie nowe
+                                ReadWebcomRepository.setLastUpdateDate(getId(), response.body().title.replaceAll("\\.", "-"), readWebcomsDAO);
+                                response.body().insertUntil(lastDb.getChapter(), chaptersDAO, readWebcomsDAO, broadcaster, new TaskDelegate(){
                                     @Override
-                                    public void onChanged(@Nullable ComicPage comicPage) {
-                                        oldest.removeObserver(this);
-                                        CyanideComicPage page = (CyanideComicPage)comicPage;
-                                        if(!page.getPrevious().isEmpty()){
-                                            final LiveData<ComicPage> older = getChapterMeta(page.getPrevious());
-                                            older.observeForever(new Observer<ComicPage>() {
-                                                @Override
-                                                public void onChanged(@Nullable ComicPage comicPage) {
-                                                    older.removeObserver(this);
-                                                    ((CyanideComicPage)comicPage).insertUntilEnd(chaptersDAO, readWebcomsDAO, downloaderService);
-                                                }
-                                            });
+                                    public void onFinish() {
+                                        a = true;
+                                        if(b){
+                                            delegate.onFinish();
                                         }
                                     }
                                 });
                             }
                             else{
-                                ReadWebcomRepository.setLastUpdateDate(getId(), response.body().title.replaceAll("\\.", "-"), readWebcomsDAO);
-                                response.body().insertUntilEnd(chaptersDAO, readWebcomsDAO, downloaderService);
+                                a = true;
                             }
+                            Chapter firstDb = chapters.get(0);
+                            final LiveData<ComicPage> oldest = getChapterMeta(firstDb.getChapter());
+                            oldest.observeForever(new Observer<ComicPage>() {
+                                @Override
+                                public void onChanged(@Nullable ComicPage comicPage) {
+                                    oldest.removeObserver(this);
+                                    CyanideComicPage page = (CyanideComicPage)comicPage;
+                                    if(!page.getPrevious().isEmpty()){
+                                        final LiveData<ComicPage> older = getChapterMeta(page.getPrevious());
+                                        older.observeForever(new Observer<ComicPage>() {
+                                            @Override
+                                            public void onChanged(@Nullable ComicPage comicPage) {
+                                                older.removeObserver(this);
+                                                ((CyanideComicPage)comicPage).insertUntilEnd(chaptersDAO, readWebcomsDAO, broadcaster, new TaskDelegate() {
+                                                    @Override
+                                                    public void onFinish() {
+                                                        b = true;
+                                                        if(a){
+                                                            delegate.onFinish();
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                    else{
+                                        b = true;
+                                        if(a)
+                                            delegate.onFinish();
+                                    }
+                                }
+                            });
                         }
-                    });
-                }
-                else{
-                    onFailure(call, new Throwable());
-                }
+                        else{
+                            ReadWebcomRepository.setLastUpdateDate(getId(), response.body().title.replaceAll("\\.", "-"), readWebcomsDAO);
+                            response.body().insertUntilEnd(chaptersDAO, readWebcomsDAO, broadcaster, new TaskDelegate() {
+                                @Override
+                                public void onFinish() {
+                                    delegate.onFinish();
+                                }
+                            });
+                        }
+                    }
+                });
             }
 
             @Override
             public void onFailure(Call<CyanideComicPage> call, Throwable t) {
-                //TODO On Failure
+                delegate.onFinish();
             }
         });
     }

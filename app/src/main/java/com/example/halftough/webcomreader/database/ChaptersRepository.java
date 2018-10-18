@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 
+import com.example.halftough.webcomreader.ChapterUpdateBroadcaster;
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.PreferenceHelper;
 import com.example.halftough.webcomreader.UserRepository;
@@ -275,19 +276,19 @@ public class ChaptersRepository {
         new insertChapterAsyncTask(chaptersDAO).execute(chapter);
     }
 
-    public static void insertChapter(Chapter chapter, ChaptersDAO chaptersDAO, ReadWebcomsDAO readWebcomsDAO, DownloaderService downloaderService){
-        new insertChapterAsyncTask(chaptersDAO, readWebcomsDAO, downloaderService).execute(chapter);
+    public static void insertChapter(Chapter chapter, ChaptersDAO chaptersDAO, ReadWebcomsDAO readWebcomsDAO, ChapterUpdateBroadcaster broadcaster){
+        new insertChapterAsyncTask(chaptersDAO, readWebcomsDAO, broadcaster).execute(chapter);
     }
 
     private static class insertChapterAsyncTask extends AsyncTask<Chapter, Void, Void>{
         private ChaptersDAO chaptersDAO;
         private ReadWebcomsDAO readWebcomsDAO;
-        private WeakReference<DownloaderService> downloaderService;
+        private WeakReference<ChapterUpdateBroadcaster> chapterUpdateBroadcaster;
         insertChapterAsyncTask(ChaptersDAO dao){ this(dao, null, null); }
-        insertChapterAsyncTask(ChaptersDAO dao, ReadWebcomsDAO readWebcomsDAO, DownloaderService downloaderService){
+        insertChapterAsyncTask(ChaptersDAO dao, ReadWebcomsDAO readWebcomsDAO, ChapterUpdateBroadcaster broadcaster){
             chaptersDAO = dao;
             this.readWebcomsDAO = readWebcomsDAO;
-            this.downloaderService = new WeakReference<>(downloaderService);
+            this.chapterUpdateBroadcaster = new WeakReference<>(broadcaster);
         }
         @Override
         protected Void doInBackground(Chapter... chapters) {
@@ -296,8 +297,8 @@ public class ChaptersRepository {
                 int count = chaptersDAO.getChaptersCount(chapters[0].getWid());
                 readWebcomsDAO.updateChapterCount(chapters[0].getWid(), count);
             }
-            if(downloaderService != null && downloaderService.get() != null)
-                downloaderService.get().broadcastChapterUpdated(chapters[0]);
+            if(chapterUpdateBroadcaster != null && chapterUpdateBroadcaster.get() != null)
+                chapterUpdateBroadcaster.get().broadcastChapterUpdated(chapters[0]);
             return null;
         }
     }

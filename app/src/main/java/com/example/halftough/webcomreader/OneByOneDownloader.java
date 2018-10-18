@@ -24,6 +24,9 @@ public abstract class OneByOneDownloader<ElementType, Extra> {
 
     public void download(){
         if (!downloading) {
+            if(queue.isEmpty()){
+                onFinished();
+            }
             while (free > 0 && !queue.isEmpty()) {
                 downloading = true;
                 free--;
@@ -37,6 +40,8 @@ public abstract class OneByOneDownloader<ElementType, Extra> {
 
     protected abstract void downloadElement(ElementType element, final Extra extra);
 
+    protected void onFinished(){ }
+
     // Method that should be called on success of downloadElement.
     // Because ways of doing that may vary, extension of this class should remember to call it.
     protected void elementDownloaded(){
@@ -48,8 +53,10 @@ public abstract class OneByOneDownloader<ElementType, Extra> {
         }
         else{
             free++;
-            if(free==capacity)
+            if(free==capacity) {
                 downloading = false;
+                onFinished();
+            }
         }
     }
 

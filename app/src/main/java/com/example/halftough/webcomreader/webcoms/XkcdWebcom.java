@@ -3,13 +3,12 @@ package com.example.halftough.webcomreader.webcoms;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.example.halftough.webcomreader.DownloaderService;
+import com.example.halftough.webcomreader.ChapterUpdateBroadcaster;
 import com.example.halftough.webcomreader.OneByOneChapterDownloader;
 import com.example.halftough.webcomreader.R;
-import com.example.halftough.webcomreader.activities.Library.LibraryModel;
+import com.example.halftough.webcomreader.TaskDelegate;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersDAO;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
@@ -17,8 +16,7 @@ import com.example.halftough.webcomreader.database.ReadWebcomRepository;
 import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -151,72 +149,75 @@ public class XkcdWebcom extends Webcom {
     }
 
     @Override
-    public void updateChapterList(final DownloaderService downloaderService, final ChaptersDAO chaptersDAO, final ReadWebcomsDAO readWebcomsDAO) {
+    public void updateChapterList(final ChapterUpdateBroadcaster chapterUpdateBroadcaster, final ChaptersDAO chaptersDAO, final ReadWebcomsDAO readWebcomsDAO, final TaskDelegate delegate) {
         initService();
         Call<XkcdComicPage> call = service.getLast();
-        call.enqueue(new Callback<XkcdComicPage>() {
-            @Override
-            public void onResponse(Call<XkcdComicPage> call, final Response<XkcdComicPage> response) {
-                if(response.isSuccessful()) {
-                    final int lastChapter = Integer.parseInt(response.body().getChapterNumber());
-                    final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(getId());
-                    dbChapters.observeForever(new Observer<List<Chapter>>() {
-                        @Override
-                        public void onChanged(@Nullable List<Chapter> chapters) {
-                            Queue<String> chaptersToGet = new LinkedList<>();
-                            dbChapters.removeObserver(this);
-                            int i = lastChapter;
-                            ListIterator<Chapter> it = chapters.listIterator(chapters.size());
-                            while (it.hasPrevious()){
-                                Chapter ch = it.previous();
-                                while(i > Integer.parseInt(ch.getChapter())){
-                                    //This will only happend for latest chapter, if it haven't been in database yet
-                                    //We update information about when was webcom last updated
-                                    if(i == lastChapter){
-                                        String date = response.body().getDate();
-                                        ReadWebcomRepository.setLastUpdateDate(getId(), date, readWebcomsDAO);
-                                    }
-                                    if(i != 404) //comic number 404 doesn't exist
-                                        chaptersToGet.add(Integer.toString(i));
-                                    i--;
-                                }
-                                i--;
+        final Response<XkcdComicPage> response;
+        try {
+            //We should be in a thread, so doing it synchronously is OK
+            response = call.execute();
+        } catch (IOException e) {
+            delegate.onFinish();
+            return;
+        }
+        if(response.isSuccessful()){
+            final int lastChapter = Integer.parseInt(response.body().getChapterNumber());
+            final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(getId());
+            dbChapters.observeForever(new Observer<List<Chapter>>() {
+                @Override
+                public void onChanged(@Nullable List<Chapter> chapters) {
+                    Queue<String> chaptersToGet = new LinkedList<>();
+                    dbChapters.removeObserver(this);
+                    int i = lastChapter;
+                    ListIterator<Chapter> it = chapters.listIterator(chapters.size());
+                    while (it.hasPrevious()){
+                        Chapter ch = it.previous();
+                        while(i > Integer.parseInt(ch.getChapter())){
+                            //This will only happend for latest chapter, if it haven't been in database yet
+                            //We update information about when was webcom last updated
+                            if(i == lastChapter){
+                                String date = response.body().getDate();
+                                ReadWebcomRepository.setLastUpdateDate(getId(), date, readWebcomsDAO);
                             }
-                            while(i > 0){
-                                if(i != 404)
-                                    chaptersToGet.add(Integer.toString(i));
-                                i--;
-                            }
-
-                            if(!chaptersToGet.isEmpty()){
-                                int count = chapters.size() + chaptersToGet.size();
-                                ReadWebcomRepository.updateChapterCount(getId(), count, readWebcomsDAO);
-                            }
-
-                            //TODO editable number of slots
-                            new OneByOneChapterDownloader(chaptersToGet, XkcdWebcom.this, downloaderService, 2){
-                                @Override
-                                public void onResponse(ComicPage page) {
-                                    if(page != null) {
-                                        Chapter chapter = new Chapter(getId(), page.getChapterNumber());
-                                        chapter.setTitle(page.getTitle());
-                                        ChaptersRepository.insertChapter(chapter, chaptersDAO);
-                                    }
-                                }
-                            }.download();
+                            if(i != 404) //comic number 404 doesn't exist
+                                chaptersToGet.add(Integer.toString(i));
+                            i--;
                         }
-                    });
-                }
-                else{
-                    onFailure(call, new Throwable());
-                }
-            }
+                        i--;
+                    }
+                    while(i > 0){
+                        if(i != 404)
+                            chaptersToGet.add(Integer.toString(i));
+                        i--;
+                    }
 
-            @Override
-            public void onFailure(Call<XkcdComicPage> call, Throwable t) {
-                //TODO on update failure
-            }
-        });
+                    if(!chaptersToGet.isEmpty()){
+                        int count = chapters.size() + chaptersToGet.size();
+                        ReadWebcomRepository.updateChapterCount(getId(), count, readWebcomsDAO);
+                    }
+
+                    //TODO editable number of slots
+                    new OneByOneChapterDownloader(chaptersToGet, XkcdWebcom.this, chapterUpdateBroadcaster, 2){
+                        @Override
+                        public void onResponse(ComicPage page) {
+                            if(page != null) {
+                                Chapter chapter = new Chapter(getId(), page.getChapterNumber());
+                                chapter.setTitle(page.getTitle());
+                                ChaptersRepository.insertChapter(chapter, chaptersDAO);
+                            }
+                        }
+
+                        @Override
+                        protected void onFinished() {
+                            delegate.onFinish();
+                        }
+                    }.download();
+                }
+            });
+        }
+        else{
+            delegate.onFinish();
+        }
     }
 
 }

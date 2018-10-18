@@ -31,9 +31,7 @@ import java.util.TreeSet;
 /**
  * Subclass for checking number of chapters, updating lists of chapters and downloading webcomics
  */
-public class DownloaderService extends IntentService {
-    private static final String ACTION_UPDATE_NEW_CHAPTERS = "UPDATE_NEW_CHAPTERS";
-    private static final String ACTION_UPDATE_NEW_CHAPTERS_IN = "UPDATE_NEW_CHAPTERS_IN";
+public class DownloaderService extends IntentService implements ChapterUpdateBroadcaster {
     private static final String ACTION_AUTODOWNLOAD = "ACTION_AUTODOWNLOAD";
     private static final String ACTION_AUTOREMOVE = "ACTION_AUTOREMOVE";
     private static final String ACTION_ENQUEUE_CHAPTER = "ACTION_ENQUEUE_CHAPTER";
@@ -48,19 +46,6 @@ public class DownloaderService extends IntentService {
         AppDatabase db = AppDatabase.getDatabase(this);
         chaptersDAO = db.chaptersDAO();
         readWebcomsDAO = db.readWebcomsDAO();
-    }
-
-    public static void updateNewChapters(Context context) {
-        Intent intent = new Intent(context, DownloaderService.class);
-        intent.setAction(ACTION_UPDATE_NEW_CHAPTERS);
-        context.startService(intent);
-    }
-
-    public static void updateNewChaptersIn(Context context, String wid){
-        Intent intent = new Intent(context, DownloaderService.class);
-        intent.setAction(ACTION_UPDATE_NEW_CHAPTERS_IN);
-        intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, wid);
-        context.startService(intent);
     }
 
     public static void autodownload(Context context, String wid){
@@ -90,12 +75,6 @@ public class DownloaderService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             switch(action){
-                case ACTION_UPDATE_NEW_CHAPTERS:
-                    handleUpdateNewChapters();
-                    break;
-                case ACTION_UPDATE_NEW_CHAPTERS_IN:
-                    handleUpdateNewChaptersIn(intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID));
-                    break;
                 case ACTION_AUTODOWNLOAD: {
                     String wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
                     handleAutodownload(wid);
@@ -116,25 +95,6 @@ public class DownloaderService extends IntentService {
         }
     }
 
-    private void handleUpdateNewChapters() {
-        final LiveData<List<ReadWebcom>> webcoms =  readWebcomsDAO.getAll();
-        webcoms.observeForever( new Observer<List<ReadWebcom>>() {
-            @Override
-            public void onChanged(@Nullable List<ReadWebcom> readWebcoms) {
-                webcoms.removeObserver(this);
-                for(ReadWebcom webcom : readWebcoms){
-                    handleUpdateNewChaptersIn(webcom.getWid());
-                    //TODO only autodownload after update is finished
-                    handleAutodownload(webcom.getWid());
-                }
-            }
-        });
-    }
-
-    private void handleUpdateNewChaptersIn(String wid) {
-        final Webcom webcom = UserRepository.getWebcomInstance(wid);
-        webcom.updateChapterList(this, chaptersDAO, readWebcomsDAO);
-    }
 
     private void handleEnqueueChapter(final String wid, final String chapter) {
         Webcom webcom = UserRepository.getWebcomInstance(wid);
@@ -254,6 +214,7 @@ public class DownloaderService extends IntentService {
         }
     }
 
+    @Override
     public void broadcastChapterUpdated(Chapter chapter){
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(UserRepository.ACTION_CHAPTER_UPDATED);

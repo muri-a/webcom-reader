@@ -16,21 +16,21 @@ import java.util.Queue;
 //Class preventing app from asking server for huge number of calls at once
 public abstract class OneByOneChapterDownloader extends OneByOneDownloader<String, Void> {
     private Webcom webcom;
-    private WeakReference<DownloaderService> downloaderService;
+    private WeakReference<ChapterUpdateBroadcaster> downloaderService;
     private final int refreshRate = 5;
     private int refreshCounter = 0;
 
-    public OneByOneChapterDownloader(Webcom webcom, DownloaderService service){ this(new LinkedList<String>(), webcom, service); }
+    public OneByOneChapterDownloader(Webcom webcom, ChapterUpdateBroadcaster broadcaster){ this(new LinkedList<String>(), webcom, broadcaster); }
 
-    public OneByOneChapterDownloader(Queue<String> chapters, Webcom webcom, DownloaderService service){
-        this(chapters, webcom, service, 1);
+    public OneByOneChapterDownloader(Queue<String> chapters, Webcom webcom, ChapterUpdateBroadcaster broadcaster){
+        this(chapters, webcom, broadcaster, 1);
     }
 
-    public OneByOneChapterDownloader(Queue<String> chapters, Webcom webcom, DownloaderService service, int slots){
+    public OneByOneChapterDownloader(Queue<String> chapters, Webcom webcom, ChapterUpdateBroadcaster broadcaster, int slots){
         free = capacity = slots;
         queue = chapters;
         this.webcom = webcom;
-        downloaderService = new WeakReference<>(service);
+        downloaderService = new WeakReference<>(broadcaster);
     }
 
     public abstract void onResponse(ComicPage page);

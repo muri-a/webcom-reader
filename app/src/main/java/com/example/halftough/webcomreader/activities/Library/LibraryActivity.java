@@ -22,6 +22,7 @@ import android.view.View;
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.PreferenceHelper;
 import com.example.halftough.webcomreader.R;
+import com.example.halftough.webcomreader.UpdateWebcomsService;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.AboutActivity;
 import com.example.halftough.webcomreader.activities.AddWebcomActivity;
@@ -222,7 +223,7 @@ public class LibraryActivity extends AppCompatActivity {
             if(data.hasExtra(UserRepository.EXTRA_WEBCOM_ID)){
                 String wid = data.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
                 viewModel.insert(new ReadWebcom(wid));
-                DownloaderService.updateNewChaptersIn(this, wid);
+                UpdateWebcomsService.updateNewChaptersIn(this, wid);
             }
         }
     }
