@@ -39,7 +39,7 @@ public abstract class OneByOneCallDownloader<CallClass, Extra> extends OneByOneD
             @Override
             public void onResponse(Call<CallClass> call, Response<CallClass> response) {
                 OneByOneCallDownloader.this.onResponse(call, response, extra);
-                elementDownloaded();
+                elementDownloaded(extra);
             }
 
             @Override

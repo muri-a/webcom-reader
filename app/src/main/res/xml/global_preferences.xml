@@ -53,4 +53,8 @@
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/global_preferences_autoremove_number" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="notify"
+        android:title="@string/global_preferences_notify" />
 </PreferenceScreen>

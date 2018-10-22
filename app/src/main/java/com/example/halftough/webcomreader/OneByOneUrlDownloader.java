@@ -55,7 +55,7 @@ public abstract class OneByOneUrlDownloader<Extra> extends OneByOneDownloader<St
             } catch (IOException e) {
                 onFail(extras[0], ext);
             }
-            elementDownloaded();
+            elementDownloaded(extras[0]);
             return null;
         }
     }

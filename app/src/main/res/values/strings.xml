@@ -81,6 +81,7 @@
     <string name="global_preferences_autodownload_number">Number of chapters to autodownload</string>
     <string name="global_preferences_autoremove_title">Autodelete read chapters</string>
     <string name="global_preferences_autoremove_number">Skip last when autoremoving</string>
+    <string name="global_preferences_notify">Nofify when finishing downloads</string>
 
     <string name="chapter_preferences_odrer_title">List order</string>
     <string-array name="chapter_perferences_order_list">
@@ -106,5 +107,13 @@
     <string name="about_issues_title">Issues</string>
     <string name="about_issues_content">If you found a bug or want to request a feature or new comic to be added, create an issue under https://gitlab.com/halftough/webcom-reader/issues.
         It helps making application better.</string>
+
+    <string name="update_service_updating">Updating %s</string>
+    <string name="download_service_downloading">Downloading %s</string>
+    <string name="download_service_downloading_few">Downloading comics</string>
+    <string name="download_service_downloading_content">%d/%d</string>
+    <string name="download_service_downloading_content_finished">%d finished</string>
+    <string name="download_service_downloading_content_few">%s %d/%d</string>
+    <string name="download_service_downloading_content_few_finished">%s %d finished</string>
 
 </resources>

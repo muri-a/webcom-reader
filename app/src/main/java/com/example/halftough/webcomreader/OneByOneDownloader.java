@@ -44,7 +44,8 @@ public abstract class OneByOneDownloader<ElementType, Extra> {
 
     // Method that should be called on success of downloadElement.
     // Because ways of doing that may vary, extension of this class should remember to call it.
-    protected void elementDownloaded(){
+    // finishedExtra isn't used in this method, but it's for overriding
+    protected void elementDownloaded(Extra finishedExtra){
         if(!queue.isEmpty()) {
             ElementType element = queue.remove();
             Extra extra = extras!=null?extras.remove():null;

@@ -30,6 +30,9 @@ import java.util.List;
 public class UpdateWebcomsService extends Service implements ChapterUpdateBroadcaster {
     private static final String ACTION_UPDATE_NEW_CHAPTERS = "UPDATE_NEW_CHAPTERS";
     private static final String ACTION_UPDATE_NEW_CHAPTERS_IN = "UPDATE_NEW_CHAPTERS_IN";
+
+    private static final String CHANNEL_UPDATE_NEW_CHAPTERS = "CHANNEL_UPDATE_NEW_CHAPTERS";
+
     private static final int FOREGROUND_ID = 7;
 
     private ReadWebcomsDAO readWebcomsDAO;
@@ -116,9 +119,9 @@ public class UpdateWebcomsService extends Service implements ChapterUpdateBroadc
         Webcom webcom = UserRepository.getWebcomInstance(wid);
         Notification notification;
         Bitmap icon = BitmapFactory.decodeResource(getResources(), webcom.getIcon());
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(UpdateWebcomsService.this, "CHANNEL_ID")
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(UpdateWebcomsService.this, CHANNEL_UPDATE_NEW_CHAPTERS)
                 .setSmallIcon(R.drawable.ic_refresh_white_24dp)
-                .setContentTitle("Updateing "+webcom.getTitle())
+                .setContentTitle( String.format(getString(R.string.update_service_updating), webcom.getTitle()) )
                 .setLargeIcon(icon)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
         notification = mBuilder.build();

@@ -39,7 +39,6 @@ public class XkcdWebcom extends Webcom {
             chapterCount = new MutableLiveData<>();
             chapterCount.setValue(0);
         }
-        initService();
     }
 
     @Override

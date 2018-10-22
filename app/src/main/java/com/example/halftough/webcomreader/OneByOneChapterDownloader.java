@@ -42,7 +42,7 @@ public abstract class OneByOneChapterDownloader extends OneByOneDownloader<Strin
             public void onChanged(@Nullable ComicPage comicPage) {
                 page.removeObserver(this);
                 OneByOneChapterDownloader.this.onResponse(comicPage);
-                elementDownloaded();
+                elementDownloaded(extra);
                 refreshCounter++;
                 if(refreshCounter % refreshRate == 0 || !downloading){
                     downloaderService.get().broadcastChapterUpdated(new Chapter(webcom.getId(), element));

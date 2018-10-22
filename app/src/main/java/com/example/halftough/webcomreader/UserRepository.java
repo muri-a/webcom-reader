@@ -9,13 +9,15 @@ import java.io.File;
 
 
 public class UserRepository {
-    public enum FieldType{ ARRAY, SINGLE, SWITCH }
-
+    public enum FieldType{ ARRAY, SINGLE, SWITCH;}
     public static final String ACTION_CHAPTER_UPDATED = "com.example.halftough.webcomreader.ACTION_CHAPTER_UPDATED";
-    public static final String GLOBAL_PREFERENCES = "com.example.halftough.webcomreader.GLOBAL_PREFERENCES";
 
+    public static final String GLOBAL_PREFERENCES = "com.example.halftough.webcomreader.GLOBAL_PREFERENCES";
     public static String EXTRA_WEBCOM_ID = "EXTRA_WEBCOM_ID";
+
     public static String EXTRA_CHAPTER_NUMBER = "EXTRA_CHAPTER_NUMBER";
+
+    private static int notificationID = 1000;
 
     public static Webcom getWebcomInstance(String id) {
         switch(id){
@@ -34,5 +36,9 @@ public class UserRepository {
         if(file != null) {
             file.delete();
         }
+    }
+
+    public static int nextNotificationID() {
+        return notificationID++;
     }
 }
