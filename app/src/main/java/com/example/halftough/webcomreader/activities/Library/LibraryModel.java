@@ -144,7 +144,7 @@ public class LibraryModel extends AndroidViewModel {
 
     //TODO something if can't remove file?
     private void deleteDir(File dir){
-        if(dir.isDirectory()){
+        if(dir.exists() && dir.isDirectory() && dir.listFiles() != null){
             for(File f : dir.listFiles()){
                 deleteDir(f);
             }

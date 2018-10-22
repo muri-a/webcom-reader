@@ -1,6 +1,5 @@
 package com.example.halftough.webcomreader;
 
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.Service;
 import android.arch.lifecycle.LiveData;
@@ -9,12 +8,9 @@ import android.content.Intent;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.example.halftough.webcomreader.database.AppDatabase;
 import com.example.halftough.webcomreader.database.Chapter;
@@ -63,7 +59,7 @@ public class UpdateWebcomsService extends Service implements ChapterUpdateBroadc
     }
 
     public static void updateNewChaptersIn(Context context, String wid){
-        Intent intent = new Intent(context, DownloaderService.class);
+        Intent intent = new Intent(context, UpdateWebcomsService.class);
         intent.setAction(ACTION_UPDATE_NEW_CHAPTERS_IN);
         intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, wid);
         context.startService(intent);
