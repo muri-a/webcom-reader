@@ -55,6 +55,7 @@
     <string name="chapter_list_filters_menu_undownloaded">Undownloaded</string>
     <string name="chapter_list_filters_menu_clear">Clear</string>
 
+    <string name="read_chapter_menu_source">Open source</string>
     <string name="read_chapter_downloading">Downloading</string>
     <string name="read_chapter_cant_download">Unable to download page</string>
 

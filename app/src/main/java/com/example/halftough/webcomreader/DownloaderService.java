@@ -43,25 +43,17 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
     private static final String ACTION_AUTOREMOVE = "ACTION_AUTOREMOVE";
     private static final String ACTION_ENQUEUE_CHAPTER = "ACTION_ENQUEUE_CHAPTER";
     private static final String CHANNEL_DOWNLOADING = "CHANNEL_DOWNLOADING";
-
     private static final int FOREGROUND_ID = 6;
-//    private static int nextID;
-//    private Map<String, Integer> idMap;
-
 
     ChapterDownloader downloader;
     private ChaptersDAO chaptersDAO;
     boolean serviceStarted = false;
-    //private ReadWebcomsDAO readWebcomsDAO;
 
     @Override
     public void onCreate() {
         downloader = new ChapterDownloader();
         AppDatabase db = AppDatabase.getDatabase(this);
         chaptersDAO = db.chaptersDAO();
-        //readWebcomsDAO = db.readWebcomsDAO();
-        //idMap = new TreeMap<>();
-        //nextID = FOREGROUND_ID;
         super.onCreate();
     }
 

@@ -1,11 +1,17 @@
 package com.example.halftough.webcomreader.activities.ReadChapter;
 
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -67,6 +73,37 @@ public class ReadChapterActivity extends AppCompatActivity {
             unregisterReceiver(broadcastReceiver);
             broadcastReceiver = null;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.read_chapter_menu, menu);
+        if(!webcom.canOpenSource()){
+            menu.findItem(R.id.readChapterMenuSource).setVisible(false);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.readChapterMenuSource:
+                final LiveData<Uri> source = webcom.getChapterSource(readChapterRepository.getChapterNumber());
+                if(source != null) {
+                    source.observe(this, new Observer<Uri>() {
+                        @Override
+                        public void onChanged(@Nullable Uri uri) {
+                            source.removeObserver(this);
+                            if (uri != null) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                startActivity(intent);
+                            }
+                        }
+                    });
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

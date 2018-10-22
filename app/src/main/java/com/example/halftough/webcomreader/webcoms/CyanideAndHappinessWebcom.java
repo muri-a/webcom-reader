@@ -3,6 +3,7 @@ package com.example.halftough.webcomreader.webcoms;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -61,6 +62,10 @@ public class CyanideAndHappinessWebcom extends Webcom {
     @Override
     public format getFormat() {
         return format.PAGES;
+    }
+    @Override
+    public boolean canOpenSource() {
+        return true;
     }
     @Override
     public MutableLiveData<Integer> getChapterCount() {
@@ -226,6 +231,13 @@ public class CyanideAndHappinessWebcom extends Webcom {
             }
         });
         return page;
+    }
+
+    @Override
+    public LiveData<Uri> getChapterSource(String chapterNumber) {
+        MutableLiveData<Uri> source = new MutableLiveData<>();
+        source.setValue(Uri.parse("http://explosm.net/comics/"+chapterNumber));
+        return source;
     }
 
     private boolean a = false, b = false;

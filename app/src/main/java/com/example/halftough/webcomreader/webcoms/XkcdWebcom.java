@@ -3,6 +3,7 @@ package com.example.halftough.webcomreader.webcoms;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.example.halftough.webcomreader.ChapterUpdateBroadcaster;
@@ -73,6 +74,10 @@ public class XkcdWebcom extends Webcom {
     @Override
     public ReadingOrder getReadingOrder() {
         return ReadingOrder.NEWEST_FIRST;
+    }
+    @Override
+    public boolean canOpenSource() {
+        return true;
     }
 
     @Override
@@ -145,6 +150,13 @@ public class XkcdWebcom extends Webcom {
             }
         });
         return page;
+    }
+
+    @Override
+    public LiveData<Uri> getChapterSource(String chapterNumber) {
+        MutableLiveData<Uri> source = new MutableLiveData<>();
+        source.setValue(Uri.parse("https://xkcd.com/"+chapterNumber));
+        return source;
     }
 
     @Override
