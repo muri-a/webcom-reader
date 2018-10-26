@@ -82,7 +82,7 @@
     <string name="global_preferences_autodownload_number">Number of chapters to autodownload</string>
     <string name="global_preferences_autoremove_title">Autodelete read chapters</string>
     <string name="global_preferences_autoremove_number">Skip last when autoremoving</string>
-    <string name="global_preferences_notify">Nofify when finishing downloads</string>
+    <string name="global_preferences_notify">Notify when finishing downloads</string>
 
     <string name="chapter_preferences_odrer_title">List order</string>
     <string-array name="chapter_perferences_order_list">
