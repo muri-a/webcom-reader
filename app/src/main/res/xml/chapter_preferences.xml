@@ -19,6 +19,7 @@
         android:key="autodownload"
         android:title="@string/chapter_preferences_autodownload_title" />
     <EditTextPreference
+        android:defaultValue="@string/global_preferences_autodownload_number_default"
         android:enabled="false"
         android:inputType="numberDecimal"
         android:key="autodownload_number"
@@ -35,6 +36,7 @@
         android:key="autoremove"
         android:title="@string/chapter_preferences_autoremove_title" />
     <EditTextPreference
+        android:defaultValue="@string/global_preferences_autoremove_save_default"
         android:enabled="false"
         android:inputType="numberDecimal"
         android:key="autoremove_save"

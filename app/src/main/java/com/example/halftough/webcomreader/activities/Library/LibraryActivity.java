@@ -2,7 +2,6 @@ package com.example.halftough.webcomreader.activities.Library;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.PreferenceHelper;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UpdateWebcomsService;
@@ -34,8 +32,6 @@ import com.example.halftough.webcomreader.database.ReadWebcom;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO Removing webcoms
-//TODO Autoupdates
 public class LibraryActivity extends AppCompatActivity {
     enum ActivityMode { NORMAL, SELECTING }
     public static int ADD_WEBCOM_RESULT = 1;
@@ -104,14 +100,8 @@ public class LibraryActivity extends AppCompatActivity {
         viewModel.getAllReadWebcoms().observe(this, new Observer<List<ReadWebcom>>() {
             @Override
             public void onChanged(@Nullable List<ReadWebcom> readWebcoms) {
-                Context context = LibraryActivity.this;
                 viewModel.sort();
                 adapter.setReadWebcoms(readWebcoms);
-                //Set default preferences for all chapters
-                //TODO maybe move to when adding a webcom
-                for(ReadWebcom webcom : readWebcoms){
-                    PreferenceManager.setDefaultValues(context, ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+webcom.getWid(), MODE_PRIVATE, R.xml.chapter_preferences, false);
-                }
             }
         });
 
@@ -224,6 +214,8 @@ public class LibraryActivity extends AppCompatActivity {
                 String wid = data.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
                 viewModel.insert(new ReadWebcom(wid));
                 UpdateWebcomsService.updateNewChaptersIn(this, wid);
+                //Set default preferences for chapters
+                PreferenceManager.setDefaultValues(this, ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, MODE_PRIVATE, R.xml.chapter_preferences, false);
             }
         }
     }

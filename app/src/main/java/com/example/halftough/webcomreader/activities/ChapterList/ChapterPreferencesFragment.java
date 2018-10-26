@@ -13,6 +13,7 @@ import com.example.halftough.webcomreader.UserRepository.FieldType;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -37,6 +38,7 @@ public class ChapterPreferencesFragment extends PreferenceFragment implements Sh
         globalPreferences = getActivity().getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
+        Set<String> thing = sharedPreferences.getAll().keySet();
         for(String key : sharedPreferences.getAll().keySet()){
             updateSummary(key);
         }
@@ -78,7 +80,7 @@ public class ChapterPreferencesFragment extends PreferenceFragment implements Sh
                 break;
             case "autodownload_number":
                 type = FieldType.SINGLE;
-                defaultVal = globalPreferences.getString("autodownload_number", getString(R.string.global_preferences_autodownload_number));
+                defaultVal = globalPreferences.getString("autodownload_number", getString(R.string.global_preferences_autodownload_number_default));
                 break;
             case "autoremove_global":
                 type = FieldType.SWITCH;
