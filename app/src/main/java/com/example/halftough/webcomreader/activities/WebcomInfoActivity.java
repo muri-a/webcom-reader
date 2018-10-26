@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,12 +15,10 @@ import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 
-//TODO hide/change add button if already on the list
-//TODO Adress
 //TODO tags
 
 public class WebcomInfoActivity extends AppCompatActivity {
-    public static String WEBCOM_INFO_ID;
+    public final static String EXTRA_IS_READ = "EXTRA_IS_READ";
     private Webcom webcom;
     TextView title;
     TextView description;
@@ -28,6 +27,7 @@ public class WebcomInfoActivity extends AppCompatActivity {
     TextView formatTextView;
     TextView pagesLabelTextView;
     TextView pagesTextView;
+    Button addButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class WebcomInfoActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Intent intent = getIntent();
-        webcom = UserRepository.getWebcomInstance(intent.getStringExtra(WEBCOM_INFO_ID));
+        webcom = UserRepository.getWebcomInstance(intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -48,12 +48,16 @@ public class WebcomInfoActivity extends AppCompatActivity {
         formatTextView = (TextView)findViewById(R.id.webcomInfoFormat);
         pagesLabelTextView = (TextView)findViewById(R.id.webcomInfoPagesLabel);
         pagesTextView = (TextView)findViewById(R.id.webcomInfoPageNumber);
+        addButton = (Button)findViewById(R.id.webcomInfoAddButton);
 
         title.setText(webcom.getTitle());
         setTitle(webcom.getTitle());
         webpageTextView.setText(webcom.getWebpage());
         description.setText(webcom.getDescription());
         icon.setImageDrawable(getResources().getDrawable(webcom.getIcon()));
+        if( intent.getBooleanExtra(EXTRA_IS_READ, false) ){
+            addButton.setEnabled(false);
+        }
         switch (webcom.getFormat()){
             case PAGES:
                 formatTextView.setText(getResources().getText(R.string.webcom_info_pages));

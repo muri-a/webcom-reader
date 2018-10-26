@@ -1,7 +1,10 @@
 package com.example.halftough.webcomreader.activities;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +14,9 @@ import android.view.View;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.RecyclerItemClickListener;
 import com.example.halftough.webcomreader.UserRepository;
+import com.example.halftough.webcomreader.database.AppDatabase;
+import com.example.halftough.webcomreader.database.ReadWebcom;
+import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 import com.example.halftough.webcomreader.webcoms.CyanideAndHappinessWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.example.halftough.webcomreader.webcoms.XkcdWebcom;
@@ -23,8 +29,8 @@ public class AddWebcomActivity extends AppCompatActivity {
 
     RecyclerView addWebcomRecyclerView;
     List<Webcom> list;
-
-    //TODO hide added
+    private ReadWebcomsDAO readWebcomsDAO;
+    LiveData<List<ReadWebcom>> read;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +41,16 @@ public class AddWebcomActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         addWebcomRecyclerView = (RecyclerView)findViewById(R.id.add_webcom_list);
-        fillAvailableComicList();
+
+        AppDatabase db = AppDatabase.getDatabase(getApplication());
+        readWebcomsDAO = db.readWebcomsDAO();
+        read = readWebcomsDAO.getAll();
+        read.observe(this, new Observer<List<ReadWebcom>>() {
+            @Override
+            public void onChanged(@Nullable List<ReadWebcom> readWebcoms) {
+                fillAvailableComicList();
+            }
+        });
     }
 
     private void fillAvailableComicList(){
@@ -44,23 +59,29 @@ public class AddWebcomActivity extends AppCompatActivity {
         list.add(new CyanideAndHappinessWebcom());
         list.add(new XkcdWebcom());
         //list.add(new Webcom(3,"Pepper & Carrot"));
-        AddWebcomAdapter adapter = new AddWebcomAdapter(list);
+        AddWebcomAdapter adapter = new AddWebcomAdapter(this, list);
         addWebcomRecyclerView.setAdapter(adapter);
         addWebcomRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        addWebcomRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                showInfoActivity(list.get(position));
-            }
-        }));
 
     }
 
     public void showInfoActivity(Webcom webcom){
         Intent addWebcomIntent = new Intent(this, WebcomInfoActivity.class);
-        addWebcomIntent.putExtra(WebcomInfoActivity.WEBCOM_INFO_ID, webcom.getId());
+        addWebcomIntent.putExtra(UserRepository.EXTRA_WEBCOM_ID, webcom.getId());
+        addWebcomIntent.putExtra(WebcomInfoActivity.EXTRA_IS_READ, isWebcomRead(webcom.getId()));
         startActivityForResult(addWebcomIntent, ADD_WEBCOM_RESULT);
+    }
+
+    public boolean isWebcomRead(String wid){
+        if(read.getValue() == null){
+            return false;
+        }
+        for(ReadWebcom rw : read.getValue()){
+            if( rw.getWid().equals(wid) ){
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

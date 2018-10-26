@@ -64,7 +64,7 @@ public class LibraryModel extends AndroidViewModel {
     }
 
     public void sort(){
-        SharedPreferences preferences = preferences = getApplication().getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences preferences = getApplication().getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
         sortBy = SortBy.fromInt(preferences.getInt(LibraryActivity.SORTING_KEY, 0));
         if(readWebcoms.getValue() != null)
             Collections.sort(readWebcoms.getValue(), new Comparator<ReadWebcom>() {
@@ -153,7 +153,6 @@ public class LibraryModel extends AndroidViewModel {
     }
 
     //TODO clean this up
-
     private static class insertAsyncTask extends AsyncTask<ReadWebcom, Void, Void> {
         private ReadWebcomsDAO mAsyncTaskDao;
         insertAsyncTask(ReadWebcomsDAO dao) {
