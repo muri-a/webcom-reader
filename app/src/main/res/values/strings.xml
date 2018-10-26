@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WebComReader</string>
+    <string name="app_name">Tinte Webcoms</string>
     <string name="title_activity_library">Library</string>
     <string name="title_activity_available_comic_list">AvailableComicListActivity</string>
     <string name="title_activity_add_webcom">Add webcom</string>
