@@ -8,9 +8,15 @@
     tools:context=".activities.AddWebcomActivity"
     tools:showIn="@layout/add_webcom_activity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/my_webcom_list"
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/librarySwiperefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/add_webcom_list_item" />
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/my_webcom_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/add_webcom_list_item" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.constraint.ConstraintLayout>

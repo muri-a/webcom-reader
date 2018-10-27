@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ public class LibraryActivity extends AppCompatActivity {
     public static int ADD_WEBCOM_RESULT = 1;
     public static final String SORTING_KEY = "library_sorting";
 
+    SwipeRefreshLayout librarySwiprrefresf;
     RecyclerView libraryRecyclerView;
     LibraryAdapter adapter;
     LibraryModel viewModel;
@@ -51,12 +53,21 @@ public class LibraryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.library_activity);
 
-        PreferenceManager.setDefaultValues(this, UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE, R.xml.global_preferences, false);
+        PreferenceManager.setDefaultValues(this, UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE, R.xml.global_preferences, true);
         preferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
 
         libraryRecyclerView = (RecyclerView)findViewById(R.id.my_webcom_list);
         selectingToolbar = (Toolbar)findViewById(R.id.myWebcomsSelectingToolbar);
         selectedWebcoms = new ArrayList<>();
+        librarySwiprrefresf = (SwipeRefreshLayout)findViewById(R.id.librarySwiperefresh);
+
+        librarySwiprrefresf.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                UpdateWebcomsService.updateNewChapters(LibraryActivity.this);
+                librarySwiprrefresf.setRefreshing(false);
+            }
+        });
 
         setTitle(R.string.title_activity_library);
 

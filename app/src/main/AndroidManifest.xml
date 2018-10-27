@@ -91,7 +91,12 @@
 
         <service
             android:name=".UpdateWebcomsService"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <receiver
+            android:name=".SheduledUpdateReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>

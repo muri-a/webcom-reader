@@ -1,5 +1,7 @@
 package com.example.halftough.webcomreader;
 
+import android.content.Context;
+
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.webcoms.CyanideAndHappinessWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
@@ -9,7 +11,7 @@ import java.io.File;
 
 
 public class UserRepository {
-    public enum FieldType{ ARRAY, SINGLE, SWITCH;}
+        public enum FieldType{ ARRAY, STRING, TIME, SWITCH;}
     public static final String ACTION_CHAPTER_UPDATED = "com.example.halftough.webcomreader.ACTION_CHAPTER_UPDATED";
 
     public static final String GLOBAL_PREFERENCES = "com.example.halftough.webcomreader.GLOBAL_PREFERENCES";
@@ -40,5 +42,36 @@ public class UserRepository {
 
     public static int nextNotificationID() {
         return notificationID++;
+    }
+
+    public static String parseHumanTimeFromMinutes(Context context, int minutes) {
+        int days = 0 , hours = 0;
+        String string = "";
+
+        days = minutes/(24*60);
+        minutes -= days*24*60;
+
+        hours = minutes/60;
+        minutes -= hours*60;
+
+        if(days > 0){
+            string += String.format("%s "+context.getString(R.string.days), days);
+        }
+        if(hours > 0){
+            if(!string.isEmpty()){
+                string += " ";
+            }
+            string += String.format("%s "+context.getString(R.string.hours), hours);
+        }
+        if(minutes > 0){
+            if(!string.isEmpty()){
+                string += " ";
+            }
+            string += String.format("%s "+context.getString(R.string.minutes), minutes);
+        }
+        if(string.isEmpty()){
+            string = string += String.format("%s "+context.getString(R.string.minutes), minutes);
+        }
+        return string;
     }
 }

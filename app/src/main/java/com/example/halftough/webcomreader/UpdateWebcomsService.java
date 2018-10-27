@@ -1,16 +1,20 @@
 package com.example.halftough.webcomreader;
 
+import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.widget.Toast;
 
 import com.example.halftough.webcomreader.database.AppDatabase;
 import com.example.halftough.webcomreader.database.Chapter;
@@ -30,6 +34,7 @@ public class UpdateWebcomsService extends Service implements ChapterUpdateBroadc
     private static final String CHANNEL_UPDATE_NEW_CHAPTERS = "CHANNEL_UPDATE_NEW_CHAPTERS";
 
     private static final int FOREGROUND_ID = 7;
+    private static final int UPDATE_BROADCAST_REQUEST_CODE = 8832438;
 
     private ReadWebcomsDAO readWebcomsDAO;
     private ChaptersDAO chaptersDAO;
@@ -82,16 +87,31 @@ public class UpdateWebcomsService extends Service implements ChapterUpdateBroadc
     }
 
     private void handleUpdateNewChapters() {
-        isLoop = true;
-        final LiveData<List<ReadWebcom>> webcoms =  readWebcomsDAO.getAll();
-        webcoms.observeForever( new Observer<List<ReadWebcom>>() {
-            @Override
-            public void onChanged(@Nullable List<ReadWebcom> readWebcoms) {
-                webcoms.removeObserver(this);
-                Iterator<ReadWebcom> it = readWebcoms.iterator();
-                updateRec(it);
+        if(!isLoop) {
+            isLoop = true;
+            final LiveData<List<ReadWebcom>> webcoms = readWebcomsDAO.getAll();
+            webcoms.observeForever(new Observer<List<ReadWebcom>>() {
+                @Override
+                public void onChanged(@Nullable List<ReadWebcom> readWebcoms) {
+                    webcoms.removeObserver(this);
+                    Iterator<ReadWebcom> it = readWebcoms.iterator();
+                    updateRec(it);
+                }
+            });
+
+            SharedPreferences preferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
+
+            boolean autoupdate = preferences.getBoolean("autoupdate", true);
+
+            if(autoupdate) {
+                int minutes = preferences.getInt("autoupdate_time", 120);
+
+                Intent intent = new Intent(this, SheduledUpdateReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), UPDATE_BROADCAST_REQUEST_CODE, intent, 0);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + minutes*60000, pendingIntent);
             }
-        });
+        }
     }
 
     private void updateRec(final Iterator<ReadWebcom> it){

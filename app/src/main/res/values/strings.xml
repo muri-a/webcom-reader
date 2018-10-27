@@ -16,6 +16,9 @@
     <string name="sorting_last_read">Last read</string>
     <string name="sorting_last_updated">Last updated</string>
     <string name="sorting_unread">Unread</string>
+    <string name="minutes">minutes</string>
+    <string name="hours">hours</string>
+    <string name="days">days</string>
 
     <string name="library_selecting">Selected: %d</string>
     <string name="library_selecting_menu_delete">Delete from library</string>
@@ -83,6 +86,8 @@
     <string name="global_preferences_autoremove_title">Autodelete read chapters</string>
     <string name="global_preferences_autoremove_number">Skip last when autoremoving</string>
     <string name="global_preferences_notify">Notify when finishing downloads</string>
+    <string name="global_preferences_autoupdate">Update comics automatically</string>
+    <string name="global_preferences_autoupdate_time">Time between updates</string>
 
     <string name="chapter_preferences_odrer_title">List order</string>
     <string-array name="chapter_perferences_order_list">

@@ -13,7 +13,6 @@ import com.example.halftough.webcomreader.UserRepository.FieldType;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -38,7 +37,6 @@ public class ChapterPreferencesFragment extends PreferenceFragment implements Sh
         globalPreferences = getActivity().getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        Set<String> thing = sharedPreferences.getAll().keySet();
         for(String key : sharedPreferences.getAll().keySet()){
             updateSummary(key);
         }
@@ -79,7 +77,7 @@ public class ChapterPreferencesFragment extends PreferenceFragment implements Sh
                 defaultVal = getString(R.string.chapter_preferences_autodownload_default);
                 break;
             case "autodownload_number":
-                type = FieldType.SINGLE;
+                type = FieldType.STRING;
                 defaultVal = globalPreferences.getString("autodownload_number", getString(R.string.global_preferences_autodownload_number_default));
                 break;
             case "autoremove_global":
@@ -88,7 +86,7 @@ public class ChapterPreferencesFragment extends PreferenceFragment implements Sh
                 preferences.add(findPreference("autoremove_save"));
                 break;
             case "autoremove_save":
-                type = FieldType.SINGLE;
+                type = FieldType.STRING;
                 defaultVal = globalPreferences.getString("autoremove_save", getString(R.string.global_preferences_autoremove_save_default));
                 break;
         }
@@ -104,7 +102,7 @@ public class ChapterPreferencesFragment extends PreferenceFragment implements Sh
                     findPreference(key).setSummary(names[index]);
             }
             break;
-            case SINGLE: {
+            case STRING: {
                 String value = sharedPreferences.getString(key, defaultVal);
                 findPreference(key).setSummary(value);
             }

@@ -57,4 +57,12 @@
         android:defaultValue="true"
         android:key="notify"
         android:title="@string/global_preferences_notify" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="autoupdate"
+        android:title="@string/global_preferences_autoupdate" />
+    <com.example.halftough.webcomreader.NumberPickerPreference
+        android:defaultValue="120"
+        android:key="autoupdate_time"
+        android:title="@string/global_preferences_autoupdate_time" />
 </PreferenceScreen>
