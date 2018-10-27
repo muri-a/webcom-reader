@@ -2,14 +2,18 @@ package com.example.halftough.webcomreader.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.UserRepository.FieldType;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -53,6 +57,7 @@ public class GlobalSettingsFragment extends PreferenceFragment implements Shared
         String defaultVal = "";
         int defaultItnVal = 0;
         FieldType type = null;
+        List<Preference> preferences = new LinkedList<>();
         switch (key){
             case "library_style":
                 type = FieldType.ARRAY;
@@ -88,6 +93,10 @@ public class GlobalSettingsFragment extends PreferenceFragment implements Shared
                 type = FieldType.STRING;
                 defaultVal = getString(R.string.global_preferences_autoremove_save_default);
                 break;
+            case "autoupdate":
+                type = FieldType.SWITCH;
+                preferences.add(findPreference("autoupdate_time"));
+                break;
             case "autoupdate_time":
                 type = FieldType.TIME;
                 defaultItnVal = 120;
@@ -106,6 +115,12 @@ public class GlobalSettingsFragment extends PreferenceFragment implements Shared
         else if(type == FieldType.TIME){
             int minutes = sharedPreferences.getInt(key, defaultItnVal);
             findPreference(key).setSummary( UserRepository.parseHumanTimeFromMinutes(getActivity(), minutes) );
+        }
+        else if(type == FieldType.SWITCH){
+            boolean state = sharedPreferences.getBoolean(key, true);
+            for(Preference preference : preferences){
+                preference.setEnabled(state);
+            }
         }
         else{
             String value = sharedPreferences.getString(key, defaultVal);
