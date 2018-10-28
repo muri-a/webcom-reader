@@ -34,7 +34,7 @@ public class UpdateWebcomsService extends Service implements ChapterUpdateBroadc
     private static final String CHANNEL_UPDATE_NEW_CHAPTERS = "CHANNEL_UPDATE_NEW_CHAPTERS";
 
     private static final int FOREGROUND_ID = 7;
-    private static final int UPDATE_BROADCAST_REQUEST_CODE = 8832438;
+    public static final int UPDATE_BROADCAST_REQUEST_CODE = 8832438;
 
     private ReadWebcomsDAO readWebcomsDAO;
     private ChaptersDAO chaptersDAO;

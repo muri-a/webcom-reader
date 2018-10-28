@@ -37,7 +37,6 @@ import java.util.List;
 public class LibraryActivity extends AppCompatActivity {
     enum ActivityMode { NORMAL, SELECTING }
     public static int ADD_WEBCOM_RESULT = 1;
-    public static int SETTINGS_RESULT = 2;
     public static final String SORTING_KEY = "library_sorting";
 
     SwipeRefreshLayout librarySwiprrefresf;
@@ -152,7 +151,7 @@ public class LibraryActivity extends AppCompatActivity {
                 break;
             case R.id.libraryMenuSettings: {
                 Intent intent = new Intent(this, GlobalSettingsActivity.class);
-                startActivityForResult(intent, SETTINGS_RESULT);
+                startActivity(intent);
                 break;
             }
             case R.id.libraryMenuAbout: {
@@ -218,13 +217,9 @@ public class LibraryActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    //TODO when turning off autoupdates stop
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        Log.e("CODES", Integer.toString(requestCode) + " " + Integer.toString(resultCode));
 
         if(requestCode== ADD_WEBCOM_RESULT && resultCode!=RESULT_CANCELED){
             if(data.hasExtra(UserRepository.EXTRA_WEBCOM_ID)){

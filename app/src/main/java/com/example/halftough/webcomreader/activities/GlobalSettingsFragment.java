@@ -1,13 +1,19 @@
 package com.example.halftough.webcomreader.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.halftough.webcomreader.R;
+import com.example.halftough.webcomreader.SheduledUpdateReceiver;
+import com.example.halftough.webcomreader.UpdateWebcomsService;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.UserRepository.FieldType;
 
@@ -15,6 +21,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static android.content.Context.ALARM_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 
 public class GlobalSettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -50,6 +57,32 @@ public class GlobalSettingsFragment extends PreferenceFragment implements Shared
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         updateSummary(key);
+        switch (key){
+            case "autoupdate":
+                if( sharedPreferences.getBoolean("autoupdate", true) ){
+                    int minutes = sharedPreferences.getInt("autoupdate_time", 120);
+
+                    Intent intent = new Intent(getActivity(), SheduledUpdateReceiver.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity().getApplicationContext(), UpdateWebcomsService.UPDATE_BROADCAST_REQUEST_CODE, intent, 0);
+                    AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + minutes*60000, pendingIntent);
+                }
+                else{
+                    Intent intent = new Intent(getActivity(), SheduledUpdateReceiver.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity().getApplicationContext(), UpdateWebcomsService.UPDATE_BROADCAST_REQUEST_CODE, intent, 0);
+                    AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
+                    alarmManager.cancel(pendingIntent);
+                }
+                break;
+            case "autoupdate_time":
+                int minutes = sharedPreferences.getInt("autoupdate_time", 120);
+
+                Intent intent = new Intent(getActivity(), SheduledUpdateReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity().getApplicationContext(), UpdateWebcomsService.UPDATE_BROADCAST_REQUEST_CODE, intent, 0);
+                AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + minutes*60000, pendingIntent);
+                break;
+        }
     }
 
     void updateSummary(String key){
