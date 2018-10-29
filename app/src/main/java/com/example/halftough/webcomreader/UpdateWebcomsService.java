@@ -100,7 +100,6 @@ public class UpdateWebcomsService extends Service implements ChapterUpdateBroadc
             });
 
             SharedPreferences preferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
-
             boolean autoupdate = preferences.getBoolean("autoupdate", true);
 
             if(autoupdate) {
