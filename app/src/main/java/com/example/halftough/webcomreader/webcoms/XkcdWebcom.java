@@ -147,7 +147,7 @@ public class XkcdWebcom extends Webcom {
     }
 
     @Override
-    public void updateChapterList(final ChapterUpdateBroadcaster chapterUpdateBroadcaster, final ChaptersDAO chaptersDAO, final ReadWebcomsDAO readWebcomsDAO, final TaskDelegate delegate) {
+    public void updateChapterList(final TaskDelegate delegate) {
         initService();
         Call<XkcdComicPage> call = service.getLast();
         final Response<XkcdComicPage> response;

@@ -103,21 +103,21 @@ public class CyanideAndHappinessWebcom extends Webcom {
         }
         public void setPrevious(String previous) { this.previous = previous; }
 
-        public void insertUntilEnd(final ChaptersDAO dao, ReadWebcomsDAO readWebcomsDAO, final ChapterUpdateBroadcaster broadcaster, TaskDelegate delegate){
-            insertUntil(null, dao, readWebcomsDAO, broadcaster, delegate);
+        public void insertUntilEnd(TaskDelegate delegate){
+            insertUntil(null, delegate);
         }
 
-        public void insertUntil(final String until, final ChaptersDAO dao, final ReadWebcomsDAO readWebcomsDAO, final ChapterUpdateBroadcaster broadcaster, final TaskDelegate delegate){
+        public void insertUntil(final String until, final TaskDelegate delegate){
             Chapter insert = new Chapter(getId(), chapter);
             insert.setTitle(title);
-            ChaptersRepository.insertChapter(insert, dao, readWebcomsDAO, broadcaster);
+            ChaptersRepository.insertChapter(insert, chaptersDAO, readWebcomsDAO, chapterUpdateBroadcaster);
             if(!previous.isEmpty() && !previous.equals(until)){
                 Call<CyanideComicPage> call = service.getChapter(previous);
                 call.enqueue(new Callback<CyanideComicPage>() {
                     @Override
                     public void onResponse(Call<CyanideComicPage> call, Response<CyanideComicPage> response) {
                         if(response.isSuccessful()) {
-                            response.body().insertUntil(until, dao, readWebcomsDAO, broadcaster, delegate);
+                            response.body().insertUntil(until, delegate);
                         }
                         else {
                             onFailure(call, new Throwable());
@@ -235,8 +235,10 @@ public class CyanideAndHappinessWebcom extends Webcom {
     private boolean a = false, b = false;
 
     //Downloader Service is here for broadcasting. Might move it somewhere
+    //TODO when there are few new chapters to download it starts downloading them, gets at least one, but not all and something goes wrong, those are lost forever
+    //TODO changing "downloading direction" should fix it
     @Override
-    public void updateChapterList(final ChapterUpdateBroadcaster broadcaster, final ChaptersDAO chaptersDAO, final ReadWebcomsDAO readWebcomsDAO, final TaskDelegate delegate) {
+    public void updateChapterList(final TaskDelegate delegate) {
         initService();
         Call<CyanideComicPage> call = service.getLast();
 
@@ -258,7 +260,7 @@ public class CyanideAndHappinessWebcom extends Webcom {
                             if(Integer.parseInt(lastDb.getChapter()) < lastChapter){
                                 //// pobieraj wszystkie nowe
                                 ReadWebcomRepository.setLastUpdateDate(getId(), response.body().title.replaceAll("\\.", "-"), readWebcomsDAO);
-                                response.body().insertUntil(lastDb.getChapter(), chaptersDAO, readWebcomsDAO, broadcaster, new TaskDelegate(){
+                                response.body().insertUntil(lastDb.getChapter(), new TaskDelegate(){
                                     @Override
                                     public void onFinish() {
                                         a = true;
@@ -284,7 +286,7 @@ public class CyanideAndHappinessWebcom extends Webcom {
                                             @Override
                                             public void onChanged(@Nullable ComicPage comicPage) {
                                                 older.removeObserver(this);
-                                                ((CyanideComicPage)comicPage).insertUntilEnd(chaptersDAO, readWebcomsDAO, broadcaster, new TaskDelegate() {
+                                                ((CyanideComicPage)comicPage).insertUntilEnd(new TaskDelegate() {
                                                     @Override
                                                     public void onFinish() {
                                                         b = true;
@@ -306,7 +308,7 @@ public class CyanideAndHappinessWebcom extends Webcom {
                         }
                         else{
                             ReadWebcomRepository.setLastUpdateDate(getId(), response.body().title.replaceAll("\\.", "-"), readWebcomsDAO);
-                            response.body().insertUntilEnd(chaptersDAO, readWebcomsDAO, broadcaster, new TaskDelegate() {
+                            response.body().insertUntilEnd(new TaskDelegate() {
                                 @Override
                                 public void onFinish() {
                                     delegate.onFinish();

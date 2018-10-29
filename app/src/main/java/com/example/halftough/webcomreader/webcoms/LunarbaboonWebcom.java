@@ -7,21 +7,18 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.example.halftough.webcomreader.ChapterUpdateBroadcaster;
-import com.example.halftough.webcomreader.OneByOneChapterDownloader;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.TaskDelegate;
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.database.ChaptersDAO;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
-import com.example.halftough.webcomreader.database.ReadWebcomRepository;
 import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Queue;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -81,12 +78,64 @@ public class LunarbaboonWebcom extends Webcom {
 
     public interface LunarbaboonService{
         @GET("")
-        Call<LunarbaboonComicPage> getLast();
+        Call<LunarbaboonListPage> getNewest();
+
+        @GET("comics/?currentPage={page}")
+        Call<LunarbaboonListPage> getList(int page);
 
         @GET("{chapter}")
         Call<LunarbaboonComicPage> getChapter(@Path("chapter") String chapter);
     }
 
+    //Contains a page of few consecutive comics
+    public class LunarbaboonListPage {
+        private int page;
+
+        public List<Chapter> getChapters(){
+            return null;
+        }
+
+        public void insertUntil(Chapter until, TaskDelegate delegate){
+            insertUntil(until, null, delegate);
+        }
+
+        public void insertUntil(Chapter until, List<Chapter> leadingToAdd, TaskDelegate delegate){
+            //We wait with adding chapters, when there is something in the database and we find new ones to aviod rare error which results chapter not being listed evev
+            if(leadingToAdd == null) {
+                leadingToAdd = new ArrayList<>();
+            }
+            for(Chapter chapter : getChapters()){
+                if( chapter.compareTo(until) <= 0){
+                    addLeadingChapters(leadingToAdd);
+                    delegate.onFinish();
+                    return;
+                }
+                else {
+                    leadingToAdd.add(chapter);
+                }
+            }
+            //when all've been added and none was in db
+            Call<LunarbaboonListPage> nextPageCall = service.getList(page+1);
+            Response<LunarbaboonListPage> nextPage;
+            try {
+                nextPage = nextPageCall.execute();
+            } catch (IOException e) {
+                //We discard what we do have, because saving it would mean errors later
+                delegate.onFinish();
+                return;
+            }
+            nextPage.body().insertUntil(until, leadingToAdd, delegate);
+        }
+
+        private void addLeadingChapters(List<Chapter> leadingToAdd){
+            for(Chapter chapter : leadingToAdd){
+                ChaptersRepository.insertChapter(chapter, chaptersDAO, readWebcomsDAO, chapterUpdateBroadcaster);
+            }
+        }
+
+    }
+
+    //Contains single comic page
     public class LunarbaboonComicPage extends ComicPage{
         @SerializedName("num")
         String num;
@@ -128,6 +177,7 @@ public class LunarbaboonWebcom extends Webcom {
         }
     }
 
+    //TODO this might be impossible with this comic. Think how to change it
     @Override
     public LiveData<ComicPage> getChapterMeta(String number) {
         initService();
@@ -152,9 +202,33 @@ public class LunarbaboonWebcom extends Webcom {
     }
 
     @Override
-    public void updateChapterList(final ChapterUpdateBroadcaster chapterUpdateBroadcaster, final ChaptersDAO chaptersDAO, final ReadWebcomsDAO readWebcomsDAO, final TaskDelegate delegate) {
+    public void updateChapterList(final TaskDelegate delegate) {
         initService();
 
+        Call<LunarbaboonListPage> newestCall = service.getNewest();
+        final Response<LunarbaboonListPage> newest;
+        try {
+            newest = newestCall.execute();
+        } catch (IOException e) {
+            delegate.onFinish();
+            return;
+        }
+        final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(getId());
+        dbChapters.observeForever(new Observer<List<Chapter>>() {
+            @Override
+            public void onChanged(@Nullable List<Chapter> chapters) {
+                dbChapters.removeObserver(this);
+                if(!chapters.isEmpty()) {
+                    Chapter dbLast = chapters.get(chapters.size() - 1);
+                    newest.body().insertUntil(dbLast, new TaskDelegate() {
+                        @Override
+                        public void onFinish() {
+
+                        }
+                    });
+                }
+            }
+        });
     }
 
 }

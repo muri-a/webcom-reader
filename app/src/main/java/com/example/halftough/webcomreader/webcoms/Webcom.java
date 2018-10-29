@@ -15,6 +15,9 @@ public abstract class Webcom {
     public enum format { CHAPTERS, PAGES;}
 
     public enum ReadingOrder {OLDEST_FIRST, NEWEST_FIRST;}
+    protected ChaptersDAO chaptersDAO;
+    protected ReadWebcomsDAO readWebcomsDAO;
+    protected ChapterUpdateBroadcaster chapterUpdateBroadcaster;
 
     public abstract String getId();
     public abstract String getTitle();
@@ -27,6 +30,16 @@ public abstract class Webcom {
     public abstract String[] getLanguages();
     public abstract ReadingOrder getReadingOrder();
     public abstract boolean canOpenSource();
+
+    public void setChaptersDAO(ChaptersDAO chaptersDAO){
+        this.chaptersDAO = chaptersDAO;
+    }
+    public void setReadWebcomsDAO(ReadWebcomsDAO readWebcomsDAO){
+        this.readWebcomsDAO = readWebcomsDAO;
+    }
+    public void setChapterUpdateBroadcaster(ChapterUpdateBroadcaster chapterUpdateBroadcaster) {
+        this.chapterUpdateBroadcaster = chapterUpdateBroadcaster;
+    }
 
     public LiveData<String> getChapterUrl(String chapter){
         final MutableLiveData<String> chapterUrl = new MutableLiveData<>();
@@ -44,7 +57,7 @@ public abstract class Webcom {
         return chapterUrl;
     }
 
-    public abstract void updateChapterList(ChapterUpdateBroadcaster chapterUpdateBroadcaster, ChaptersDAO chaptersDAO, ReadWebcomsDAO readWebcomsDAO, TaskDelegate delegate);
+    public abstract void updateChapterList(TaskDelegate delegate);
     public abstract LiveData<ComicPage> getChapterMeta(String number);
     public abstract LiveData<Uri> getChapterSource(String chapterNumber);
     //public abstract List<String> getChapterList();

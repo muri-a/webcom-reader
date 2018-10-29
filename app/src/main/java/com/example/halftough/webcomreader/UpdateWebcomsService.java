@@ -168,7 +168,10 @@ public class UpdateWebcomsService extends Service implements ChapterUpdateBroadc
         }
         @Override
         public void run() {
-            webcom.updateChapterList(UpdateWebcomsService.this, chaptersDAO, readWebcomsDAO, new TaskDelegate(){
+            webcom.setChaptersDAO(chaptersDAO);
+            webcom.setReadWebcomsDAO(readWebcomsDAO);
+            webcom.setChapterUpdateBroadcaster(UpdateWebcomsService.this);
+            webcom.updateChapterList(new TaskDelegate(){
                 @Override
                 public void onFinish() {
                     delegate.onFinish();
