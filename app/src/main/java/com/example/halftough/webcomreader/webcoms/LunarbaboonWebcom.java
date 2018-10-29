@@ -90,6 +90,7 @@ public class LunarbaboonWebcom extends Webcom {
     //Contains a page of few consecutive comics
     public class LunarbaboonListPage {
         private int page;
+        private boolean isLast;
 
         public List<Chapter> getChapters(){
             return null;
@@ -97,6 +98,27 @@ public class LunarbaboonWebcom extends Webcom {
 
         public void insertUntil(Chapter until, TaskDelegate delegate){
             insertUntil(until, null, delegate);
+        }
+
+        public void insertUntilEnd(TaskDelegate delegate){
+            readWebcomsDAO.setExtra(getId(), Integer.toString(page));
+            for(Chapter chapter : getChapters()){
+                ChaptersRepository.insertChapter(chapter, chaptersDAO, readWebcomsDAO, chapterUpdateBroadcaster);
+            }
+            if(!isLast){
+                Call<LunarbaboonListPage> nextPageCall = service.getList(page+1);
+                Response<LunarbaboonListPage> nextPage;
+                try {
+                    nextPage = nextPageCall.execute();
+                } catch (IOException e) {
+                    delegate.onFinish();
+                    return;
+                }
+                nextPage.body().insertUntilEnd(delegate);
+            }
+            else{
+                delegate.finish();
+            }
         }
 
         public void insertUntil(Chapter until, List<Chapter> leadingToAdd, TaskDelegate delegate){
@@ -213,22 +235,24 @@ public class LunarbaboonWebcom extends Webcom {
             delegate.onFinish();
             return;
         }
-        final LiveData<List<Chapter>> dbChapters = chaptersDAO.getChapters(getId());
-        dbChapters.observeForever(new Observer<List<Chapter>>() {
-            @Override
-            public void onChanged(@Nullable List<Chapter> chapters) {
-                dbChapters.removeObserver(this);
-                if(!chapters.isEmpty()) {
-                    Chapter dbLast = chapters.get(chapters.size() - 1);
-                    newest.body().insertUntil(dbLast, new TaskDelegate() {
-                        @Override
-                        public void onFinish() {
 
-                        }
-                    });
+        Chapter dbLast = chaptersDAO.getLastChapterAsync(getId());
+        if (dbLast != null) {
+            newest.body().insertUntil(dbLast, new TaskDelegate() {
+                @Override
+                public void onFinish() {
+
                 }
-            }
-        });
+            });
+        }
+        else{
+            newest.body().insertUntilEnd( new TaskDelegate(){
+                @Override
+                public void onFinish() {
+
+                }
+            });
+        }
     }
 
 }

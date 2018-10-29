@@ -39,4 +39,7 @@ public interface ReadWebcomsDAO {
 
     @Query("UPDATE read_webcoms SET readChapters = :count WHERE wid=:wid")
     void updateReadChapterCount(String wid, int count);
+
+    @Query("UPDATE read_webcoms SET extra = :extra WHERE wid=:wid")
+    void setExtra(String wid, String extra);
 }

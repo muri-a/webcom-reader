@@ -3,6 +3,7 @@ package com.example.halftough.webcomreader.database;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -24,6 +25,8 @@ public class Chapter implements Comparable<Chapter> {
     @NonNull
     @TypeConverters(DownloadStatusConverter.class)
     private DownloadStatus downloadStatus = DownloadStatus.UNDOWNLOADED;
+    @Nullable
+    private String extra = null;
 
     public Chapter(String wid, String chapter){
         this.wid = wid;
@@ -33,14 +36,11 @@ public class Chapter implements Comparable<Chapter> {
     @NonNull
     public String getWid() { return wid; }
     public void setWid(String wid) { this.wid = wid; }
-
     @NonNull
     public String getChapter() { return chapter; }
     public void setChapter(String chapter) { this.chapter = chapter; }
-
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
-
     @NonNull
     public Status getStatus() {
         return status;
@@ -48,14 +48,18 @@ public class Chapter implements Comparable<Chapter> {
     public void setStatus(@NonNull Status status) {
         this.status = status;
     }
-
     @NonNull
     public DownloadStatus getDownloadStatus() {
         return downloadStatus;
     }
-
     public void setDownloadStatus(@NonNull DownloadStatus downloadStatus) {
         this.downloadStatus = downloadStatus;
+    }
+    public String getExtra() {
+        return extra;
+    }
+    public void setExtra(String extra) {
+        extra = extra;
     }
 
     @Override
