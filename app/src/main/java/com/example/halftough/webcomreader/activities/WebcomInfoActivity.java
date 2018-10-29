@@ -26,7 +26,6 @@ public class WebcomInfoActivity extends AppCompatActivity {
     TextView webpageTextView;
     TextView formatTextView;
     TextView pagesLabelTextView;
-    TextView pagesTextView;
     Button addButton;
 
     @Override
@@ -46,8 +45,6 @@ public class WebcomInfoActivity extends AppCompatActivity {
         icon = (ImageView)findViewById(R.id.webcomInfoIcon);
         webpageTextView = (TextView)findViewById(R.id.webcomInfoWebpage);
         formatTextView = (TextView)findViewById(R.id.webcomInfoFormat);
-        pagesLabelTextView = (TextView)findViewById(R.id.webcomInfoPagesLabel);
-        pagesTextView = (TextView)findViewById(R.id.webcomInfoPageNumber);
         addButton = (Button)findViewById(R.id.webcomInfoAddButton);
 
         title.setText(webcom.getTitle());
@@ -61,19 +58,11 @@ public class WebcomInfoActivity extends AppCompatActivity {
         switch (webcom.getFormat()){
             case PAGES:
                 formatTextView.setText(getResources().getText(R.string.webcom_info_pages));
-                pagesLabelTextView.setText(getResources().getText(R.string.webcom_info_pages_label));
                 break;
             case CHAPTERS:
                 formatTextView.setText(getResources().getText(R.string.webcom_info_chapters));
-                pagesLabelTextView.setText(getResources().getText(R.string.webcom_info_chapters_label));
                 break;
         }
-        webcom.getChapterCount().observe(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(@Nullable Integer integer) {
-                pagesTextView.setText(integer.toString());
-            }
-        });
     }
 
     public void addWebcom(View view){

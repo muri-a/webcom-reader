@@ -36,15 +36,11 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public class CyanideAndHappinessWebcom extends Webcom {
-    private static MutableLiveData<Integer> chapterCount;
     private CyanideService service;
 
     public CyanideAndHappinessWebcom(){
-        if(chapterCount==null){
-            chapterCount = new MutableLiveData<>();
-            chapterCount.setValue(0);
-        }
     }
+
     @Override
     public String getId(){ return "cyanideandhappiness"; }
     @Override
@@ -66,10 +62,6 @@ public class CyanideAndHappinessWebcom extends Webcom {
     @Override
     public boolean canOpenSource() {
         return true;
-    }
-    @Override
-    public MutableLiveData<Integer> getChapterCount() {
-        return chapterCount;
     }
 
     @Override

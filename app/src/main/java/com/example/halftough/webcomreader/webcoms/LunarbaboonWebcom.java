@@ -33,13 +33,8 @@ import retrofit2.http.Path;
 
 public class LunarbaboonWebcom extends Webcom {
     private LunarbaboonService service;
-    private static MutableLiveData<Integer> chapterCount;
 
     public LunarbaboonWebcom(){
-        if(chapterCount==null){
-            chapterCount = new MutableLiveData<>();
-            chapterCount.setValue(0);
-        }
     }
 
     @Override
@@ -82,11 +77,6 @@ public class LunarbaboonWebcom extends Webcom {
     @Override
     public boolean canOpenSource() {
         return true;
-    }
-
-    @Override
-    public MutableLiveData<Integer> getChapterCount() {
-        return chapterCount;
     }
 
     public interface LunarbaboonService{

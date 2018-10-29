@@ -26,7 +26,6 @@ public abstract class Webcom {
     public abstract String[] getTags();
     public abstract String[] getLanguages();
     public abstract ReadingOrder getReadingOrder();
-    public abstract MutableLiveData<Integer> getChapterCount(); //Returns number of all available pages/chapters of comic
     public abstract boolean canOpenSource();
 
     public LiveData<String> getChapterUrl(String chapter){

@@ -33,14 +33,6 @@ import retrofit2.http.Path;
 
 public class XkcdWebcom extends Webcom {
     private XkcdService service;
-    private static MutableLiveData<Integer> chapterCount;
-
-    public XkcdWebcom(){
-        if(chapterCount==null){
-            chapterCount = new MutableLiveData<>();
-            chapterCount.setValue(0);
-        }
-    }
 
     @Override
     public String getId(){ return "xkcd"; }
@@ -78,11 +70,6 @@ public class XkcdWebcom extends Webcom {
     @Override
     public boolean canOpenSource() {
         return true;
-    }
-
-    @Override
-    public MutableLiveData<Integer> getChapterCount() {
-        return chapterCount;
     }
 
     public interface XkcdService{
