@@ -26,6 +26,7 @@ import org.json.JSONException;
 
 import java.io.File;
 
+//TODO Move everythong. Repository doesn't fif here
 public class ReadChapterRepository {
     private ChaptersDAO chaptersDAO;
     private Webcom webcom;
