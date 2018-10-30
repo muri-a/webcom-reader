@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.database.AppDatabase;
@@ -113,12 +114,13 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
 
     private void handleEnqueueChapter(final String wid, final String chapter) {
         Webcom webcom = UserRepository.getWebcomInstance(wid);
+        webcom.setChaptersDAO(chaptersDAO);
         final LiveData<String> url = webcom.getChapterUrl(chapter);
         url.observeForever(new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 url.removeObserver(this);
-                if (!s.isEmpty()) {
+                if (s!=null && !s.isEmpty()) {
                     downloader.enqueue(s, new Chapter(wid, chapter));
                     updateNotification();
                 }

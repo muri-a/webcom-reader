@@ -6,8 +6,8 @@ public abstract class OneByOneDownloader<ElementType, Extra> {
     protected int capacity;
     protected int free;
     protected boolean downloading = false;
-    Queue<ElementType> queue;
-    Queue<Extra> extras;
+    protected Queue<ElementType> queue;
+    protected Queue<Extra> extras;
 
     public void add(ElementType element, Extra extra){
         queue.add(element);

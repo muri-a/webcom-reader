@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.halftough.webcomreader.database.Chapter;
 import com.example.halftough.webcomreader.webcoms.CyanideAndHappinessWebcom;
+import com.example.halftough.webcomreader.webcoms.LunarbaboonWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.example.halftough.webcomreader.webcoms.XkcdWebcom;
 
@@ -11,7 +12,7 @@ import java.io.File;
 
 
 public class UserRepository {
-        public enum FieldType{ ARRAY, STRING, TIME, SWITCH;}
+    public enum FieldType{ ARRAY, STRING, TIME, SWITCH;}
     public static final String ACTION_CHAPTER_UPDATED = "com.example.halftough.webcomreader.ACTION_CHAPTER_UPDATED";
 
     public static final String GLOBAL_PREFERENCES = "com.example.halftough.webcomreader.GLOBAL_PREFERENCES";
@@ -25,6 +26,8 @@ public class UserRepository {
         switch(id){
             case "cyanideandhappiness":
                 return new CyanideAndHappinessWebcom();
+            case "lunarbaboon":
+                return new LunarbaboonWebcom();
             case "xkcd":
                 return new XkcdWebcom();
             default:

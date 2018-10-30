@@ -25,7 +25,6 @@ public class WebcomInfoActivity extends AppCompatActivity {
     ImageView icon;
     TextView webpageTextView;
     TextView formatTextView;
-    TextView pagesLabelTextView;
     Button addButton;
 
     @Override

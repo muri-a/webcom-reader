@@ -18,6 +18,7 @@ import com.example.halftough.webcomreader.database.AppDatabase;
 import com.example.halftough.webcomreader.database.ReadWebcom;
 import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 import com.example.halftough.webcomreader.webcoms.CyanideAndHappinessWebcom;
+import com.example.halftough.webcomreader.webcoms.LunarbaboonWebcom;
 import com.example.halftough.webcomreader.webcoms.Webcom;
 import com.example.halftough.webcomreader.webcoms.XkcdWebcom;
 
@@ -57,6 +58,7 @@ public class AddWebcomActivity extends AppCompatActivity {
         list = new ArrayList<Webcom>();
 
         list.add(new CyanideAndHappinessWebcom());
+        list.add(new LunarbaboonWebcom());
         list.add(new XkcdWebcom());
         //list.add(new Webcom(3,"Pepper & Carrot"));
         AddWebcomAdapter adapter = new AddWebcomAdapter(this, list);

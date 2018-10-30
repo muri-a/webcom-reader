@@ -59,7 +59,7 @@ public class Chapter implements Comparable<Chapter> {
         return extra;
     }
     public void setExtra(String extra) {
-        extra = extra;
+        this.extra = extra;
     }
 
     @Override

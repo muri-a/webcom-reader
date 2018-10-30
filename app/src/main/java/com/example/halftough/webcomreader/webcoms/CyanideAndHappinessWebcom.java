@@ -5,16 +5,12 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-import com.example.halftough.webcomreader.ChapterUpdateBroadcaster;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.TaskDelegate;
 import com.example.halftough.webcomreader.database.Chapter;
-import com.example.halftough.webcomreader.database.ChaptersDAO;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
 import com.example.halftough.webcomreader.database.ReadWebcomRepository;
-import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -207,8 +203,7 @@ public class CyanideAndHappinessWebcom extends Webcom {
         }
     }
 
-    @Override
-    public LiveData<ComicPage> getChapterMeta(String number) {
+    public LiveData<ComicPage> getChapterPage(String number) {
         initService();
         final MutableLiveData<ComicPage> page = new MutableLiveData<>();
         Call<CyanideComicPage> call = service.getChapter(number);
@@ -232,8 +227,24 @@ public class CyanideAndHappinessWebcom extends Webcom {
         return source;
     }
 
-    private boolean a = false, b = false;
+    @Override
+    public LiveData<String> getChapterUrl(String chapter) {
+        final MutableLiveData<String> chapterUrl = new MutableLiveData<>();
+        final LiveData<ComicPage> call = getChapterPage(chapter);
+        call.observeForever(new Observer<ComicPage>() {
+            @Override
+            public void onChanged(@Nullable ComicPage comicPage) {
+                call.removeObserver(this);
+                if(comicPage != null)
+                    chapterUrl.postValue(comicPage.getImage());
+                else
+                    chapterUrl.postValue("");
+            }
+        });
+        return chapterUrl;
+    }
 
+    private boolean a = false, b = false;
     //Downloader Service is here for broadcasting. Might move it somewhere
     //TODO when there are few new chapters to download it starts downloading them, gets at least one, but not all and something goes wrong, those are lost forever
     //TODO changing "downloading direction" should fix it
@@ -274,14 +285,14 @@ public class CyanideAndHappinessWebcom extends Webcom {
                                 a = true;
                             }
                             Chapter firstDb = chapters.get(0);
-                            final LiveData<ComicPage> oldest = getChapterMeta(firstDb.getChapter());
+                            final LiveData<ComicPage> oldest = getChapterPage(firstDb.getChapter());
                             oldest.observeForever(new Observer<ComicPage>() {
                                 @Override
                                 public void onChanged(@Nullable ComicPage comicPage) {
                                     oldest.removeObserver(this);
                                     CyanideComicPage page = (CyanideComicPage)comicPage;
                                     if(!page.getPrevious().isEmpty()){
-                                        final LiveData<ComicPage> older = getChapterMeta(page.getPrevious());
+                                        final LiveData<ComicPage> older = getChapterPage(page.getPrevious());
                                         older.observeForever(new Observer<ComicPage>() {
                                             @Override
                                             public void onChanged(@Nullable ComicPage comicPage) {

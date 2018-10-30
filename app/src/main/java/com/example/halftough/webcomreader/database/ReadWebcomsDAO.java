@@ -42,4 +42,7 @@ public interface ReadWebcomsDAO {
 
     @Query("UPDATE read_webcoms SET extra = :extra WHERE wid=:wid")
     void setExtra(String wid, String extra);
+
+    @Query("SELECT extra FROM read_webcoms WHERE wid=:wid")
+    String getExtraAsync(String wid);
 }

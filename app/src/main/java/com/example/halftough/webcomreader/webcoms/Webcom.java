@@ -41,27 +41,9 @@ public abstract class Webcom {
         this.chapterUpdateBroadcaster = chapterUpdateBroadcaster;
     }
 
-    public LiveData<String> getChapterUrl(String chapter){
-        final MutableLiveData<String> chapterUrl = new MutableLiveData<>();
-        final LiveData<ComicPage> call = getChapterMeta(chapter);
-        call.observeForever(new Observer<ComicPage>() {
-            @Override
-            public void onChanged(@Nullable ComicPage comicPage) {
-                call.removeObserver(this);
-                if(comicPage != null)
-                    chapterUrl.postValue(comicPage.getImage());
-                else
-                    chapterUrl.postValue("");
-            }
-        });
-        return chapterUrl;
-    }
+    public abstract LiveData<String> getChapterUrl(String chapter);
 
     public abstract void updateChapterList(TaskDelegate delegate);
-    public abstract LiveData<ComicPage> getChapterMeta(String number);
+    //public abstract LiveData<ComicPage> getChapterPage(String number);
     public abstract LiveData<Uri> getChapterSource(String chapterNumber);
-    //public abstract List<String> getChapterList();
-    //public String getFirstChapterId(){ return getChapterList().get(0); }
-    //public String getLastChapterId(){ return getChapterList().get(getChapterList().size()-1); }
-    //public abstract void updateChapters();
 }

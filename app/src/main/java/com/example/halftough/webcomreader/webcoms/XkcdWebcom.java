@@ -7,17 +7,16 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.example.halftough.webcomreader.ChapterUpdateBroadcaster;
-import com.example.halftough.webcomreader.OneByOneChapterDownloader;
+import com.example.halftough.webcomreader.OneByOneDownloader;
 import com.example.halftough.webcomreader.R;
 import com.example.halftough.webcomreader.TaskDelegate;
 import com.example.halftough.webcomreader.database.Chapter;
-import com.example.halftough.webcomreader.database.ChaptersDAO;
 import com.example.halftough.webcomreader.database.ChaptersRepository;
 import com.example.halftough.webcomreader.database.ReadWebcomRepository;
-import com.example.halftough.webcomreader.database.ReadWebcomsDAO;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -121,8 +120,7 @@ public class XkcdWebcom extends Webcom {
         }
     }
 
-    @Override
-    public LiveData<ComicPage> getChapterMeta(String number) {
+    public LiveData<ComicPage> getChapterPage(String number) {
         initService();
         final MutableLiveData<ComicPage> page = new MutableLiveData<>();
         Call<XkcdComicPage> call = service.getChapter(number);
@@ -144,6 +142,23 @@ public class XkcdWebcom extends Webcom {
         MutableLiveData<Uri> source = new MutableLiveData<>();
         source.setValue(Uri.parse("https://xkcd.com/"+chapterNumber));
         return source;
+    }
+
+    @Override
+    public LiveData<String> getChapterUrl(String chapter) {
+        final MutableLiveData<String> chapterUrl = new MutableLiveData<>();
+        final LiveData<ComicPage> call = getChapterPage(chapter);
+        call.observeForever(new Observer<ComicPage>() {
+            @Override
+            public void onChanged(@Nullable ComicPage comicPage) {
+                call.removeObserver(this);
+                if(comicPage != null)
+                    chapterUrl.postValue(comicPage.getImage());
+                else
+                    chapterUrl.postValue("");
+            }
+        });
+        return chapterUrl;
     }
 
     @Override
@@ -194,26 +209,55 @@ public class XkcdWebcom extends Webcom {
                         ReadWebcomRepository.updateChapterCount(getId(), count, readWebcomsDAO);
                     }
 
-                    //TODO editable number of slots
-                    new OneByOneChapterDownloader(chaptersToGet, XkcdWebcom.this, chapterUpdateBroadcaster, 2){
-                        @Override
-                        public void onResponse(ComicPage page) {
-                            if(page != null) {
-                                Chapter chapter = new Chapter(getId(), page.getChapterNumber());
-                                chapter.setTitle(page.getTitle());
-                                ChaptersRepository.insertChapter(chapter, chaptersDAO);
-                            }
-                        }
+                    new xkcdDownloader(chaptersToGet, delegate).download();
 
-                        @Override
-                        protected void onFinished() {
-                            delegate.onFinish();
-                        }
-                    }.download();
                 }
             });
         }
         else{
+            delegate.onFinish();
+        }
+    }
+
+    private class xkcdDownloader extends OneByOneDownloader<String, Void>{
+        private WeakReference<ChapterUpdateBroadcaster> downloaderService = new WeakReference(chapterUpdateBroadcaster);
+        private final int refreshRate = 5;
+        private int refreshCounter = 0;
+        private TaskDelegate delegate;
+
+        public xkcdDownloader(Queue<String> chapterstoGet, TaskDelegate delegate){
+            queue = chapterstoGet;
+            this.delegate = delegate;
+            free = capacity = 2;
+        }
+
+        @Override
+        protected void downloadElement(final String element, final Void extra) {
+            final LiveData<ComicPage> page = getChapterPage(element);
+            page.observeForever(new Observer<ComicPage>() {
+                @Override
+                public void onChanged(@Nullable ComicPage comicPage) {
+                    page.removeObserver(this);
+                    onResponse(comicPage);
+                    elementDownloaded(extra);
+                    refreshCounter++;
+                    if(refreshCounter % refreshRate == 0 || !downloading){
+                        downloaderService.get().broadcastChapterUpdated(new Chapter(getId(), element));
+                    }
+                }
+            });
+        }
+
+        public void onResponse(ComicPage page) {
+            if(page != null) {
+                Chapter chapter = new Chapter(getId(), page.getChapterNumber());
+                chapter.setTitle(page.getTitle());
+                ChaptersRepository.insertChapter(chapter, chaptersDAO);
+            }
+        }
+
+        @Override
+        protected void onFinished() {
             delegate.onFinish();
         }
     }
