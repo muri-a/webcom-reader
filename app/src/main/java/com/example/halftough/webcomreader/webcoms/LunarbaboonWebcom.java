@@ -187,6 +187,10 @@ public class LunarbaboonWebcom extends Webcom {
                 Call<LunarbaboonListPage> nextPageCall = service.getList(page+1);
                 Response<LunarbaboonListPage> nextPage;
                 try {
+                    //We wait for a bit, to not send too much requests to a server
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {}
+                try {
                     nextPage = nextPageCall.execute();
                 } catch (IOException e) {
                     delegate.onFinish();

@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.PreferenceHelper;
@@ -112,17 +113,20 @@ public class ReadChapterRepository {
     }
 
     public void markRead(){
-        if(chapter.getValue() == null)
+        Log.e("Marking read", "1");
+        if(chapter.getValue() == null) {
             return;
+        }
+        Log.e("Marking read", "2");
         wasUpdate = true;
         chapter.getValue().setStatus(Chapter.Status.READ);
         new setStatusAsyncTask(chaptersDAO, new TaskDelegate() {
             @Override
             public void onFinish() {
                 DownloaderService.autodownload(context, webcom.getId());
+                DownloaderService.autoremove(context, webcom.getId());
             }
         }).execute(chapter.getValue());
-        DownloaderService.autoremove(context, webcom.getId());
     }
 
     public boolean getUpdateMarker() {
