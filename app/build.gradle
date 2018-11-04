@@ -9,6 +9,7 @@ android {
         versionCode 3
         versionName "0.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -55,4 +56,10 @@ dependencies {
 
     //Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
+}
+
+configurations {
+    all {
+        exclude module: 'xpp3'
+    }
 }
