@@ -11,11 +11,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
 
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.database.AppDatabase;
@@ -43,8 +44,24 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
     private static final String ACTION_AUTODOWNLOAD = "ACTION_AUTODOWNLOAD";
     private static final String ACTION_AUTOREMOVE = "ACTION_AUTOREMOVE";
     private static final String ACTION_ENQUEUE_CHAPTER = "ACTION_ENQUEUE_CHAPTER";
+    private static final String EXTRA_DOWNLOAD_TYPE = "EXTRA_DOWNLOAD_TYPE";
     private static final String CHANNEL_DOWNLOADING = "CHANNEL_DOWNLOADING";
     private static final int FOREGROUND_ID = 6;
+    private static final int WIFI_ONLY_ID = 8;
+
+    public enum DownoladType { AUTO(1), MANUAL(2), ONREAD(3);
+        int val;
+        DownoladType(int a){ val = a;}
+        int getVal(){ return val; }
+        public static DownoladType fromInt(int a){
+            switch (a){
+                case 1: return AUTO;
+                case 2: return MANUAL;
+                case 3: return ONREAD;
+            }
+            return null;
+        }
+    }
 
     ChapterDownloader downloader;
     private ChaptersDAO chaptersDAO;
@@ -78,11 +95,12 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
         context.startService(intent);
     }
 
-    public static void enqueueChapter(Context context, Chapter chapter) {
+    public static void enqueueChapter(Context context, Chapter chapter, DownoladType type) {
         Intent intent = new Intent(context, DownloaderService.class);
         intent.setAction(ACTION_ENQUEUE_CHAPTER);
         intent.putExtra(UserRepository.EXTRA_WEBCOM_ID, chapter.getWid());
         intent.putExtra(UserRepository.EXTRA_CHAPTER_NUMBER, chapter.getChapter());
+        intent.putExtra(EXTRA_DOWNLOAD_TYPE, type.getVal());
         context.startService(intent);
     }
 
@@ -104,7 +122,8 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
                 case ACTION_ENQUEUE_CHAPTER: {
                     final String wid = intent.getStringExtra(UserRepository.EXTRA_WEBCOM_ID);
                     final String chapter = intent.getStringExtra(UserRepository.EXTRA_CHAPTER_NUMBER);
-                    handleEnqueueChapter(wid, chapter);
+                    final DownoladType type = DownoladType.fromInt( intent.getIntExtra(EXTRA_DOWNLOAD_TYPE, 1) );
+                    handleEnqueueChapter(wid, chapter, type);
                     break;
                 }
             }
@@ -112,7 +131,7 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void handleEnqueueChapter(final String wid, final String chapter) {
+    private void handleEnqueueChapter(final String wid, final String chapter, final DownoladType type) {
         Webcom webcom = UserRepository.getWebcomInstance(wid);
         webcom.setChaptersDAO(chaptersDAO);
         final LiveData<String> url = webcom.getChapterUrl(chapter);
@@ -121,7 +140,7 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
             public void onChanged(@Nullable String s) {
                 url.removeObserver(this);
                 if (s!=null && !s.isEmpty()) {
-                    downloader.enqueue(s, new Chapter(wid, chapter));
+                    downloader.enqueue(s, new ChapterToDownload(new Chapter(wid, chapter), type));
                     updateNotification();
                 }
             }
@@ -132,6 +151,18 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
         Webcom webcom = UserRepository.getWebcomInstance(wid);
         SharedPreferences chapterPreferences = getSharedPreferences(ChapterPreferencesFragment.PREFERENCE_KEY_COMIC+wid, MODE_PRIVATE);
         SharedPreferences globalPreferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
+
+        String limit = globalPreferences.getString("download_limit", "no limit");
+
+        //If autodownloads are limited to wifi
+        if(!limit.equals("no limit")){
+            ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            if(!mWifi.isConnected()){
+                return;
+            }
+        }
+
         PreferenceHelper.AutodownloadSetting mode = PreferenceHelper.getAutodownloadSetting(this, chapterPreferences, globalPreferences, webcom);
         if(mode == PreferenceHelper.AutodownloadSetting.NONE){
             return;
@@ -154,7 +185,7 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
                     if(chapter.getDownloadStatus() == Chapter.DownloadStatus.UNDOWNLOADED){
                         ChaptersRepository.setDownloadStatus(chapter, Chapter.DownloadStatus.DOWNLOADING, chaptersDAO);
                         //TODO wait for setDownloadStatus to finish
-                        handleEnqueueChapter(chapter.getWid(), chapter.getChapter());
+                        handleEnqueueChapter(chapter.getWid(), chapter.getChapter(), DownoladType.AUTO);
                     }
                 }
             }
@@ -194,6 +225,9 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
 
     private void updateNotification(){
         Notification notification = buildNotification();
+        if(notification == null){
+            return;
+        }
 
         if(!serviceStarted){
             startForeground(FOREGROUND_ID, notification);
@@ -214,6 +248,10 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
 
         if(downloadStatus.size() == 1){
             ChapterDownloadStatus status = downloadStatus.firstEntry().getValue();
+            if(status.getAll() == 0){
+                return null;
+            }
+
             Webcom webcom = UserRepository.getWebcomInstance(status.getWid());
             notificationTitle = String.format(getString(R.string.download_service_downloading), webcom.getTitle());
             icon = BitmapFactory.decodeResource(getResources(), webcom.getIcon());
@@ -226,11 +264,15 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
 
         }
         else {
+            Boolean isNull = true;
             notificationTitle = getString(R.string.download_service_downloading_few);
             icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
             StringBuilder str = new StringBuilder();
             for (TreeMap.Entry<String,ChapterDownloadStatus> entry : downloadStatus.entrySet()) {
                 ChapterDownloadStatus status = entry.getValue();
+                if(status.getAll() > 0){
+                    isNull = false;
+                }
                 Webcom webcom = UserRepository.getWebcomInstance(status.getWid());
                 if(str.length() > 0){
                     str.append("\n");
@@ -243,6 +285,9 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
                 }
             }
             notificationText = str.toString();
+            if(isNull){
+                return null;
+            }
         }
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(DownloaderService.this, CHANNEL_DOWNLOADING)
@@ -255,7 +300,24 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
         return mBuilder.build();
     }
 
+    private void noWifiNotification(){
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        String text = getString(R.string.download_service_wifi_only);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(DownloaderService.this, CHANNEL_DOWNLOADING)
+                .setSmallIcon(R.drawable.ic_network_locked_white_24dp)
+                .setContentTitle(getString(R.string.download_service_error))
+                .setContentText(text)
+                .setLargeIcon(icon)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        Notification notification = mBuilder.build();
+        NotificationManager nManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        nManager.notify(WIFI_ONLY_ID, notification);
+    }
+
+
     class ChapterDownloadStatus{
+        //Counts how many chapters of given comic we download, to display this data on notification
         private String wid;
         private int progress = 0;
         private int all = 0;
@@ -270,6 +332,7 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
         }
         public void startDownload() { progress += 1; }
         public void finishDownload() { finished += 1; }
+        public void skipDownload() { all -= 1; if(all<0) all=0; }
 
         public String getWid() {
             return wid;
@@ -283,20 +346,45 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
         public boolean isFinished(){ return all==finished; }
     }
 
-    class ChapterDownloader extends OneByOneUrlDownloader<Chapter> {
+    class ChapterToDownload{
+        private Chapter chapter;
+        private DownoladType type;
+
+        public ChapterToDownload(Chapter chapter, DownoladType type){
+            this.chapter = chapter;
+            this.type = type;
+        }
+
+        public Chapter getChapter() {
+            return chapter;
+        }
+        public void setChapter(Chapter chapter) {
+            this.chapter = chapter;
+        }
+        public DownoladType getType() {
+            return type;
+        }
+        public void setType(DownoladType type) {
+            this.type = type;
+        }
+        public String getWid(){ return chapter.getWid(); }
+        public String getNumber(){ return chapter.getChapter(); }
+    }
+
+    class ChapterDownloader extends OneByOneUrlDownloader<ChapterToDownload> {
         TreeMap<String, ChapterDownloadStatus> statusMap = new TreeMap<>();
 
         @Override
-        void onResponse(BufferedInputStream bufferInStream, Chapter extra, String extentsion) {
-            saveBufferToFile(bufferInStream, extra, extentsion);
+        void onResponse(BufferedInputStream bufferInStream, ChapterToDownload extra, String extentsion) {
+            saveBufferToFile(bufferInStream, extra.getChapter(), extentsion);
         }
-        void onFail(Chapter chapter, String extentsion){
-            chaptersDAO.setDownloadStatus(chapter.getWid(), chapter.getChapter(), Chapter.DownloadStatus.UNDOWNLOADED);
-            broadcastChapterUpdated(chapter);
+        void onFail(ChapterToDownload chapter, String extentsion){
+            chaptersDAO.setDownloadStatus(chapter.getWid(), chapter.getNumber(), Chapter.DownloadStatus.UNDOWNLOADED);
+            broadcastChapterUpdated(chapter.getChapter());
         }
 
         @Override
-        public void enqueue(String element, Chapter chapter) {
+        public void enqueue(String element, ChapterToDownload chapter) {
             ChapterDownloadStatus status = statusMap.get(chapter.getWid());
             if(status == null){
                 status = new ChapterDownloadStatus(chapter.getWid());
@@ -307,15 +395,39 @@ public class DownloaderService extends Service implements ChapterUpdateBroadcast
         }
 
         @Override
-        protected void downloadElement(String element, Chapter chapter) {
+        protected void downloadElement(String element, final ChapterToDownload chapter) {
             ChapterDownloadStatus status = statusMap.get(chapter.getWid());
+            //Check if downloading is for wifi only and if so, if we are connected to wifi
+            SharedPreferences globalPreferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
+            String limit = globalPreferences.getString("download_limit", "no limit");
+            if(!limit.equals("no limit")){
+                ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                if(!mWifi.isConnected()){
+                    if(limit.equals("all downloads over wifi") || chapter.getType() == DownoladType.AUTO){
+                        if(chapter.getType() != DownoladType.AUTO){
+                            noWifiNotification();
+                        }
+                        status.skipDownload();
+                        elementDownloaded(chapter);
+                        ChaptersRepository.setDownloadStatus(chapter.getChapter(), Chapter.DownloadStatus.UNDOWNLOADED, chaptersDAO, new TaskDelegate() {
+                            @Override
+                            public void onFinish() {
+                                broadcastChapterUpdated(chapter.getChapter());
+                            }
+                        });
+                        return;
+                    }
+                }
+            }
+
             status.startDownload();
             updateNotification();
             super.downloadElement(element, chapter);
         }
 
         @Override
-        protected void elementDownloaded(Chapter finishedExtra) {
+        protected void elementDownloaded(ChapterToDownload finishedExtra) {
             ChapterDownloadStatus status = statusMap.get(finishedExtra.getWid());
             status.finishDownload();
             updateNotification();

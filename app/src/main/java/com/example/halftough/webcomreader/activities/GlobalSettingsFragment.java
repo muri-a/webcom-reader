@@ -112,6 +112,12 @@ public class GlobalSettingsFragment extends PreferenceFragment implements Shared
                 valuesId = R.array.global_perferences_order_list_values;
                 defaultVal = getString(R.string.global_preferences_order_default);
                 break;
+            case "download_limit":
+                type = FieldType.ARRAY;
+                namesId = R.array.global_preferences_download_limit_list;
+                valuesId = R.array.global_preferences_download_limit_values;
+                defaultVal = getString(R.string.global_preferences_download_limit_default);
+                break;
             case "autodownload":
                 type = FieldType.ARRAY;
                 namesId = R.array.global_preferences_autodownload_list;

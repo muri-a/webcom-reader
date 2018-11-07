@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -87,6 +89,18 @@ public class UpdateWebcomsService extends Service implements ChapterUpdateBroadc
     }
 
     private void handleUpdateNewChapters() {
+        SharedPreferences globalPreferences = getSharedPreferences(UserRepository.GLOBAL_PREFERENCES, MODE_PRIVATE);
+        String limit = globalPreferences.getString("download_limit", "no limit");
+
+        //If updates are limited to wifi
+        if(limit.equals("autodownloads updates over wifi") || limit.equals("all downloads over wifi")){
+            ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            if(!mWifi.isConnected()){
+                return;
+            }
+        }
+
         if(!isLoop) {
             isLoop = true;
             final LiveData<List<ReadWebcom>> webcoms = readWebcomsDAO.getAll();

@@ -28,6 +28,13 @@
     <string name="global_preferences_autodownload_default">default</string>
     <string name="global_preferences_autodownload_number_default">5</string>
     <string name="global_preferences_autoremove_save_default">2</string>
+    <string-array name="global_preferences_download_limit_values">
+        <item>no limit</item>
+        <item>autodownloads over wifi</item>
+        <item>autodownloads updates over wifi</item>
+        <item>all downloads over wifi</item>
+    </string-array>
+    <string name="global_preferences_download_limit_default">autodownloads over wifi</string>
 
     <string name="chapter_preferences_order_default">global</string>
     <string-array name="chapter_preferences_autodownload_values">

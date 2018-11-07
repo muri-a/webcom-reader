@@ -82,7 +82,7 @@ public class ReadChapterRepository {
                 Chapter lChapter = chapter.getValue();
                 lChapter.setDownloadStatus(Chapter.DownloadStatus.DOWNLOADING);
                 new ChaptersRepository.setDownloadStatusAsyncTask(chaptersDAO).execute(lChapter);
-                DownloaderService.enqueueChapter(context, chapter.getValue());
+                DownloaderService.enqueueChapter(context, chapter.getValue(), DownloaderService.DownoladType.ONREAD);
                 //no break
             case DOWNLOADING:
                 context.listenForDownload(chapter.getValue());

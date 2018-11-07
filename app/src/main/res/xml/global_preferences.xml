@@ -30,6 +30,12 @@
         android:key="chapter_order"
         android:title="@string/global_preferences_order_title" />
     <ListPreference
+        android:defaultValue="@string/global_preferences_download_limit_default"
+        android:entries="@array/global_preferences_download_limit_list"
+        android:entryValues="@array/global_preferences_download_limit_values"
+        android:key="download_limit"
+        android:title="@string/global_preferences_downloat_limit" />
+    <ListPreference
         android:defaultValue="@string/global_preferences_autodownload_default"
         android:entries="@array/global_preferences_autodownload_list"
         android:entryValues="@array/global_preferences_autodownload_values"

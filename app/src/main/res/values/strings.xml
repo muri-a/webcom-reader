@@ -88,6 +88,13 @@
     <string name="global_preferences_notify">Notify when finishing downloads</string>
     <string name="global_preferences_autoupdate">Update comics automatically</string>
     <string name="global_preferences_autoupdate_time">Time between updates</string>
+    <string name="global_preferences_downloat_limit">Limit downloading</string>
+    <string-array name="global_preferences_download_limit_list">
+        <item>No limit</item>
+        <item>Autodownloads only over wifi</item>
+        <item>Autodownloads and updates only over wifi</item>
+        <item>All downloads only over wifi</item>
+    </string-array>
 
     <string name="chapter_preferences_odrer_title">List order</string>
     <string-array name="chapter_perferences_order_list">
@@ -121,5 +128,7 @@
     <string name="download_service_downloading_content_finished">%d finished</string>
     <string name="download_service_downloading_content_few">%s %d/%d</string>
     <string name="download_service_downloading_content_few_finished">%s %d finished</string>
+    <string name="download_service_error">Error</string>
+    <string name="download_service_wifi_only">Downloading over cellural data has been blocked by the user.\nConnect to wifi or change settings.</string>
 
 </resources>

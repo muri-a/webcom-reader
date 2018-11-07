@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import com.example.halftough.webcomreader.ChapterUpdateBroadcaster;
 import com.example.halftough.webcomreader.DownloaderService;
 import com.example.halftough.webcomreader.PreferenceHelper;
+import com.example.halftough.webcomreader.TaskDelegate;
 import com.example.halftough.webcomreader.UserRepository;
 import com.example.halftough.webcomreader.activities.ChapterList.ChapterPreferencesFragment;
 import com.example.halftough.webcomreader.webcoms.Webcom;
@@ -59,7 +60,7 @@ public class ChaptersRepository {
     public void downloadChapter(Chapter chapter){
         chapter.setDownloadStatus(Chapter.DownloadStatus.DOWNLOADING);
         new setDownloadStatusAsyncTask(chaptersDAO, this).execute(chapter);
-        DownloaderService.enqueueChapter(application, chapter);
+        DownloaderService.enqueueChapter(application, chapter, DownloaderService.DownoladType.MANUAL);
     }
 
     public void deleteChapter(Chapter chapter){
@@ -222,23 +223,34 @@ public class ChaptersRepository {
     }
 
     public static void setDownloadStatus(Chapter chapter, Chapter.DownloadStatus status, ChaptersDAO chaptersDAO){
+        setDownloadStatus(chapter, status, chaptersDAO, null);
+    }
+
+    public static void setDownloadStatus(Chapter chapter, Chapter.DownloadStatus status, ChaptersDAO chaptersDAO, TaskDelegate delegate){
         chapter.setDownloadStatus(status);
-        new setDownloadStatusAsyncTask(chaptersDAO).execute(chapter);
+        new setDownloadStatusAsyncTask(chaptersDAO, delegate).execute(chapter);
     }
 
     public static class setDownloadStatusAsyncTask extends AsyncTask<Chapter, Void, Void>{
         private ChaptersDAO mAsyncTaskDao;
         private ChaptersRepository repository;
-        public setDownloadStatusAsyncTask(ChaptersDAO dao){ this(dao, null); }
-        public setDownloadStatusAsyncTask(ChaptersDAO dao, ChaptersRepository repository) {
+        private TaskDelegate delegate;
+        public setDownloadStatusAsyncTask(ChaptersDAO dao){ this(dao, null, null); }
+        public setDownloadStatusAsyncTask(ChaptersDAO dao, ChaptersRepository repository){ this(dao, repository, null); }
+        public setDownloadStatusAsyncTask(ChaptersDAO dao, TaskDelegate delegate){ this(dao, null, delegate); }
+        public setDownloadStatusAsyncTask(ChaptersDAO dao, ChaptersRepository repository, TaskDelegate delegate) {
             mAsyncTaskDao = dao;
             this.repository = repository;
+            this.delegate = delegate;
         }
         @Override
         protected Void doInBackground(Chapter... chapters) {
             mAsyncTaskDao.setDownloadStatus(chapters[0].getWid(), chapters[0].getChapter(), chapters[0].getDownloadStatus());
             if(repository!=null)
                 repository.update();
+            if(delegate != null){
+                delegate.finish();
+            }
             return null;
         }
     }
