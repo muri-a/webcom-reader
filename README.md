@@ -15,7 +15,3 @@ List of working webcoms:
 2. [Lunarbaboon](http://www.lunarbaboon.com/)
 3. [Cyanide & Happiness](http://explosm.net)
 
-List of planned webcoms:
-
-1. [Dilbert](http://dilbert.com/)
-2. [Pepper & Carrot](https://www.peppercarrot.com/)
